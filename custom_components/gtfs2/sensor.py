@@ -520,7 +520,6 @@ def setup_platform(
 
     if number_results != 0:
         row = 0
-        _LOGGER.warning("Number results: ", int(number_results))
         while row <= int(number_results) :
             _LOGGER.warning("Requesting record: ", row)
             add_entities(
