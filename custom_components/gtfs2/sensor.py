@@ -276,7 +276,7 @@ def get_next_departure(
     offset: cv.time_period,
     include_tomorrow: bool = False,
     route: Any,
-    number_results: Any,
+    row: Any,
 ) -> dict:
     """Get the next departure for the given schedule."""
     now = dt_util.now().replace(tzinfo=None) + offset
@@ -355,7 +355,7 @@ def get_next_departure(
         end_station_id=end_station_id,
         today=now_date,
         limit=limit,
-        offset=offset,
+        offset=row,
     )
 
     # Create lookup timetable for today and possibly tomorrow, taking into
