@@ -521,7 +521,7 @@ def setup_platform(
     if number_results != 0:
         rowcount = 0
         while rowcount <= int(number_results) :
-            _LOGGER.warning("Requesting record: ", self.rowcount)
+            _LOGGER.warning("Requesting record: ", rowcount)
             add_entities(
                 [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, row)]
             )
