@@ -520,7 +520,7 @@ def setup_platform(
 
     if number_results != 0:
         row = 0
-        while row <= number_results:
+        while row <= int(number_results) :
             add_entities(
                 [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, row)]
             )
