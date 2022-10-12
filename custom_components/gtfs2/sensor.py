@@ -519,9 +519,9 @@ def setup_platform(
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, data))
 
     if number_results != 0:
-        row = 0
-        while row <= int(number_results) :
-            _LOGGER.warning("Requesting record: ", row)
+        rowcount = 0
+        while rowcount <= int(number_results) :
+            _LOGGER.warning("Requesting record: ", self.rowcount)
             add_entities(
                 [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, row)]
             )
