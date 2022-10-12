@@ -598,7 +598,7 @@ class GTFSDepartureSensor(SensorEntity):
 
     def update(self) -> None:
         """Get the latest data from GTFS and update the states."""
-        _LOGGER.warning("Number of records / rows", self.rowcount)
+        print("Number of records / rows", rowcount)
         with self.lock:
             # Fetch valid stop information once
             if not self._origin:
