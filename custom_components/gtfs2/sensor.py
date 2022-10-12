@@ -273,10 +273,10 @@ def get_next_departure(
     schedule: Any,
     start_station_id: Any,
     end_station_id: Any,
-    offset: cv.time_period,
-    include_tomorrow: bool = False,
     route: Any,
     row: Any,
+    offset: cv.time_period,
+    include_tomorrow: bool = False,
 ) -> dict:
     """Get the next departure for the given schedule."""
     now = dt_util.now().replace(tzinfo=None) + offset
@@ -625,10 +625,10 @@ class GTFSDepartureSensor(SensorEntity):
                 self._pygtfs,
                 self.origin,
                 self.destination,
-                self._offset,
-                self._include_tomorrow,
                 self.route,
                 self.row,
+                self._offset,
+                self._include_tomorrow,
             )
 
             # Define the state as a UTC timestamp with ISO 8601 format
