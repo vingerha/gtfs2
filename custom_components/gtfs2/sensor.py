@@ -274,7 +274,7 @@ def get_next_departure(
     start_station_id: Any,
     end_station_id: Any,
     route: Any,
-    row: Any,
+    rows: Any,
     offset: cv.time_period,
     include_tomorrow: bool = False,
 ) -> dict:
@@ -355,7 +355,7 @@ def get_next_departure(
         end_station_id=end_station_id,
         today=now_date,
         limit=limit,
-        offset=row,
+        offset=rows,
     )
 
     # Create lookup timetable for today and possibly tomorrow, taking into
@@ -543,7 +543,7 @@ class GTFSDepartureSensor(SensorEntity):
         offset: datetime.timedelta,
         include_tomorrow: bool,
         route: Any,
-        row: Any,
+        rows: Any,
     ) -> None:
         """Initialize the sensor."""
         self._pygtfs = gtfs
@@ -553,7 +553,7 @@ class GTFSDepartureSensor(SensorEntity):
         self._offset = offset
         self._custom_name = name
         self.route = route
-        self.row = row
+        self.rows = rows
 
         self._available = False
         self._icon = ICON
@@ -568,7 +568,7 @@ class GTFSDepartureSensor(SensorEntity):
         self._route = None
         self._trip = None
         self._route = None
-        self._row = None
+        self._rows = None
 
         self.lock = threading.Lock()
         self.update()
@@ -628,7 +628,7 @@ class GTFSDepartureSensor(SensorEntity):
                 self.origin,
                 self.destination,
                 self.route,
-                self.row,
+                self.rows,
                 self._offset,
                 self._include_tomorrow,
             )
