@@ -49,7 +49,9 @@ ATTR_WHEELCHAIR_ORIGIN = "origin_station_wheelchair_boarding_available"
 CONF_DATA = "data"
 CONF_DESTINATION = "destination"
 CONF_ORIGIN = "origin"
+CONF_ROUTE = "route"
 CONF_TOMORROW = "include_tomorrow"
+CONF_NUMBER_RESULTS = "number_results"
 
 DEFAULT_NAME = "GTFS2 Sensor"
 DEFAULT_PATH = "gtfs2"
@@ -259,6 +261,8 @@ PLATFORM_SCHEMA = SENSOR_PLATFORM_SCHEMA.extend(
         vol.Required(CONF_DESTINATION): cv.string,
         vol.Required(CONF_DATA): cv.string,
         vol.Optional(CONF_NAME): cv.string,
+        vol.Optional(CONF_ROUTE): cv.string,
+        vol.Optional(CONF_NUMBER_RESULTS, default=0): cv.string,
         vol.Optional(CONF_OFFSET, default=0): cv.time_period,
         vol.Optional(CONF_TOMORROW, default=False): cv.boolean,
     }
@@ -271,6 +275,8 @@ def get_next_departure(
     end_station_id: Any,
     offset: cv.time_period,
     include_tomorrow: bool = False,
+    route: Any,
+    number_results: Any,
 ) -> dict:
     """Get the next departure for the given schedule."""
     now = dt_util.now().replace(tzinfo=None) + offset
@@ -341,6 +347,7 @@ def get_next_departure(
                  {tomorrow_order}
                  origin_stop_time.departure_time
         LIMIT :limit
+        OFFSET :offset
         """
     result = schedule.engine.execute(
         text(sql_query),
@@ -348,6 +355,7 @@ def get_next_departure(
         end_station_id=end_station_id,
         today=now_date,
         limit=limit,
+        offset=offset,
     )
 
     # Create lookup timetable for today and possibly tomorrow, taking into
@@ -488,7 +496,9 @@ def setup_platform(
     data = config[CONF_DATA]
     origin = config.get(CONF_ORIGIN)
     destination = config.get(CONF_DESTINATION)
+    route = config.get(CONF_ROUTE)
     name = config.get(CONF_NAME)
+    number_results = config.get(CONF_NUMBER_RESULTS)
     offset: datetime.timedelta = config[CONF_OFFSET]
     include_tomorrow = config[CONF_TOMORROW]
 
@@ -508,9 +518,13 @@ def setup_platform(
     if not gtfs.feeds:
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, data))
 
-    add_entities(
-        [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow)]
-    )
+    if number_results != 0:
+        row = 0
+        while row <= number_results:
+            add_entities(
+                [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, row)]
+            )
+            row = row + 1
 
 
 class GTFSDepartureSensor(SensorEntity):
@@ -526,6 +540,8 @@ class GTFSDepartureSensor(SensorEntity):
         destination: Any,
         offset: datetime.timedelta,
         include_tomorrow: bool,
+        route: Any,
+        row: Any,
     ) -> None:
         """Initialize the sensor."""
         self._pygtfs = gtfs
@@ -534,6 +550,8 @@ class GTFSDepartureSensor(SensorEntity):
         self._include_tomorrow = include_tomorrow
         self._offset = offset
         self._custom_name = name
+        self.route = route
+        self.row = row
 
         self._available = False
         self._icon = ICON
@@ -547,6 +565,8 @@ class GTFSDepartureSensor(SensorEntity):
         self._origin = None
         self._route = None
         self._trip = None
+        self._route = None
+        self._row = None
 
         self.lock = threading.Lock()
         self.update()
@@ -607,6 +627,8 @@ class GTFSDepartureSensor(SensorEntity):
                 self.destination,
                 self._offset,
                 self._include_tomorrow,
+                self.route,
+                self.row,
             )
 
             # Define the state as a UTC timestamp with ISO 8601 format
