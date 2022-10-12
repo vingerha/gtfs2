@@ -541,7 +541,7 @@ class GTFSDepartureSensor(SensorEntity):
         offset: datetime.timedelta,
         include_tomorrow: bool,
         route: Any,
-        rows: Any,
+        rowcount: Any,
     ) -> None:
         """Initialize the sensor."""
         self._pygtfs = gtfs
@@ -551,7 +551,7 @@ class GTFSDepartureSensor(SensorEntity):
         self._offset = offset
         self._custom_name = name
         self.route = route
-        self.rows = rows
+        self.rowcount = rowcount
 
         self._available = False
         self._icon = ICON
@@ -566,7 +566,7 @@ class GTFSDepartureSensor(SensorEntity):
         self._route = None
         self._trip = None
         self._route = None
-        self._rows = None
+        self._rowcount = None
 
         self.lock = threading.Lock()
         self.update()
@@ -598,6 +598,7 @@ class GTFSDepartureSensor(SensorEntity):
 
     def update(self) -> None:
         """Get the latest data from GTFS and update the states."""
+        _LOGGER.warning("Number of records / rows", self.rowcount)
         with self.lock:
             # Fetch valid stop information once
             if not self._origin:
@@ -626,7 +627,7 @@ class GTFSDepartureSensor(SensorEntity):
                 self.origin,
                 self.destination,
                 self.route,
-                self.rows,
+                self.rowcount,
                 self._offset,
                 self._include_tomorrow,
             )
