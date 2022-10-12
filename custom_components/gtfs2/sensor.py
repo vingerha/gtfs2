@@ -524,7 +524,7 @@ def setup_platform(
             add_entities(
                 [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, rowcount)]
             )
-            row = row + 1
+            rowcount = rowcount + 1
 
 
 class GTFSDepartureSensor(SensorEntity):
