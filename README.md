@@ -6,22 +6,26 @@ Copy from HA GTFS, aiming to improve the integration
 <h4> Note: uses folder /config/gtfs2 </h4>
 
 ## Updates
-- 20221212: version de base, copy/fork et adaptation au prix instantanés
+- 20221212: base version, integrates calendar_dates into the sql query to make sure the correct trips / dates are presented
 
-## Installation depuis HACS :
+## Installation via HACS :
 
-Dans HACS, cliquer sur ... puis depots personnalisés
-Ajouter :
+In  HACS, select the 3-dots and then custom repositories
+Add :
 - URL : https://github.com/vingerha/gtfs2
-- Catégorie : Intégration
+- Category : Integration
 
 ## Configuration
-Exemples de configuration :
+Example de configuration :
 ```
   - platform: gtfs2
     origin: "STOPPOINT:00812"
     destination: "STOPPOINT:01549"
-    name: "Ligne 530 (test)"
+    name: "Bus 530 outbound"
     data: zou.zip
     include_tomorrow: true
 ```
+## How to find origin/destination
+Note that the format of these can be different for each (!) source.
+Option 1: open the zip-file and search in stops.txt
+Option 2: wait for the first setup, open the sqlite db (e.g. DBBrowser for sqlite) and search through the stops table....this is easier to use but requires to know how to browse db's
