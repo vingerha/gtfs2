@@ -27,5 +27,5 @@ Example de configuration :
 ```
 ## How to find origin/destination
 Note that the format of these can be different for each (!) source.
-Option 1: open the zip-file and search in stops.txt
-Option 2: wait for the first setup, open the sqlite db (e.g. DBBrowser for sqlite) and search through the stops table....this is easier to use but requires to know how to browse db's
+- Option 1: open the zip-file and search in stops.txt
+- Option 2: wait for the first setup, open the sqlite db (e.g. DBBrowser for sqlite) and search through the stops table....this is easier to use but requires to know how to browse db's
