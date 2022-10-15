@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+from datetime import timezone
 import logging
 import os
 import threading
@@ -26,6 +27,8 @@ import homeassistant.util.dt as dt_util
 
 _LOGGER = logging.getLogger(__name__)
 
+
+
 ATTR_ARRIVAL = "arrival"
 ATTR_BICYCLE = "trip_bikes_allowed_state"
 ATTR_DAY = "day"
@@ -49,7 +52,9 @@ ATTR_WHEELCHAIR_ORIGIN = "origin_station_wheelchair_boarding_available"
 CONF_DATA = "data"
 CONF_DESTINATION = "destination"
 CONF_ORIGIN = "origin"
+CONF_ROUTE = "route"
 CONF_TOMORROW = "include_tomorrow"
+CONF_NUMBER_RESULTS = "number_results"
 
 DEFAULT_NAME = "GTFS2 Sensor"
 DEFAULT_PATH = "gtfs2"
@@ -259,16 +264,19 @@ PLATFORM_SCHEMA = SENSOR_PLATFORM_SCHEMA.extend(
         vol.Required(CONF_DESTINATION): cv.string,
         vol.Required(CONF_DATA): cv.string,
         vol.Optional(CONF_NAME): cv.string,
+        vol.Optional(CONF_ROUTE): cv.string,
+        vol.Optional(CONF_NUMBER_RESULTS, default=0): cv.string,
         vol.Optional(CONF_OFFSET, default=0): cv.time_period,
         vol.Optional(CONF_TOMORROW, default=False): cv.boolean,
     }
 )
 
-
 def get_next_departure(
     schedule: Any,
     start_station_id: Any,
     end_station_id: Any,
+    route: Any,
+    rows: Any,
     offset: cv.time_period,
     include_tomorrow: bool = False,
 ) -> dict:
@@ -276,15 +284,10 @@ def get_next_departure(
     now = dt_util.now().replace(tzinfo=None) + offset
     now_date = now.strftime(dt_util.DATE_STR_FORMAT)
     now_time = dt_util.as_local(dt_util.utcnow()).strftime("%H:%m")
-    now_datetime = now_date + ' ' + now_time
     yesterday = now - datetime.timedelta(days=1)
     yesterday_date = yesterday.strftime(dt_util.DATE_STR_FORMAT)
     tomorrow = now + datetime.timedelta(days=1)
-    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
-    
-    _LOGGER.debug(
-                "Nowdatetime %s", now_datetime
-            )
+    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT) 
 
     # Fetch all departures for yesterday, today and optionally tomorrow,
     # up to an overkill maximum in case of a departure every minute for those
@@ -297,10 +300,13 @@ def get_next_departure(
         tomorrow_select = f"calendar.{tomorrow_name} AS tomorrow,"
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
+        
+    _LOGGER.debug(
+                "Fetching data after time: %s", now_time
+            )    
 
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,
-               datetime(calendar_dates.date || ' ' || time(origin_stop_time.departure_time)) origin_depart_datetime,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -343,7 +349,7 @@ def get_next_departure(
         AND start_station.stop_id = :origin_station_id
                    AND end_station.stop_id = :end_station_id
         AND origin_stop_sequence < dest_stop_sequence
-        AND origin_depart_datetime > :now_datetime
+        AND origin_depart_time > :now_time
         AND calendar.start_date <= :today
         AND calendar.end_date >= :today
         AND ( calendar_dates.date = {yesterday_date} 
@@ -354,6 +360,7 @@ def get_next_departure(
                  {tomorrow_order}
                  origin_stop_time.departure_time
         LIMIT :limit
+        OFFSET :offset
         """
     result = schedule.engine.execute(
         text(sql_query),
@@ -361,8 +368,13 @@ def get_next_departure(
         end_station_id=end_station_id,
         today=now_date,
         limit=limit,
-        now_datetime=now_datetime,
+        offset=rows,
+        now_time=now_time,
     )
+    
+    _LOGGER.debug(
+                "Query %s", sql_query
+            )        
 
     # Create lookup timetable for today and possibly tomorrow, taking into
     # account any departures from yesterday scheduled after midnight,
@@ -502,9 +514,13 @@ def setup_platform(
     data = config[CONF_DATA]
     origin = config.get(CONF_ORIGIN)
     destination = config.get(CONF_DESTINATION)
+    route = config.get(CONF_ROUTE)
     name = config.get(CONF_NAME)
+    number_results = config.get(CONF_NUMBER_RESULTS)
     offset: datetime.timedelta = config[CONF_OFFSET]
     include_tomorrow = config[CONF_TOMORROW]
+    
+    
 
     os.makedirs(gtfs_dir, exist_ok=True)
 
@@ -522,9 +538,13 @@ def setup_platform(
     if not gtfs.feeds:
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, data))
 
-    add_entities(
-        [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow)]
-    )
+    if number_results != 0:
+        rowcount = 0
+        while rowcount <= int(number_results) :
+            add_entities(
+                [GTFSDepartureSensor(gtfs, name, origin, destination, offset, include_tomorrow, route, rowcount)]
+            )
+            rowcount = rowcount + 1
 
 
 class GTFSDepartureSensor(SensorEntity):
@@ -540,6 +560,8 @@ class GTFSDepartureSensor(SensorEntity):
         destination: Any,
         offset: datetime.timedelta,
         include_tomorrow: bool,
+        route: Any,
+        rowcount: Any,
     ) -> None:
         """Initialize the sensor."""
         self._pygtfs = gtfs
@@ -548,6 +570,8 @@ class GTFSDepartureSensor(SensorEntity):
         self._include_tomorrow = include_tomorrow
         self._offset = offset
         self._custom_name = name
+        self.route = route
+        self.rowcount = rowcount
 
         self._available = False
         self._icon = ICON
@@ -561,6 +585,8 @@ class GTFSDepartureSensor(SensorEntity):
         self._origin = None
         self._route = None
         self._trip = None
+        self._route = None
+        self._rowcount = None
 
         self.lock = threading.Lock()
         self.update()
@@ -568,12 +594,19 @@ class GTFSDepartureSensor(SensorEntity):
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        return self._name
+        _LOGGER.debug(
+                "Name %s and rc: %s", self._name + '_N' + str(self.rowcount)
+            )
+        return (self._name + '_N' + str(self.rowcount))
 
     @property
     def native_value(self) -> datetime.datetime | None:
         """Return the state of the sensor."""
-        return self._state
+        if self._state:
+            state_tz = self._state.replace(tzinfo=None).astimezone(tz=None)
+        else:
+            state_tz = "1970-01-01 00:00:00"
+        return state_tz
 
     @property
     def available(self) -> bool:
@@ -619,6 +652,8 @@ class GTFSDepartureSensor(SensorEntity):
                 self._pygtfs,
                 self.origin,
                 self.destination,
+                self.route,
+                self.rowcount,
                 self._offset,
                 self._include_tomorrow,
             )
@@ -627,7 +662,8 @@ class GTFSDepartureSensor(SensorEntity):
             if not self._departure:
                 self._state = None
             else:
-                self._state = self._departure["departure_time"].replace(tzinfo=None).astimezone(tz=None
+                self._state = self._departure["departure_time"].replace(
+                    tzinfo=dt_util.UTC
                 )
 
             # Fetch trip and route details once, unless updated
