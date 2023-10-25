@@ -1,0 +1,8 @@
+{
+  "name": "gtfs2",
+  "country": "FR",
+  "domains": ["sensor"],
+  "render_readme": true,
+  "documentation": "https://github.com/vingerha/gtfs2",
+  "homeassistant": "0.99.0"
+}

@@ -1,0 +1,10 @@
+{
+  "domain": "gtfs2",
+  "name": "General Transit Feed Specification (GTFS) Second",
+  "documentation": "https://github.com/vingerha/gtfs2",
+  "requirements": ["pygtfs==0.1.7"],
+  "version": "1.0.0",
+  "codeowners": [],
+  "iot_class": "local_polling",
+  "loggers": ["pygtfs"]
+}
