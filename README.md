@@ -3,7 +3,7 @@
 # GTFS2
 Copy from HA GTFS, aiming to improve the integration
 
-<h4> Note: uses folder /config/gtfs2 </h4>
+<h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
 ## Updates
 - 20230320: added TZ to state and arrival attribute, using the agency timezone value (if available)
