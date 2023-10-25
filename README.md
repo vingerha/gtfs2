@@ -6,8 +6,7 @@ Copy from HA GTFS, aiming to improve the integration
 <h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
 ## Updates
-- 20230320: added TZ to state and arrival attribute, using the agency timezone value (if available)
-- 20221212: base version, integrates calendar_dates into the sql query to make sure the correct trips / dates are presented
+- 20231025: adds attributes 'next_departures' with max (!) 10 values of the remaining departure times for that day (and first of tomorrow if configured)
 
 ## Installation via HACS :
 
