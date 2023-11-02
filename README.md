@@ -23,6 +23,6 @@ In Settings > Devices & Sevices
 Use the workflow
 
 **IMPORTANT**
-- when setting up a new workflow, by using the url to the external ZIP file, this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
+- when setting up a new datasource (by using the url to the external ZIP file) this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
 
 
