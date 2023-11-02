@@ -23,8 +23,5 @@ In Settings > Devices & Sevices
 Use the workflow
 **IMPORTANT**
 - when setting up a new workflow, by using the url to the external ZIP file, this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
-```
-## How to find origin/destination
-Note that the format of these can be different for each (!) source.
-- Option 1: open the zip-file and search in stops.txt
-- Option 2: wait for the setup after the initial integration, in /config/gtfs2 open the sqlite db (e.g. DBBrowser for sqlite) and search through the stops table....this is easier to use but requires to know how to browse db's
+
+
