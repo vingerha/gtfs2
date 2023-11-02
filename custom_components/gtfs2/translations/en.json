@@ -39,7 +39,8 @@
       "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "files_deleted": "Datasource deleted, this may affect existing routes"
     }
   }
 }

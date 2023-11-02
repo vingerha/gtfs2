@@ -14,6 +14,12 @@
         },
         "description": "NOTE: with a new url: this may take minutes after submit"
       },
+      "remove": {
+        "data": {
+          "file": "Select existing source"
+        },
+        "description": "Select from existing sources in your gtfs2 folder"
+      },
       "route": {
         "data": {
           "route": "Name of the route"
@@ -39,7 +45,8 @@
       "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "files_deleted": "Datasource deleted, this may affect existing routes"
     }
   }
 }

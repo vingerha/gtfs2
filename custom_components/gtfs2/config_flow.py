@@ -17,6 +17,7 @@ from .gtfs_helper import (
     get_route_list,
     get_stop_list,
     get_datasources,
+    remove_datasource,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,26 +45,31 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the source."""
         errors: dict[str, str] = {}
         if user_input is None:
+            datasources = get_datasources(self.hass, DEFAULT_PATH)
+            datasources.append("setup new")
+            datasources.append("remove datasource")
             return self.async_show_form(
                 step_id="user",
                 data_schema=vol.Schema(
                     {
-                        vol.Required("file", default="setup new"): vol.In(
-                            get_datasources(self.hass, DEFAULT_PATH)
-                        ),
+                        vol.Required("file", default="setup new"): vol.In(datasources),
                     },
                 ),
             )
 
-        if user_input["file"] != "setup new":
+        if user_input["file"] == "setup new":
+            self._user_inputs.update(user_input)
+            _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
+            return await self.async_step_source()
+        elif user_input["file"] == "remove datasource":
+            self._user_inputs.update(user_input)
+            _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
+            return await self.async_step_remove()
+        else:
             user_input["url"] = "na"
             self._user_inputs.update(user_input)
             _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
             return await self.async_step_route()
-        else:
-            self._user_inputs.update(user_input)
-            _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
-            return await self.async_step_source()
 
     async def async_step_source(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
@@ -87,6 +93,28 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
+
+    async def async_step_remove(self, user_input: dict | None = None) -> FlowResult:
+        """Handle a flow initialized by the user."""
+        errors: dict[str, str] = {}
+        if user_input is None:
+            datasources = get_datasources(self.hass, DEFAULT_PATH)
+            return self.async_show_form(
+                step_id="remove",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required("file"): vol.In(datasources),
+                    },
+                ),
+                errors=errors,
+            )
+        try:
+            removed = remove_datasource(self.hass, DEFAULT_PATH, user_input["file"])
+            _LOGGER.debug(f"removed value: {removed}")
+        except Exception as ex:
+            _LOGGER.info("Error while deleting : %s", {ex})
+            return "generic_failure"
+        return self.async_abort(reason="files_deleted")
 
     async def async_step_route(self, user_input: dict | None = None) -> FlowResult:
         """Handle the route."""

@@ -325,6 +325,13 @@ def get_datasources(hass, path) -> dict[str]:
     for file in files:
         if file.endswith(".sqlite"):
             datasources.append(file.split(".")[0])
-    datasources.append("setup new")
     _LOGGER.debug(f"Datasources output: {datasources}")
     return datasources
+
+
+def remove_datasource(hass, path, filename):
+    gtfs_dir = hass.config.path(path)
+    _LOGGER.info(f"Removing: {os.path.join(gtfs_dir, filename)}.*")
+    os.remove(os.path.join(gtfs_dir, filename + ".zip"))
+    os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
+    return "removed"
