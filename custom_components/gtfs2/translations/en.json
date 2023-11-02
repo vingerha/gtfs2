@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "file": "Select source"
+        },
+        "description": "Select from existing sources in your gtfs2 folder"
+      },
+      "source": {
+        "data": {
+          "file": "New datasource name",
+          "url": "external url to gtfs data file"
+        },
+        "description": "NOTE: with a new url: this may take minutes after submit"
+      },
+      "route": {
+        "data": {
+          "route": "Name of the route"
+        }
+      },
+      "stops": {
+        "data": {
+          "origin": "Origin Stop",
+          "destination": "Destination Stop",
+          "name": "Name of the route",
+          "offset": "Offset in minutes",
+          "refresh_interval": "Refresh interval in minutes",
+          "include_tomorrow": "Include tomorrow"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]",
+      "stop_incorrect": "Start and/or End destination probably incorrect, check logs",
+      "generic_failure": "Overall failure, check logs",
+      "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
