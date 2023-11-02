@@ -37,7 +37,9 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, str]:
         """Update."""
         data = self.config_entry.data
-        self._pygtfs = get_gtfs(self.hass, DEFAULT_PATH, data["file"], data["url"])
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data["file"], data["url"], False
+        )
         self._data = {
             "schedule": self._pygtfs,
             "origin": data["origin"].split(": ")[0],

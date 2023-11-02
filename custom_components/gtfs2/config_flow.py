@@ -119,7 +119,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_route(self, user_input: dict | None = None) -> FlowResult:
         """Handle the route."""
         self._pygtfs = get_gtfs(
-            self.hass, DEFAULT_PATH, self._user_inputs["file"], self._user_inputs["url"]
+            self.hass,
+            DEFAULT_PATH,
+            self._user_inputs["file"],
+            self._user_inputs["url"],
+            False,
         )
         errors: dict[str, str] = {}
         if user_input is None:
@@ -179,7 +183,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _check_data(self, data):
         self._pygtfs = await self.hass.async_add_executor_job(
-            get_gtfs, self.hass, DEFAULT_PATH, data["file"], data["url"]
+            get_gtfs, self.hass, DEFAULT_PATH, data["file"], data["url"], False
         )
         if self._pygtfs == "no_data_file":
             return "no_data_file"
@@ -187,7 +191,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _check_config(self, data):
         self._pygtfs = await self.hass.async_add_executor_job(
-            get_gtfs, self.hass, DEFAULT_PATH, data["file"], data["url"]
+            get_gtfs, self.hass, DEFAULT_PATH, data["file"], data["url"], False
         )
         if self._pygtfs == "no_data_file":
             return "no_data_file"

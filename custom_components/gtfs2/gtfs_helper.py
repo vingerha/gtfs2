@@ -233,7 +233,7 @@ def get_next_departure(data):
     }
 
 
-def get_gtfs(hass, path, filename, url):
+def get_gtfs(hass, path, filename, url, update):
     """Get gtfs file."""
     file = filename + ".zip"
     gtfs_dir = hass.config.path(path)
@@ -241,6 +241,9 @@ def get_gtfs(hass, path, filename, url):
     _LOGGER.debug(f"path: {path}")
     _LOGGER.debug(f"data: {file}")
     _LOGGER.debug(f"url: {url}")
+    if update and os.path.exists(os.path.join(gtfs_dir, file)):
+        remove_datasource(hass, path, filename)
+
     if not os.path.exists(os.path.join(gtfs_dir, file)):
         ##try to get via url###
         try:

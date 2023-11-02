@@ -4,10 +4,19 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 
 from .const import DOMAIN, PLATFORMS
 from .coordinator import GTFSUpdateCoordinator
+from .const import DEFAULT_PATH
+
+import voluptuous as vol
+from .gtfs_helper import get_gtfs
+
+
+DOMAIN = "gtfs2"
+
+## service call end
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -52,3 +61,34 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
+
+
+### service call
+
+GTFS_UPDATE_SCHEMA = vol.Schema(
+    {
+        vol.Required("name"): str,
+        vol.Required("url"): str,
+        vol.Required("update", default=True): bool,
+    }
+)
+
+
+def setup(hass, config):
+    """Setup the service example component."""
+
+    def get_or_update_gtfs(call):
+        """My GTFS service."""
+        _LOGGER.info("Updating GTFS with: %s", call.data)
+        get_gtfs(
+            hass, DEFAULT_PATH, call.data["name"], call.data["url"], call.data["update"]
+        )
+        # _LOGGER.info('Compensate temperature to ...', call.data.get('temperature'))
+
+    # Register our service with Home Assistant.
+    hass.services.register(
+        DOMAIN, "update_gtfs", get_or_update_gtfs, schema=GTFS_UPDATE_SCHEMA
+    )
+
+    # Return boolean to indicate that initialization was successfully.
+    return True
