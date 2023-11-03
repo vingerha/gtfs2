@@ -38,6 +38,9 @@ data:
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/8aec6d6b-a1bd-4bc7-b8db-9fba1ac0a66a)
 
+## Thank you
+@joostlek : massve thanks to help me through many aspects of getting to this inital level
+@mxbssn for initiating, bringing ideas, helping with testing
 
 
 
