@@ -149,24 +149,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             f"UserInputs RouteID: {self._user_inputs['route'].split(': ')[0]}"
         )
         if user_input is None:
+            stops = get_stop_list(
+                self._pygtfs,
+                self._user_inputs["route"].split(": ")[0],
+                self._user_inputs["direction"],
+            )
+            last_stop = stops[-1:][0]
             return self.async_show_form(
                 step_id="stops",
                 data_schema=vol.Schema(
                     {
-                        vol.Required("origin"): vol.In(
-                            get_stop_list(
-                                self._pygtfs,
-                                self._user_inputs["route"].split(": ")[0],
-                                self._user_inputs["direction"],
-                            )
-                        ),
-                        vol.Required("destination"): vol.In(
-                            get_stop_list(
-                                self._pygtfs,
-                                self._user_inputs["route"].split(": ")[0],
-                                self._user_inputs["direction"],
-                            )
-                        ),
+                        vol.Required("origin"): vol.In(stops),
+                        vol.Required("destination", default=last_stop): vol.In(stops),
                         vol.Required("name"): str,
                         vol.Optional("offset", default=0): int,
                         vol.Required("refresh_interval", default=15): int,

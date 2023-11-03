@@ -245,14 +245,12 @@ def get_gtfs(hass, path, filename, url, update=False):
         remove_datasource(hass, path, filename)
 
     if not os.path.exists(os.path.join(gtfs_dir, file)):
-        ##try to get via url###
         try:
             r = requests.get(url, allow_redirects=True)
             open(os.path.join(gtfs_dir, file), "wb").write(r.content)
         except Exception as ex:  # pylint: disable=broad-except
             _LOGGER.error("The given URL or GTFS data file/folder was not found")
             return "no_data_file"
-    # unpack zip file
     (gtfs_root, _) = os.path.splitext(file)
 
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
@@ -260,21 +258,17 @@ def get_gtfs(hass, path, filename, url, update=False):
     gtfs = pygtfs.Schedule(joined_path)
     # check or wait for unpack
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    _LOGGER.debug(f"journal: {journal}")
     while os.path.isfile(journal):
         time.sleep(10)
-        _LOGGER.debug("Waiting for unpack of data")
-
     if not gtfs.feeds:
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
-    _LOGGER.debug("No unpack and data is there")
     return gtfs
 
 
 def get_route_list(schedule):
     sql_routes = f"""
     SELECT route_id, route_long_name from routes
-    order by route_id
+    order by cast(route_id as decimal)
     """  # noqa: S608
     result = schedule.engine.connect().execute(
         text(sql_routes),
@@ -316,6 +310,7 @@ def get_stop_list(schedule, route_id, direction):
     for x in stops_list:
         val = x[0] + ": " + x[1]
         stops.append(val)
+    _LOGGER.debug(f"gtfs_helper stops: {stops}")
     return stops
 
 
@@ -329,7 +324,6 @@ def get_datasources(hass, path) -> dict[str]:
     for file in files:
         if file.endswith(".sqlite"):
             datasources.append(file.split(".")[0])
-    _LOGGER.debug(f"Datasources output: {datasources}")
     return datasources
 
 
