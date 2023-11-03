@@ -40,7 +40,8 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
-      "files_deleted": "Datasource deleted, this may affect existing routes"
+      "files_deleted": "Datasource deleted, this may affect existing routes",
+      "stop_incorrect": "Start and/or End destination incorrect, posisbly not in same direction, check logs"
     }
   }
 }

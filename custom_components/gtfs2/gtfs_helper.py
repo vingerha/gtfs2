@@ -294,14 +294,13 @@ def get_route_list(schedule):
 def get_stop_list(schedule, route_id):
     _LOGGER.debug(f"route_id {route_id}")
     sql_stops = f"""
-    SELECT distinct(s.stop_id), s.stop_name
-    from routes r, trips t, stop_times st, stops s
-    where t.route_id = r.route_id
-    and st.trip_id = t.trip_id
-    and st.stop_id = s.stop_id
-	and t.direction_id = 0
-    and r.route_id = '{route_id}'
-	order by st.stop_sequence
+    SELECT distinct(s.stop_id), s.stop_name, CASE WHEN t.direction_id ='0' then '↑' else '↓' end as direction
+    from trips t
+    inner join routes r on r.route_id = t.route_id
+    inner join stop_times st on st.trip_id = t.trip_id
+    inner join stops s on s.stop_id = st.stop_id
+    where  r.route_id = '{route_id}'
+    order by t.direction_id, st.stop_sequence
     """  # noqa: S608
     result = schedule.engine.connect().execute(
         text(sql_stops),
@@ -313,7 +312,7 @@ def get_stop_list(schedule, route_id):
         row = row_cursor._asdict()
         stops_list.append(list(row_cursor))
     for x in stops_list:
-        val = x[0] + ": " + x[1]
+        val = x[0] + ": " + x[1] + " ( " + x[2] + " )"
         stops.append(val)
     return stops
 

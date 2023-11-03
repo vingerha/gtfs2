@@ -176,6 +176,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if check_config:
             _LOGGER.debug(f"CheckConfig: {check_config}")
             errors["base"] = check_config
+            return self.async_abort(reason=check_config)
         else:
             return self.async_create_entry(
                 title=user_input["name"], data=self._user_inputs
