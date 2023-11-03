@@ -26,7 +26,7 @@ Use the workflow
 - when setting up a new datasource (by using the url to the external ZIP file) this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
 
 ## Data add / update
-Data can be updated at your own discretion by a service
+Data can be updated at your own discretion by a service, e.g. you can have a weekly automation to run the service
 It requires the following structure
 ```
 service: gtfs2.update_gtfs
