@@ -233,7 +233,7 @@ def get_next_departure(data):
     }
 
 
-def get_gtfs(hass, path, filename, url, update):
+def get_gtfs(hass, path, filename, url, update=False):
     """Get gtfs file."""
     file = filename + ".zip"
     gtfs_dir = hass.config.path(path)

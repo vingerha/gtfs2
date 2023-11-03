@@ -13,10 +13,12 @@ from .const import DEFAULT_PATH
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
 
-
-DOMAIN = "gtfs2"
-
-## service call end
+GTFS_UPDATE_SCHEMA = vol.Schema(
+    {
+        vol.Required("name"): str,
+        vol.Required("url"): str,
+    }
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Pronote from a config entry."""
+    """Set up GTFS from a config entry."""
 
     hass.data.setdefault(DOMAIN, {})
 
@@ -63,32 +65,16 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return unload_ok
 
 
-### service call
-
-GTFS_UPDATE_SCHEMA = vol.Schema(
-    {
-        vol.Required("name"): str,
-        vol.Required("url"): str,
-        vol.Required("update", default=True): bool,
-    }
-)
-
-
 def setup(hass, config):
     """Setup the service example component."""
 
-    def get_or_update_gtfs(call):
+    def update_gtfs(call):
         """My GTFS service."""
         _LOGGER.info("Updating GTFS with: %s", call.data)
-        get_gtfs(
-            hass, DEFAULT_PATH, call.data["name"], call.data["url"], call.data["update"]
-        )
-        # _LOGGER.info('Compensate temperature to ...', call.data.get('temperature'))
+        get_gtfs(hass, DEFAULT_PATH, call.data["name"], call.data["url"], True)
+        return True
 
-    # Register our service with Home Assistant.
     hass.services.register(
-        DOMAIN, "update_gtfs", get_or_update_gtfs, schema=GTFS_UPDATE_SCHEMA
+        DOMAIN, "update_gtfs", update_gtfs, schema=GTFS_UPDATE_SCHEMA
     )
-
-    # Return boolean to indicate that initialization was successfully.
     return True
