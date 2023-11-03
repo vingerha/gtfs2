@@ -36,7 +36,8 @@ data:
 ```
 **Note:** for "update" to work, the name should be the ***same*** as the existing source. It will first remove the existing one and reload the one as per your URL
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/496742cc-e0b2-4120-af51-1587e8ee6fa4)
+![image](https://github.com/vingerha/gtfs2/assets/44190435/8aec6d6b-a1bd-4bc7-b8db-9fba1ac0a66a)
+
 
 
 
