@@ -1,0 +1,17 @@
+# Describes the format for available ADS services
+update_gtfs:
+  fields:
+    name:
+      name: Name of the transport service, without .zip
+      description: If you use the same name as an existing one, the existing one will be overwitten
+      required: true
+      example: "mytransportservice"
+      selector:
+        text:
+    url:
+      name: URL
+      description: provide the full path to the zip file itself
+      required: true
+      example: "https://path-to-my-zip-file-location/filename.zip"
+      selector:
+        text:

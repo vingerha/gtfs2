@@ -132,6 +132,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data_schema=vol.Schema(
                     {
                         vol.Required("route"): vol.In(get_route_list(self._pygtfs)),
+                        vol.Required("direction"): vol.In(
+                            {"0": "Outward", "1": "Return"}
+                        ),
                     },
                 ),
             )
@@ -152,12 +155,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     {
                         vol.Required("origin"): vol.In(
                             get_stop_list(
-                                self._pygtfs, self._user_inputs["route"].split(": ")[0]
+                                self._pygtfs,
+                                self._user_inputs["route"].split(": ")[0],
+                                self._user_inputs["direction"],
                             )
                         ),
                         vol.Required("destination"): vol.In(
                             get_stop_list(
-                                self._pygtfs, self._user_inputs["route"].split(": ")[0]
+                                self._pygtfs,
+                                self._user_inputs["route"].split(": ")[0],
+                                self._user_inputs["direction"],
                             )
                         ),
                         vol.Required("name"): str,

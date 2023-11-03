@@ -16,7 +16,8 @@
       },
       "route": {
         "data": {
-          "route": "Name of the route"
+          "route": "Name of the route",
+          "direction": "Principal/inital direction of the vehicle"
         }
       },
       "stops": {
