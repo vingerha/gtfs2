@@ -31,7 +31,7 @@ It requires the following structure
 ```
 service: gtfs2.update_gtfs
 data:
-  name: ... name-of-your-new-source
+  name: ... name-of-your-source
   url: https://....url-to-your-zip
   update: true
 ```
