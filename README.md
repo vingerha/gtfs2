@@ -33,9 +33,8 @@ service: gtfs2.update_gtfs
 data:
   name: ... name-of-your-source
   url: https://....url-to-your-zip
-  update: true
 ```
-**Note:** for "update: true" to work, the name should be the same as the existing source. I will first remove the existing one and reload the one as per your URL
+**Note:** for "update" to work, the name should be the ***same*** as the existing source. It will first remove the existing one and reload the one as per your URL
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/496742cc-e0b2-4120-af51-1587e8ee6fa4)
 
