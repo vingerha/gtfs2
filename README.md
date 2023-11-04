@@ -10,6 +10,12 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 
 <h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
+## Difference with GTFS HA core (outside of GUI setup)
+Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
+- Pro: you receive the first applicable departure time and just have to check the type of transport (bus/tram/etc.)
+- Con: you have to know exactly which start and stop you want and (!) for those in the proper direction. Noting that the same stops exist with differnt ID for different routes/trips/directions
+> bypass in GTFS2: attribute added: next_departure_line shows all next departues with their line/means-of-transport
+
 ## Updates
 - 20231104: initial version
 
