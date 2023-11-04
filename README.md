@@ -7,6 +7,7 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
 - allows to load/update/delete datasources in gtfs2 folder
 - added a sservice to update the GTFS datasource, e.g. calling the service via automation
+- translations: at present only English and French
 
 <h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
