@@ -1,13 +1,17 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # GTFS2
-Copy from HA GTFS, aiming to improve the integration
+This is a adaptation of the GTFS integration in HA Core
+- configuration via the GUI, no configuration.yaml needed
+- Uses selected route to further select start/end stops
+- Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
+- allows to load/update/delete datasources in gtfs2 folder
+- added a sservice to update the GTFS datasource, e.g. calling the service via automation
 
 <h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
 ## Updates
-- 20231102: major update, moved away from configiuration.yaml setup 
-- 20231025: adds attributes 'next_departures' with max (!) 10 values of the remaining departure times for that day (and first of tomorrow if configured)
+- 20231104: initial version
 
 ## ToDo's
 - resolve issue that when updating the gtfs sqlite, it may throw a sqlite db locked error when an existing entity for the same db starts polling it
