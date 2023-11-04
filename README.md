@@ -9,6 +9,9 @@ Copy from HA GTFS, aiming to improve the integration
 - 20231102: major update, moved away from configiuration.yaml setup 
 - 20231025: adds attributes 'next_departures' with max (!) 10 values of the remaining departure times for that day (and first of tomorrow if configured)
 
+## ToDo's
+- resolve issue that when updating the gtfs sqlite, it may throw a sqlite db locked error when an existing entity for the same db starts polling it
+
 ## Installation via HACS :
 
 In  HACS, select the 3-dots and then custom repositories
