@@ -9,7 +9,9 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 - added a sservice to update the GTFS datasource, e.g. calling the service via automation
 - translations: at present only English and French
 
-<h4> Note: uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
+<h4> Note: 
+- certain source provde lagre zip-files which will in turne result in much larger db files, unpakcing may take 30-60 mins
+- the integration uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
