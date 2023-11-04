@@ -28,6 +28,7 @@ In Settings > Devices & Sevices
 
 ## Configuration
 Use the workflow
+
 Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
 **IMPORTANT**
