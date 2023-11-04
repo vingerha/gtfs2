@@ -50,7 +50,7 @@ data:
 
 
 ## Thank you
-- @joostlek ... massive thanks to help me through many tech aspects of getting to the inital version
+- @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
 
 
