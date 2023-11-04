@@ -40,8 +40,8 @@ data:
 
 
 ## Thank you
-@joostlek : massve thanks to help me through many aspects of getting to this inital level
-@mxbssn for initiating, bringing ideas, helping with testing
+- @joostlek ... massive thanks to help me through many tech aspects of getting to the inital version
+- @mxbssn for initiating, bringing ideas, helping with testing
 
 
 
