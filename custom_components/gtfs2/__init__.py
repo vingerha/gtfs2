@@ -70,7 +70,7 @@ def setup(hass, config):
 
     def update_gtfs(call):
         """My GTFS service."""
-        _LOGGER.info("Updating GTFS with: %s", call.data)
+        _LOGGER.debug("Updating GTFS with: %s", call.data)
         get_gtfs(hass, DEFAULT_PATH, call.data["name"], call.data["url"], True)
         return True
 

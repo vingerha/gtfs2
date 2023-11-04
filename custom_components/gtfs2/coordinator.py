@@ -55,6 +55,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 get_next_departure, self._data
             )
         except Exception as ex:  # pylint: disable=broad-except
-            _LOGGER.info("Error getting gtfs data from generic helper: %s", ex)
+            _LOGGER.error("Error getting gtfs data from generic helper: %s", ex)
 
         return self._data

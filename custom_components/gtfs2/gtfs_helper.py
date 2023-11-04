@@ -14,7 +14,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def get_next_departure(data):
-    _LOGGER.debug(f"GetNextDeparture DATA: {data}")
     """Get next departures from data."""
     schedule = data["schedule"]
     start_station_id = data["origin"]
@@ -41,7 +40,7 @@ def get_next_departure(data):
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
 
     sql_query = f"""
-        SELECT trip.trip_id, trip.route_id,
+        SELECT trip.trip_id, trip.route_id,route.route_long_name,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -75,6 +74,8 @@ def get_next_departure(data):
                    ON trip.trip_id = destination_stop_time.trip_id
         INNER JOIN stops end_station
                    ON destination_stop_time.stop_id = end_station.stop_id
+        INNER JOIN routes route
+                   ON route.route_id = trip.route_id
         WHERE (calendar.{yesterday.strftime("%A").lower()} = 1
                OR calendar.{now.strftime("%A").lower()} = 1
                {tomorrow_where}
@@ -152,7 +153,7 @@ def get_next_departure(data):
     for key in sorted(timetable.keys()):
         if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             item = timetable[key]
-            _LOGGER.debug(
+            _LOGGER.info(
                 "Departure found for station %s @ %s -> %s", start_station_id, key, item
             )
             break
@@ -165,8 +166,20 @@ def get_next_departure(data):
     for key in sorted(timetable.keys()):
         if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             timetable_remaining.append(key)
+    _LOGGER.debug(
+        "Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining
+    )
 
-    _LOGGER.debug("Timetable Remaining Departures: %s", timetable_remaining)
+    timetable_remaining_line = []
+    for key2, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+            timetable_remaining_line.append(
+                str(key2) + " (" + str(value["route_long_name"]) + ")"
+            )
+    _LOGGER.debug(
+        "Timetable Remaining Departures on this Start/Stop, per line: %s",
+        timetable_remaining_line,
+    )
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
@@ -230,6 +243,7 @@ def get_next_departure(data):
         "origin_stop_time": origin_stop_time,
         "destination_stop_time": destination_stop_time,
         "next_departures": timetable_remaining,
+        "next_departures_lines": timetable_remaining_line,
     }
 
 
@@ -238,9 +252,6 @@ def get_gtfs(hass, path, filename, url, update=False):
     file = filename + ".zip"
     gtfs_dir = hass.config.path(path)
     os.makedirs(gtfs_dir, exist_ok=True)
-    _LOGGER.debug(f"path: {path}")
-    _LOGGER.debug(f"data: {file}")
-    _LOGGER.debug(f"url: {url}")
     if update and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
 
@@ -287,7 +298,6 @@ def get_route_list(schedule):
 
 
 def get_stop_list(schedule, route_id, direction):
-    _LOGGER.debug(f"route_id {route_id}")
     sql_stops = f"""
     SELECT distinct(s.stop_id), s.stop_name
     from trips t
@@ -310,7 +320,7 @@ def get_stop_list(schedule, route_id, direction):
     for x in stops_list:
         val = x[0] + ": " + x[1]
         stops.append(val)
-    _LOGGER.debug(f"gtfs_helper stops: {stops}")
+    _LOGGER.debug(f"stops: {stops}")
     return stops
 
 
@@ -324,12 +334,13 @@ def get_datasources(hass, path) -> dict[str]:
     for file in files:
         if file.endswith(".sqlite"):
             datasources.append(file.split(".")[0])
+    _LOGGER.debug(f"datasources: {datasources}")
     return datasources
 
 
 def remove_datasource(hass, path, filename):
     gtfs_dir = hass.config.path(path)
-    _LOGGER.info(f"Removing: {os.path.join(gtfs_dir, filename)}.*")
+    _LOGGER.info(f"Removing datasource: {os.path.join(gtfs_dir, filename)}.*")
     os.remove(os.path.join(gtfs_dir, filename + ".zip"))
     os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
     return "removed"

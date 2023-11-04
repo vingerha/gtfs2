@@ -362,6 +362,13 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self._attributes["next_departures"] = self._departure["next_departures"][
                 :10
             ]
+        # Add next departures with their lines
+        prefix = "next_departures_lines"
+        self._attributes["next_departures_lines"] = []
+        if self._next_departures:
+            self._attributes["next_departures_lines"] = self._departure[
+                "next_departures_lines"
+            ][:10]
 
         self._attributes["updated_at"] = dt_util.now().replace(tzinfo=None)
         self._attr_extra_state_attributes = self._attributes
