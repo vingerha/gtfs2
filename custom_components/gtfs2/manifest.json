@@ -1,7 +1,7 @@
 {
   "domain": "gtfs2",
   "name": "GTFS 2 (General Transit Feed Specification)",
-  "codeowners": [],
+  "codeowners": [@vingerha],
   "config_flow": true,
   "documentation": "https://github.com/vingerha/gtfs2",
   "iot_class": "local_polling",
