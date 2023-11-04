@@ -14,7 +14,8 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 - 20231104: initial version
 
 ## ToDo's
-- resolve issue that when updating the gtfs sqlite, it may throw a sqlite db locked error when an existing entity for the same db starts polling it
+- Issue when updating the source db, it throws a db locked error. This when an existing entity for the same db starts polling it at the same time
+- Icon for the integration
 
 ## Installation via HACS :
 
