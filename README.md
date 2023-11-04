@@ -43,16 +43,14 @@ Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
 ## Data add / update
 Data can be updated at your own discretion by a service, e.g. you can have a weekly automation to run the service
-It requires the following structure
-```
-service: gtfs2.update_gtfs
-data:
-  name: ... name-of-your-source
-  url: https://....url-to-your-zip
-```
 **Note:** for "update" to work, the name should be the ***same*** as the existing source. It will first remove the existing one and reload the one as per your URL
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/2defc23d-a1a0-40be-b610-6c5360fbd464)
+
+or via yaml
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/4f1f21c6-1290-4326-96da-db1ad049ae7c)
+
 
 
 ## Thank you
