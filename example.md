@@ -6,6 +6,7 @@
 In this case that is: https://data.lemet.fr/documents/LEMET-gtfs.zip
 
 ### Add new in devices and services
+
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/ed7e8fbe-c3b9-4337-982f-74da5ea6e3dd)
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/7dd77425-07f8-45d0-8d0c-d9948fca6fbb)
@@ -17,11 +18,14 @@ NOTE: this will download and unpack the zip-file to a sqlite database, which can
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/02ab24ed-c10d-43e5-8c3e-f221044a1a9e)
 
 ## Select the route
+
 After the datasource is retrieved, you can select the route that you'd like to track on 
 By selecting a route and its direction, it allows to filter the proper stops
+
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/80d133c5-b00e-43f8-aef0-c203eba4eb6b)
 
 ## Select the start / end stop
+
 By default it will show the start and end stop of the chosen route
 Name: select a name that applies to your route, the name is used also for updates
 Offset: allows to add an offset in minutes to the collection of data, e.g. if you need 10minutes to walk to the stop, you are not interested in any departure earlier than 10 minutes from now
@@ -30,7 +34,9 @@ Refresh interval: reloads the data with the new timings, if your transport has a
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/8007911c-f1c7-406c-9295-4d132df07ab6)
 
 ## Added
+
 You can add a optional area
+
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/f2f855f9-bc07-405d-8b0b-09b3da7e4f79)
 
 Sample of the entity and its attributes
