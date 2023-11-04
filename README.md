@@ -1,7 +1,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # GTFS2
-This is a adaptation of the GTFS integration in HA Core
+This is an adaptation of the GTFS integration in HA Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
 - Uses selected route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
@@ -28,6 +28,7 @@ In Settings > Devices & Sevices
 
 ## Configuration
 Use the workflow
+Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
 **IMPORTANT**
 - when setting up a new datasource (by using the url to the external ZIP file) this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
