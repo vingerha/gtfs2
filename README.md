@@ -49,7 +49,8 @@ Data can be updated at your own discretion by a service, e.g. you can have a wee
 
 or via yaml
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/4f1f21c6-1290-4326-96da-db1ad049ae7c)
+![image](https://github.com/vingerha/gtfs2/assets/44190435/2fea7926-a64d-43b6-a653-c95f1f01c66d)
+
 
 
 
