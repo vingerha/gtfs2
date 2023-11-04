@@ -21,7 +21,8 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 
 ## ToDo's
 - Issue when updating the source db, it throws a db locked error. This when an existing entity for the same db starts polling it at the same time
-- Icon for the integration
+- Icon for the integration (brands)
+- bypass setup control for routes that have no trips 'today'. The configuration does a spot-check if start/end actually return data with the idea to validate the setup. However, this only checks for 'today' so if your route actually has no transport running at the day of setup (say Sunday or Holiday) then it will reject it.
 
 ## Installation via HACS :
 
