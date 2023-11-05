@@ -10,14 +10,14 @@
       "source": {
         "data": {
           "file": "New datasource name",
-          "url": "external url to gtfs data file"
+          "url": "external url to gtfs data (zip) file"
         },
-        "description": "NOTE: with a new url: this may take minutes after submit"
+        "description": "NOTE: with a new url, this may take quite a bit of time, \n depending on file-size and system performance"
       },
       "route": {
         "data": {
           "route": "Name of the route",
-          "direction": "Principal/inital direction of the vehicle"
+          "direction": "Principal/initial direction of the vehicle"
         }
       },
       "stops": {
@@ -35,14 +35,14 @@
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
       "unknown": "[%key:common::config_flow::error::unknown%]",
-      "stop_incorrect": "Start and/or End destination probably incorrect, check logs",
+      "stop_incorrect": "Start and/or End destination incorrect, possibly no transport 'today' or not in same direction, check logs",
       "generic_failure": "Overall failure, check logs",
       "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Datasource deleted, this may affect existing routes",
-      "stop_incorrect": "Start and/or End destination incorrect, possibly not in same direction, check logs"
+      "stop_incorrect": "Start and/or End destination incorrect, possibly no transport 'today' or not in same direction, check logs"
     }
   }
 }

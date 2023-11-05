@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def get_next_departure(data):
+    _LOGGER.debug("Get next departure with data: %s", data)
     """Get next departures from data."""
     schedule = data["schedule"]
     start_station_id = data["origin"]

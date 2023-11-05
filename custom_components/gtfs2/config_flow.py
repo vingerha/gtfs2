@@ -165,7 +165,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Optional("offset", default=0): int,
                         vol.Required("refresh_interval", default=15): int,
                         vol.Required("include_tomorrow"): vol.In(
-                            {"no": "No", "yes": "Yes"}
+                            {false: "No", true: "Yes"}
                         ),
                     },
                 ),

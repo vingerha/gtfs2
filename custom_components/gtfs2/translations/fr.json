@@ -10,9 +10,9 @@
       "source": {
         "data": {
           "file": "Nouveau nom de source de données",
-          "url": "URL externe vers le fichier de données GTFS"
+          "url": "URL externe vers le fichier (zip) de données GTFS"
         },
-        "description": "REMARQUE : avec une nouvelle URL : cela peut prendre quelques minutes après la soumission"
+        "description": "REMARQUE : avec une nouvelle URL, cela peut prendre du temps après la soumission, selon la taille du fichier et performance du serveur"
       },
       "route": {
         "data": {
@@ -35,14 +35,14 @@
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
       "unknown": "[%key:common::config_flow::error::unknown%]",
-      "stop_incorrect": "La destination de début et/ou de fin est probablement incorrecte, vérifiez les journaux",
+      "stop_incorrect": "Destination de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez les journaux",
       "generic_failure": "Échec global, vérifiez les journaux",
       "no_data_file": "Problème de collecte de données : URL incorrecte ou nom de fichier ne se trouvant pas dans le bon dossier"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Source de données supprimée, cela peut affecter les itinéraires existants",
-      "stop_incorrect": "Destination de début et/ou de fin incorrecte, peut-être pas dans la même direction, vérifiez les journaux"
+      "stop_incorrect": "Destination de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez les journaux"
     }
   }
 }
