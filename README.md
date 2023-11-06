@@ -10,6 +10,7 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 - translations: at present only English and French
 
 <h4> Note: 
+  
 - certain sources provide large zip-files, which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
 - the integration uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
 
