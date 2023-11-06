@@ -1,5 +1,7 @@
 # Describes the format for available ADS services
 update_gtfs:
+  name: Update GTFS Data
+  description: Collects a new gtfs zip and unpacks it to sqlite
   fields:
     name:
       name: Name of the transport service, without .zip
