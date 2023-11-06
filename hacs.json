@@ -1,6 +1,4 @@
 {
-  "name": "gtfs2",
-  "country": "ALL",
-  "render_readme": true,
-  "homeassistant": "2023.10"
+  "name": "GTFS2 for HomeAssistant",
+  "homeassistant": "2023.10.1"
 }
