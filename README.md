@@ -9,11 +9,6 @@ This is an adaptation of the GTFS integration in HA Core, enhancements:
 - added a sservice to update the GTFS datasource, e.g. calling the service via automation
 - translations: at present only English and French
 
-<h4> Note: 
-  
-- certain sources provide large zip-files, which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
-- the integration uses folder /config/gtfs2 to store the data (zip and sqlite)</h4>
-
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
 - Pro: you receive the first applicable departure time and just have to check the type of transport (bus/tram/etc.)
@@ -45,7 +40,10 @@ Use the workflow
 Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
 **IMPORTANT**
-- when setting up a new datasource (by using the url to the external ZIP file) this may easily take 5-10 minutes before the next step is reached, depending on the content of the ZIP.
+
+- certain providers publish large zip-files which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
+- for these large db, performance may be slow too, there is a PR to improve this by adding indexes to the stop_times table
+- the integration uses folder /config/gtfs2 to store the datafiles (zip and sqlite)
 
 ## Data add / update
 Data can be updated at your own discretion by a service, e.g. you can have a weekly automation to run the service
