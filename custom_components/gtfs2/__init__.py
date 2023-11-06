@@ -2,14 +2,11 @@
 from __future__ import annotations
 
 import logging
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 
-from .const import DOMAIN, PLATFORMS
+from .const import DOMAIN, PLATFORMS, DEFAULT_PATH
 from .coordinator import GTFSUpdateCoordinator
-from .const import DEFAULT_PATH
-
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
 
