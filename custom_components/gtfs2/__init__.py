@@ -13,13 +13,6 @@ from .const import DEFAULT_PATH
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
 
-GTFS_UPDATE_SCHEMA = vol.Schema(
-    {
-        vol.Required("name"): str,
-        vol.Required("url"): str,
-    }
-)
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -75,6 +68,5 @@ def setup(hass, config):
         return True
 
     hass.services.register(
-        DOMAIN, "update_gtfs", update_gtfs, schema=GTFS_UPDATE_SCHEMA
-    )
+        DOMAIN, "update_gtfs", update_gtfs)
     return True
