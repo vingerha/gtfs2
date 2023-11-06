@@ -1,6 +1,6 @@
 {
   "name": "gtfs2",
-  "country": "",
+  "country": "ALL",
   "domains": ["sensor"],
   "render_readme": true,
   "homeassistant": "0.99.0"
