@@ -18,7 +18,7 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 - Pro: you receive the first applicable departure time and just have to check the type of transport (bus/tram/etc.)
 - Con: you have to know exactly which start and stop you want and in the proper direction. Noting that the same stops exist with differnt ID for different routes/trips/directions
 
-*Solution in GTFS2*: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
+***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
 - 20231104: initial version
