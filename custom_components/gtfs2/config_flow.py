@@ -207,6 +207,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "name": data["name"],
             "next_departure": None,
         }
+
         try:
             self._data["next_departure"] = await self.hass.async_add_executor_job(
                 get_next_departure, self._data
