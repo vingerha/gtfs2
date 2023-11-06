@@ -380,3 +380,49 @@ def remove_datasource(hass, path, filename):
     os.remove(os.path.join(gtfs_dir, filename + ".zip"))
     os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
     return "removed"
+
+
+def check_datasource_index(schedule):
+    sql_index_1 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'stop_times' and name like '%trip_id%';
+    """
+    sql_index_2 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'stop_times' and name like '%stop_id%';
+    """
+    sql_add_index_1 = f"""
+    create index gtfs2_stop_times_trip_id on stop_times(trip_id)
+    """
+    sql_add_index_2 = f"""
+    create index gtfs2_stop_times_stop_id on stop_times(stop_id)
+    """
+    result_1a = schedule.engine.connect().execute(
+        text(sql_index_1),
+        {"q": "q"},
+    )
+    for row_cursor in result_1a:
+        _LOGGER.debug("IDX result1: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checkidx'] == 0:
+            _LOGGER.info("Adding index 1 to improve performance")
+            result_1b = schedule.engine.connect().execute(
+            text(sql_add_index_1),
+            {"q": "q"},
+            )        
+        
+    result_2a = schedule.engine.connect().execute(
+        text(sql_index_2),
+        {"q": "q"},
+    )
+    for row_cursor in result_2a:
+        _LOGGER.debug("IDX result2: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checkidx'] == 0:
+            _LOGGER.info("Adding index 2 to improve performance")
+            result_2b = schedule.engine.connect().execute(
+            text(sql_add_index_2),
+            {"q": "q"},
+            )
