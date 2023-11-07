@@ -363,6 +363,7 @@ def get_stop_list(schedule, route_id, direction):
 def get_datasources(hass, path) -> dict[str]:
     _LOGGER.debug(f"Datasources path: {path}")
     gtfs_dir = hass.config.path(path)
+    os.makedirs(gtfs_dir, exist_ok=True)
     _LOGGER.debug(f"Datasources folder: {gtfs_dir}")
     files = os.listdir(gtfs_dir)
     _LOGGER.debug(f"Datasources files: {files}")

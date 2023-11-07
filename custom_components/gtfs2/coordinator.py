@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL
-from .gtfs_helper import get_gtfs, get_next_departure
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,6 +49,10 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
         }
+        
+        check_index = await self.hass.async_add_executor_job(
+                check_datasource_index, self._pygtfs
+            )
 
         try:
             self._data["next_departure"] = await self.hass.async_add_executor_job(
