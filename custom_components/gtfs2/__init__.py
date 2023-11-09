@@ -5,12 +5,31 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 
-from .const import DOMAIN, PLATFORMS, DEFAULT_PATH
-from .coordinator import GTFSUpdateCoordinator
+from datetime import timedelta
+
+from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL
+from .coordinator import GTFSUpdateCoordinator, GTFSRealtimeUpdateCoordinator
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
 
 _LOGGER = logging.getLogger(__name__)
+
+async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    _LOGGER.debug("Migrating from version %s", config_entry.version)
+
+    if config_entry.version == 1:
+
+        new = {**config_entry.data}
+        new['extract_from'] = 'url'
+        new.pop('refresh_interval')
+
+        config_entry.version = 2
+        hass.config_entries.async_update_entry(config_entry, data=new)
+
+    _LOGGER.debug("Migration to version %s successful", config_entry.version)
+
+    return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up GTFS from a config entry."""
@@ -18,13 +37,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
 
     coordinator = GTFSUpdateCoordinator(hass, entry)
+    
+    coordinator_rt = GTFSRealtimeUpdateCoordinator(hass, entry)
 
     await coordinator.async_config_entry_first_refresh()
+    
+    await coordinator_rt.async_config_entry_first_refresh()
 
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
     }
-
+    
+    entry.async_on_unload(entry.add_update_listener(update_listener))
+    
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
@@ -49,4 +74,10 @@ def setup(hass, config):
 
     hass.services.register(
         DOMAIN, "update_gtfs", update_gtfs)
+    return True
+
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    """Handle options update."""
+    hass.data[DOMAIN][entry.entry_id]['coordinator'].update_interval = timedelta(minutes=entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))
+
     return True

@@ -68,6 +68,12 @@ async def async_setup_entry(
     ]
 
     await coordinator.async_config_entry_first_refresh()
+    
+    coordinator_rt: GTFSRealtimeUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id][
+        "coordinator"
+    ]
+
+    await coordinator_rt.async_config_entry_first_refresh()
 
     sensors = [
         GTFSDepartureSensor(coordinator),
@@ -82,7 +88,6 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator) -> None:
         """Initialize the GTFSsensor."""
         super().__init__(coordinator)
-
         self._name = coordinator.data["name"]
         self._attributes: dict[str, Any] = {}
 
@@ -185,7 +190,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                 )
                 self._agency = False
 
-        # Define the state as a UTC timestamp with ISO 8601 format
+        # Define the state as a Agency TZ, then help TZ (which is UTC if no HA TZ set)
         if not self._departure:
             self._state = None
         elif self._agency:
@@ -198,10 +203,11 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             )
         else:
             _LOGGER.debug(
-                "Self._departure time for state value UTC: %s",
+                "Self._departure time from helper: %s",
                 {self._departure["departure_time"]},
             )
-            self._state = self._departure["departure_time"].replace(tzinfo=dt_util.UTC)
+            self._state = self._departure["departure_time"]
+            
         # settin state value
         self._attr_native_value = self._state
 
@@ -398,3 +404,25 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._attributes = {
             k: v for k, v in self._attributes.items() if not k.startswith(prefix)
         }
+
+
+class GTFSRealtimeDepartureSensor(CoordinatorEntity, SensorEntity):
+    """Implementation of a GTFS departure sensor."""
+
+    def __init__(self, coordinator) -> None:
+        """Initialize the GTFSsensor."""
+        super().__init__(coordinator)
+        _LOGGER.debug("GTFS RT Sensor: coordinator data: %s", coordinator.data )
+        self._attributes = self._update_attrs()
+        self._attr_extra_state_attributes = self._attributes
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._update_attrs()
+        super()._handle_coordinator_update()
+
+    def _update_attrs(self):  # noqa: C901 PLR0911
+        _LOGGER.debug(f"GTFS RT Sensor update attr DATA: {self.coordinator}")
+        self._attributes["next_departure_realtime"] = self.coordinator
+        return self._attributes

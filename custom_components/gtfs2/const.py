@@ -37,11 +37,6 @@ ATTR_WHEELCHAIR = "trip_wheelchair_access_available"
 ATTR_WHEELCHAIR_DESTINATION = "destination_station_wheelchair_boarding_available"
 ATTR_WHEELCHAIR_ORIGIN = "origin_station_wheelchair_boarding_available"
 
-CONF_DATA = "data"
-CONF_DESTINATION = "destination"
-CONF_ORIGIN = "origin"
-CONF_TOMORROW = "include_tomorrow"
-
 BICYCLE_ALLOWED_DEFAULT = STATE_UNKNOWN
 BICYCLE_ALLOWED_OPTIONS = {1: True, 2: False}
 DROP_OFF_TYPE_DEFAULT = STATE_UNKNOWN
@@ -240,3 +235,7 @@ WHEELCHAIR_ACCESS_DEFAULT = STATE_UNKNOWN
 WHEELCHAIR_ACCESS_OPTIONS = {1: True, 2: False}
 WHEELCHAIR_BOARDING_DEFAULT = STATE_UNKNOWN
 WHEELCHAIR_BOARDING_OPTIONS = {1: True, 2: False}
+
+
+# Realtime specifics
+DEFAULT_REFRESH_INTERVAL_RT = 1

@@ -9,18 +9,24 @@ import pygtfs
 from sqlalchemy.sql import text
 
 import homeassistant.util.dt as dt_util
+from homeassistant.core import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_next_departure(data):
-    _LOGGER.debug("Get next departure with data: %s", data)
+def get_next_departure(self):
+    _LOGGER.debug("Get next departure with data: %s", self._data)
     """Get next departures from data."""
-    schedule = data["schedule"]
-    start_station_id = data["origin"]
-    end_station_id = data["destination"]
-    offset = data["offset"]
-    include_tomorrow = data["include_tomorrow"]
+    if self.hass.config.time_zone is None:
+        _LOGGER.error("Timezone is not set in Home Assistant configuration")
+        timezone = "UTC"
+    else:
+        timezone=dt_util.get_time_zone(self.hass.config.time_zone)
+    schedule = self._data["schedule"]
+    start_station_id = self._data["origin"]
+    end_station_id = self._data["destination"]
+    offset = self._data["offset"]
+    include_tomorrow = self._data["include_tomorrow"]
     now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
     now_date = now.strftime(dt_util.DATE_STR_FORMAT)
     yesterday = now - datetime.timedelta(days=1)
@@ -243,8 +249,8 @@ def get_next_departure(data):
         f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
     )
 
-    depart_time = dt_util.parse_datetime(origin_depart_time)
-    arrival_time = dt_util.parse_datetime(dest_arrival_time)
+    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)
+    arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone)
 
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
@@ -283,25 +289,33 @@ def get_next_departure(data):
     }
 
 
-def get_gtfs(hass, path, filename, url, update=False):
+def get_gtfs(hass, path, data, update=False):
     """Get gtfs file."""
-    file = filename + ".zip"
+    _LOGGER.debug("Getting gtfs with data: %s", data)
+    filename = data["file"]
+    url = data["url"]
+    file = data["file"] + ".zip"
     gtfs_dir = hass.config.path(path)
     os.makedirs(gtfs_dir, exist_ok=True)
     if update and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
-
-    if not os.path.exists(os.path.join(gtfs_dir, file)):
-        try:
-            r = requests.get(url, allow_redirects=True)
-            open(os.path.join(gtfs_dir, file), "wb").write(r.content)
-        except Exception as ex:  # pylint: disable=broad-except
-            _LOGGER.error("The given URL or GTFS data file/folder was not found")
-            return "no_data_file"
+    if data["extract_from"] == "zip":
+        if not os.path.exists(os.path.join(gtfs_dir, file)):
+            _LOGGER.error("The given GTFS zipfile was not found")
+            return "no_zip_file"
+    if data["extract_from"] == "url":
+        if not os.path.exists(os.path.join(gtfs_dir, file)):
+            try:
+                r = requests.get(url, allow_redirects=True)
+                open(os.path.join(gtfs_dir, file), "wb").write(r.content)
+            except Exception as ex:  # pylint: disable=broad-except
+                _LOGGER.error("The given URL or GTFS data file/folder was not found")
+                return "no_data_file"
     (gtfs_root, _) = os.path.splitext(file)
 
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
     joined_path = os.path.join(gtfs_dir, sqlite_file)
+    _LOGGER.debug("unpacking: %s", joined_path)
     gtfs = pygtfs.Schedule(joined_path)
     # check or wait for unpack
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
@@ -314,7 +328,7 @@ def get_gtfs(hass, path, filename, url, update=False):
 
 def get_route_list(schedule):
     sql_routes = f"""
-    SELECT route_id, route_long_name from routes
+    SELECT route_id, route_short_name, route_long_name from routes
     order by cast(route_id as decimal)
     """  # noqa: S608
     result = schedule.engine.connect().execute(
@@ -327,7 +341,7 @@ def get_route_list(schedule):
         row = row_cursor._asdict()
         routes_list.append(list(row_cursor))
     for x in routes_list:
-        val = x[0] + ": " + x[1]
+        val = x[0] + ": " + x[1] + " (" + x[2] + ")"
         routes.append(val)
     _LOGGER.debug(f"routes: {routes}")
     return routes
