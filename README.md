@@ -21,7 +21,7 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 - new attribute: next_departure_headsigns
 - adding route shortname in selection/list to overcome data discrepancies been short name and long name
 - for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
-- timezone fo next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
+- timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
 
 20231104: initial version
 
