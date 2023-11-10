@@ -21,7 +21,8 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 - timezone check is now in order: agency (deliverung data), if not > HA system, if not > UTC
 - attribute next_departure_headsigns
 - adding route shortname in selection/list
-- for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs 
+- for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
+
 20231104: initial version
 
 ## ToDo's
