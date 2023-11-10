@@ -20,12 +20,25 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
 
     if config_entry.version == 1:
 
-        new = {**config_entry.data}
-        new['extract_from'] = 'url'
-        new.pop('refresh_interval')
-
-        config_entry.version = 2
+        new_data = {**config_entry.data}
+        new_data['extract_from'] = 'url'
+        new_data.pop('refresh_interval')
+        
+        new_options = {**config_entry.options}
+        new_options['real_time'] = False
+        new_options['refresh_interval'] = 15
+        
+        config_entry.version = 3
         hass.config_entries.async_update_entry(config_entry, data=new)
+        hass.config_entries.async_update_entry(config_entry, options=new_options)
+    
+    if config_entry.version == 2:
+
+        new_options = {**config_entry.options}
+        new_options['real_time'] = False
+
+        config_entry.version = 3
+        hass.config_entries.async_update_entry(config_entry, options=new_options)        
 
     _LOGGER.debug("Migration to version %s successful", config_entry.version)
 
