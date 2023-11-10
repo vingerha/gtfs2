@@ -12,7 +12,7 @@
           "file": "Nom de la nouvelle source de données",
           "url": "URL externe vers le fichier (zip) des données GTFS"
         },
-        "description": "REMARQUE : avec une nouvelle URL, cela peut prendre du temps après la soumission, selon la taille du fichier et performance du serveur"
+        "description": "REMARQUE: avec une nouvelle URL/zip, cela peut prendre du temps après la soumission, \n selon la taille du fichier et performance du serveur"
       },
       "route": {
         "data": {
@@ -37,12 +37,25 @@
       "unknown": "[%key:common::config_flow::error::unknown%]",
       "stop_incorrect": "Arrêt de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez les logs d'érreur",
       "generic_failure": "Échec global, vérifiez les logs d'érreur",
-      "no_data_file": "Problème de collecte de données : URL incorrecte ou nom de fichier ne se trouvant pas dans le bon dossier"
+      "no_data_file": "Problème de collecte de données : URL incorrecte ou nom de fichier ne se trouve pas dans le bon dossier",
+	  "no_zip_file": "Problème de collecte de données : fichier ZIP ne se trouve pas dans le bon dossier"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Source de données supprimée, cela peut affecter les itinéraires existants",
-      "stop_incorrect": "Arrêt de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez logs d'érreur"
+      "stop_incorrect": "Arrêt de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez logs d'érreur",
+	  "no_data_file": "Problème de collecte de données : URL incorrecte ou nom de fichier ne se trouve pas dans le bon dossier",
+	  "no_zip_file": "Problème de collecte de données : fichier ZIP ne se trouve pas dans le bon dossier, note: sensible à la casse"
+    }
+  },
+   "options": {
+    "step": {
+      "init": {
+        "description": "Personnalisez le fonctionnement de l'intégration",
+        "data": {
+          "refresh_interval": "Personnalisez le fonctionnement de l'intégration"
+        }
+      }
     }
   }
 }

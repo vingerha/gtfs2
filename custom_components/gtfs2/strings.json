@@ -12,7 +12,7 @@
           "file": "New datasource name",
           "url": "external url to gtfs data file"
         },
-        "description": "NOTE: with a new url: this may take minutes after submit"
+        "description": "NOTE: with a new url/zip, this may take a long time after submit"
       },
       "remove": {
         "data": {
@@ -43,12 +43,31 @@
       "unknown": "[%key:common::config_flow::error::unknown%]",
       "stop_incorrect": "Start and/or End destination probably incorrect, check logs",
       "generic_failure": "Overall failure, check logs",
-      "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder"
+      "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder",
+	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Datasource deleted, this may affect existing routes",
-      "stop_incorrect": "Start and/or End destination incorrect, possibly not in same direction, check logs"
+      "stop_incorrect": "Start and/or End destination incorrect, possibly not in same direction, check logs",
+	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Customize the way the integration works",
+        "data": {
+          "refresh_interval": "Data refresh interval (in minutes)"
+        }
+      },
+	  "real_time": {
+        "description": "Provide url to real time API",
+        "data": {
+          "trip_update_url": "URL to trip data",
+		  "vehicle_position_url": "URL to vehicle position (can be the same as trip data)"
+        }
+      }
     }
   }
 }
