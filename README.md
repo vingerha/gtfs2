@@ -17,7 +17,11 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 ***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
-- 20231104: initial version
+20231110: adding features:
+- timezone check is now in order: agency (deliverung data), if not > HA system, if not > UTC
+- attribute next_departure_headsigns
+- adding route shortname in selection/list
+20231104: initial version
 
 ## ToDo's
 - Issue when updating the source db, it throws a db locked error. This when an existing entity for the same db starts polling it at the same time
