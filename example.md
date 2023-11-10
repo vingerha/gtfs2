@@ -11,7 +11,9 @@ In this case that is: https://data.lemet.fr/documents/LEMET-gtfs.zip
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/7dd77425-07f8-45d0-8d0c-d9948fca6fbb)
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/3688925f-63cd-451a-9db1-313a028c2188)
+### Two options, either extract from a file you placed in the gtfs2 folder Or use a url
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/e64cb7d9-7b68-4169-9cc4-e216a303f7d3)
 
 NOTE: this will download and unpack the zip-file to a sqlite database, which can take time (examples from 10mins to 2hrs), **please be patient**
 
