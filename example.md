@@ -13,9 +13,10 @@ In this case that is: https://data.lemet.fr/documents/LEMET-gtfs.zip
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/3688925f-63cd-451a-9db1-313a028c2188)
 
-NOTE: this will download and unpack the zip-file to a sqlite database, which can take (many) minutes, **please be patient**
+NOTE: this will download and unpack the zip-file to a sqlite database, which can take time (examples from 10mins to 2hrs), **please be patient**
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/02ab24ed-c10d-43e5-8c3e-f221044a1a9e)
+![image](https://github.com/vingerha/gtfs2/assets/44190435/dd26f517-1cd9-4386-b4ea-c605d02a0ac7)
+
 
 ## Select the route
 
