@@ -12,6 +12,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 import homeassistant.util.dt as dt_util
 
+from .coordinator import GTFSRealtimeUpdateCoordinator
+
 from .const import (
     ATTR_ARRIVAL,
     ATTR_BICYCLE,
@@ -379,18 +381,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self._attributes["next_departures_headsign"] = self._departure[
                 "next_departures_headsign"
             ][:10]            
-        
-        # Add next departure realtime
-        self._attributes["next_departure_realtime"] = self._departure[
-                "next_departure_realtime"
-            ]
-        self._attributes["gtfs_rt_updated_at"] = self._departure[
-                "gtfs_rt_updated_at"
-            ]    
-        
-        self._attributes["gtfs_updated_at"] = self._departure[
-                "gtfs_updated_at"
-            ]
+
+        self._attributes["updated_at"] = dt_util.now().replace(tzinfo=None)
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes
 
@@ -420,3 +412,36 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         }
 
 
+class GTFSRealtimeDepartureSensor(CoordinatorEntity):
+    """Implementation of a GTFS departure sensor."""
+
+    def __init__(self, coordinator: GTFSRealtimeUpdateCoordinator) -> None:
+        """Initialize the GTFSsensor."""
+        super().__init__(coordinator)
+        self._name = coordinator.data["name"] + "_rt"
+        self._attributes: dict[str, Any] = {}
+
+        self._attr_unique_id = f"gtfs-{self._name}_rt"
+        self._attr_device_info = DeviceInfo(
+            name=f"GTFS - {self._name}",
+            entry_type=DeviceEntryType.SERVICE,
+            identifiers={(DOMAIN, f"GTFS - {self._name}_rt")},
+            manufacturer="GTFS",
+            model=self._name,
+        )
+        _LOGGER.debug("GTFS RT Sensor: coordinator data: %s", coordinator.data )
+        self._coordinator = coordinator
+        self._attributes = self._update_attrs_rt()
+        self._attr_extra_state_attributes = self._attributes
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._update_attrs_rt()
+        super()._handle_coordinator_update()
+
+    def _update_attrs_rt(self):  # noqa: C901 PLR0911
+        _LOGGER.debug(f"GTFS RT Sensor update attr DATA: {self._coordinator.data}")
+        self._attr_native_value = coordinator.data
+        self._attributes["next_departure_realtime"] = self._coordinator.data
+        return self._attributes

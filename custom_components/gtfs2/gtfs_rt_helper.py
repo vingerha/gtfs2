@@ -122,7 +122,7 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
 ## reworked for gtfs2
 
 def get_next_services(self):
-    self.data = self._get_rt_route_statuses
+    self.data = self._data
     self._stop = self._stop_id
     self._route = self._route_id
     self._direction = self._direction
