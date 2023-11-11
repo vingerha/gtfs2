@@ -76,27 +76,27 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_source(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
         errors: dict[str, str] = {}
-        if user_input is not None:
-            check_data = await self._check_data(user_input)
-            if check_data:
-                errors["base"] = check_data
-                return self.async_abort(reason=check_data)
-            else:
-                self._user_inputs.update(user_input)
-                _LOGGER.debug(f"UserInputs Data: {self._user_inputs}")
-                return await self.async_step_route()
-
-        return self.async_show_form(
-            step_id="source",
-            data_schema=vol.Schema(
-                {
-                    vol.Required("file"): str,
-                    vol.Required("extract_from"): vol.In({"zip": "Use gtfs2/zipfile with above name, without extension", "url": "Use URL below, leave 'na' if using zip"}),
-                    vol.Required("url", default="na"): str,
-                },
-            ),
-            errors=errors,
-        )            
+        if user_input is None:
+            return self.async_show_form(
+                step_id="source",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required("file"): str,
+                        vol.Required("extract_from"): vol.In({"zip": "Use gtfs2/zipfile with above name, without extension", "url": "Use URL below, leave 'na' if using zip"}),
+                        vol.Required("url", default="na"): str,
+                    },
+                ),
+                errors=errors,
+            )    
+        check_data = await self._check_data(user_input)
+        _LOGGER.debug("Source check data: %s", check_data)
+        if check_data :
+            errors["base"] = check_data
+            return self.async_abort(reason=check_data)
+        else:
+            self._user_inputs.update(user_input)
+            _LOGGER.debug(f"UserInputs Data: {self._user_inputs}")
+            return await self.async_step_route()            
 
     async def async_step_remove(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
@@ -122,13 +122,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_route(self, user_input: dict | None = None) -> FlowResult:
         """Handle the route."""
+        errors: dict[str, str] = {}
+        check_data = await self._check_data(self._user_inputs)
+        _LOGGER.debug("Source check data: %s", check_data)
+        if check_data :
+            errors["base"] = check_data
+            return self.async_abort(reason=check_data)
         self._pygtfs = get_gtfs(
             self.hass,
             DEFAULT_PATH,
             self._user_inputs,
             False,
         )
-        errors: dict[str, str] = {}
+
         if user_input is None:
             return self.async_show_form(
                 step_id="route",
@@ -140,6 +146,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ),
                     },
                 ),
+                errors=errors,
             )
         self._user_inputs.update(user_input)
         _LOGGER.debug(f"UserInputs Route: {self._user_inputs}")
@@ -189,7 +196,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._pygtfs = await self.hass.async_add_executor_job(
             get_gtfs, self.hass, DEFAULT_PATH, data, False
         )
-        if self._pygtfs == "no_data_file" or "no_zip_file":
+        _LOGGER.debug("Checkdata: %s ", self._pygtfs)
+        if self._pygtfs in ['no_data_file', 'no_zip_file', 'extracting'] :
             return self._pygtfs
         return None
 
@@ -260,7 +268,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional("refresh_interval", default=self.config_entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL)): int,
-                    vol.Required("real_time"): vol.In({False: "No", True: "Yes"}),
+                    vol.Required("real_time", default=self.config_entry.options.get("real_time")): vol.In({False: "No", True: "Yes"}),
                 }
             ),
         )
@@ -278,8 +286,8 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="real_time",
             data_schema=vol.Schema(
                 {
-                    vol.Required("trip_update_url"): str,
-                    vol.Required("vehicle_position_url"): str,
+                    vol.Required("trip_update_url", default=self.config_entry.options.get("trip_update_url")): str,
+                    vol.Required("vehicle_position_url", default=self.config_entry.options.get("vehicle_position_url")): str,
                 },
             ),
             errors=errors,

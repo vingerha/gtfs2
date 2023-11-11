@@ -50,7 +50,8 @@
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Datasource deleted, this may affect existing routes",
       "stop_incorrect": "Start and/or End destination incorrect, possibly not in same direction, check logs",
-	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder"
+	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder",
+	  "extracting": "Extracting data, this can take a while"
     }
   },
   "options": {

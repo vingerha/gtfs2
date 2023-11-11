@@ -45,7 +45,8 @@
       "files_deleted": "Datasource deleted, this may affect existing routes",
       "stop_incorrect": "Start and/or End destination incorrect, possibly no transport 'today' or not in same direction, check logs",
 	  "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder",
-	  "no_zip_file": "Data collection issue: ZIP file not existing in the correct folder, note that it is capital-sensitive"
+	  "no_zip_file": "Data collection issue: ZIP file not existing in the correct folder, note that it is capital-sensitive",
+	  "extracting": "Extracting data, this can take a while"
     }
   },
   "options": {

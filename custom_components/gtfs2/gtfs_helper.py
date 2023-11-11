@@ -7,6 +7,7 @@ import os
 import requests
 import pygtfs
 from sqlalchemy.sql import text
+import multiprocessing
 
 import homeassistant.util.dt as dt_util
 from homeassistant.core import HomeAssistant
@@ -305,11 +306,19 @@ def get_next_departure(self):
 def get_gtfs(hass, path, data, update=False):
     """Get gtfs file."""
     _LOGGER.debug("Getting gtfs with data: %s", data)
+    gtfs_dir = hass.config.path(path)
+    os.makedirs(gtfs_dir, exist_ok=True)
     filename = data["file"]
     url = data["url"]
     file = data["file"] + ".zip"
-    gtfs_dir = hass.config.path(path)
-    os.makedirs(gtfs_dir, exist_ok=True)
+    sqlite = data["file"] + ".sqlite"
+    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
+    _LOGGER.debug("filename__: %s", filename[-2:])
+    _LOGGER.debug("journal: %s", journal)
+    _LOGGER.debug("journal exist: %s", os.path.exists(journal))
+    if os.path.exists(journal) :
+        _LOGGER.debug("Still unpacking %s", filename)
+        return "extracting"
     if update and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
     if data["extract_from"] == "zip":
@@ -327,17 +336,12 @@ def get_gtfs(hass, path, data, update=False):
     (gtfs_root, _) = os.path.splitext(file)
 
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
-    joined_path = os.path.join(gtfs_dir, sqlite_file)
-    _LOGGER.debug("unpacking: %s", joined_path)
-    gtfs = pygtfs.Schedule(joined_path)
-    # check or wait for unpack
-    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    while os.path.isfile(journal):
-        time.sleep(10)
+    joined_path = os.path.join(gtfs_dir, sqlite_file) 
+    gtfs = pygtfs.Schedule(joined_path) 
     if not gtfs.feeds:
+        _LOGGER.info("Starting gtfs file unpacking: %s", joined_path)
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     return gtfs
-
 
 def get_route_list(schedule):
     sql_routes = f"""
@@ -397,7 +401,7 @@ def get_datasources(hass, path) -> dict[str]:
     datasources = []
     for file in files:
         if file.endswith(".sqlite"):
-            datasources.append(file.split(".")[0])
+            datasources.append(file.split(".")[0])        
     _LOGGER.debug(f"datasources: {datasources}")
     return datasources
 
