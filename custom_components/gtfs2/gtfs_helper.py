@@ -298,6 +298,7 @@ def get_next_departure(self):
         "next_departures": timetable_remaining,
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,
+        "gtfs_updated_at": dt_util.now().replace(tzinfo=None),
     }
 
 
