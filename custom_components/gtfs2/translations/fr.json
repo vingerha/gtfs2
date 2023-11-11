@@ -10,9 +10,10 @@
       "source": {
         "data": {
           "file": "Nom de la nouvelle source de données",
-          "url": "URL externe vers le fichier (zip) des données GTFS"
+          "url": "URL externe vers le fichier (zip) des données GTFS",
+		  "extract_from": "Collecte données de:"
         },
-        "description": "REMARQUE: avec une nouvelle URL/zip, cela peut prendre du temps après la soumission, \n selon la taille du fichier et performance du serveur"
+        "description": "REMARQUE: avec une nouvelle URL/zip, cela peut prendre du temps après la soumission, selon la taille du fichier et performance du serveur"
       },
       "route": {
         "data": {
@@ -54,8 +55,30 @@
       "init": {
         "description": "Personnalisez le fonctionnement de l'intégration",
         "data": {
-          "refresh_interval": "Personnalisez le fonctionnement de l'intégration"
+          "refresh_interval": "Intervalle d'actualisation en minutes",
+		  "real_time": "Ajoute intégration temps réel? \n (nécessite données de la même source)"
         }
+      },
+	  "real_time": {
+        "description": "URL vers données temps réel",
+        "data": {
+          "trip_update_url": "URL vers: trip data",
+		  "vehicle_position_url": "URL vers: position véhicule (ou trip data)"
+        }
+      }
+    }
+  },
+ "selector": {
+    "extract_from": {
+      "options": {
+        "zip": "ZIP: attend un fichier dans dossier 'gtfs2' avec le même nom, sans extension .zip",
+        "url": "URL: utilise l'URL below, laisse 'na' si zip"
+      }
+    },
+	"direction": {
+      "options": {
+        "0": "Aller",
+        "1": "Retour"
       }
     }
   }

@@ -9,6 +9,7 @@ from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import selector
 
 from .const import DEFAULT_PATH, DOMAIN, DEFAULT_REFRESH_INTERVAL
 
@@ -81,8 +82,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="source",
                 data_schema=vol.Schema(
                     {
+                        vol.Required("extract_from"): selector.SelectSelector(selector.SelectSelectorConfig(options=["zip", "url"], translation_key="extract_from")),
                         vol.Required("file"): str,
-                        vol.Required("extract_from"): vol.In({"zip": "Use gtfs2/zipfile with above name, without extension", "url": "Use URL below, leave 'na' if using zip"}),
                         vol.Required("url", default="na"): str,
                     },
                 ),
@@ -141,9 +142,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data_schema=vol.Schema(
                     {
                         vol.Required("route"): vol.In(get_route_list(self._pygtfs)),
-                        vol.Required("direction"): vol.In(
-                            {"0": "Outward", "1": "Return"}
-                        ),
+                        vol.Required("direction"): selector.SelectSelector(selector.SelectSelectorConfig(options=["0", "1"], translation_key="direction")),
                     },
                 ),
                 errors=errors,
@@ -173,9 +172,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required("destination", default=last_stop): vol.In(stops),
                         vol.Required("name"): str,
                         vol.Optional("offset", default=0): int,
-                        vol.Required("include_tomorrow"): vol.In(
-                            {False: "No", True: "Yes"}
-                        ),
+                        vol.Optional("include_tomorrow", default = False): selector.BooleanSelector(),
                     },
                 ),
                 errors=errors,
@@ -262,15 +259,16 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 self._user_inputs.update(user_input)
                 _LOGGER.debug(f"GTFS Options without realtime: {self._user_inputs}")
                 return self.async_create_entry(title="", data=self._user_inputs)
-
+        
+        opt1_schema = {
+                    vol.Optional("refresh_interval", default=self.config_entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL)): int,
+                    vol.Optional("real_time", default=self.config_entry.options.get("real_time")): selector.BooleanSelector()
+                }
+        
+        
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional("refresh_interval", default=self.config_entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL)): int,
-                    vol.Required("real_time", default=self.config_entry.options.get("real_time")): vol.In({False: "No", True: "Yes"}),
-                }
-            ),
+            data_schema=vol.Schema(opt1_schema)
         )
         
     async def async_step_real_time(

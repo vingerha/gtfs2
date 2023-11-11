@@ -10,7 +10,8 @@
       "source": {
         "data": {
           "file": "New datasource name",
-          "url": "external url to gtfs data (zip) file"
+          "url": "external url to gtfs data (zip) file",
+		  "extract_from": "Extract data from:"
         },
         "description": "NOTE: with a new url/zip, this may take quite a bit of time, \n depending on file-size and system performance"
       },
@@ -54,7 +55,8 @@
       "init": {
         "description": "Customize the way the integration works",
         "data": {
-          "refresh_interval": "Data refresh interval (in minutes)"
+          "refresh_interval": "Data refresh interval (in minutes)",
+		  "real_time": "Setup Realtime integration? \n (needs data from the same source)"
         }
       },
 	  "real_time": {
@@ -63,6 +65,20 @@
           "trip_update_url": "URL to trip data",
 		  "vehicle_position_url": "URL to vehicle position (can be the same as trip data)"
         }
+      }
+    }
+  },
+  "selector": {
+    "extract_from": {
+      "options": {
+        "zip": "ZIP: expects a file in gtfs2-folder with below name, without extension .zip",
+        "url": "URL: uses your URL below, leave 'na' if using zip"
+      }
+    },
+	"direction": {
+      "options": {
+        "0": "Outward",
+        "1": "Return"
       }
     }
   }
