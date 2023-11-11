@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL_RT
+from .const import DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL
 from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index
 from .gtfs_rt_helper import get_rt_route_statuses, get_next_services
 
@@ -92,7 +92,7 @@ class GTFSRealtimeUpdateCoordinator(DataUpdateCoordinator):
         #add real_time if setup
 
 
-        if options["real_time"]:
+        if "real_time" in options:
         
             """Initialize the info object."""
             self._trip_update_url = options["trip_update_url"]
@@ -115,7 +115,7 @@ class GTFSRealtimeUpdateCoordinator(DataUpdateCoordinator):
             self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
             _LOGGER.debug("GTFS RT: Realtime next service: %s", self._get_next_service)
         else:
-            _LOGGER.debug("GTFS RT: Issue with options")
-
+            _LOGGER.error("GTFS RT: Issue with entity options")
+            return "---"
 
         return self._get_next_service

@@ -12,7 +12,7 @@
           "file": "New datasource name",
           "url": "external url to gtfs data (zip) file"
         },
-        "description": "NOTE: with a new url, this may take quite a bit of time, \n depending on file-size and system performance"
+        "description": "NOTE: with a new url/zip, this may take quite a bit of time, \n depending on file-size and system performance"
       },
       "route": {
         "data": {

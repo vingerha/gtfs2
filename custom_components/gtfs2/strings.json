@@ -12,7 +12,7 @@
           "file": "New datasource name",
           "url": "external url to gtfs data file"
         },
-        "description": "NOTE: with a new url: this may take minutes after submit"
+        "description": "NOTE: with a new url/zip, this may take a long time after submit"
       },
       "remove": {
         "data": {

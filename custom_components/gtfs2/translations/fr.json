@@ -12,7 +12,7 @@
           "file": "Nom de la nouvelle source de données",
           "url": "URL externe vers le fichier (zip) des données GTFS"
         },
-        "description": "REMARQUE : avec une nouvelle URL, cela peut prendre du temps après la soumission, selon la taille du fichier et performance du serveur"
+        "description": "REMARQUE: avec une nouvelle URL/zip, cela peut prendre du temps après la soumission, \n selon la taille du fichier et performance du serveur"
       },
       "route": {
         "data": {

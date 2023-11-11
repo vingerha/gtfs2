@@ -91,7 +91,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required("file"): str,
-                    vol.Required("extract_from"): vol.In({"zip": "Existing Zipfile with same name", "url": "URL below"}),
+                    vol.Required("extract_from"): vol.In({"zip": "Use gtfs2/zipfile with above name, without extension", "url": "Use URL below, leave 'na' if using zip"}),
                     vol.Required("url", default="na"): str,
                 },
             ),
@@ -246,6 +246,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
+            user_input['real_time'] = False
             if user_input['real_time']:
                 self._user_inputs.update(user_input)
                 _LOGGER.debug(f"GTFS Options with realtime: {self._user_inputs}")
@@ -260,7 +261,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional("refresh_interval", default=self.config_entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL)): int,
-                    vol.Required("real_time"): vol.In({False: "No", True: "Yes"}),
+#                    vol.Required("real_time"): vol.In({False: "No", True: "Yes"}),
                 }
             ),
         )

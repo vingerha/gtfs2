@@ -48,7 +48,7 @@ def get_next_departure(self):
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
 
     sql_query = f"""
-        SELECT trip.trip_id, trip.route_id,route.route_long_name,
+        SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -93,7 +93,7 @@ def get_next_departure(self):
         AND calendar.start_date <= :today
         AND calendar.end_date >= :today
 		UNION ALL
-	    SELECT trip.trip_id, trip.route_id,route.route_long_name,
+	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -211,7 +211,7 @@ def get_next_departure(self):
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining
     )
-
+    # create upcoming timetable with line info
     timetable_remaining_line = []
     for key2, value in sorted(timetable.items()):
         if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
@@ -221,6 +221,17 @@ def get_next_departure(self):
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, per line: %s",
         timetable_remaining_line,
+    )
+    # create upcoming timetable with headsign
+    timetable_remaining_headsign = []
+    for key2, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+            timetable_remaining_headsign.append(
+                str(key2) + " (" + str(value["trip_headsign"]) + ")"
+            )
+    _LOGGER.debug(
+        "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
+        timetable_remaining_headsign,
     )
 
     # Format arrival and departure dates and times, accounting for the
@@ -286,6 +297,7 @@ def get_next_departure(self):
         "destination_stop_time": destination_stop_time,
         "next_departures": timetable_remaining,
         "next_departures_lines": timetable_remaining_line,
+        "next_departures_headsign": timetable_remaining_headsign,
     }
 
 
