@@ -27,8 +27,10 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options = {**config_entry.options}
         new_options['real_time'] = False
         new_options['refresh_interval'] = 15
+        new_options['api_key'] = ""
+        new_options['x_api_key'] = ""
         
-        config_entry.version = 3
+        config_entry.version = 4
         hass.config_entries.async_update_entry(config_entry, data=new)
         hass.config_entries.async_update_entry(config_entry, options=new_options)
     
@@ -36,9 +38,20 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
 
         new_options = {**config_entry.options}
         new_options['real_time'] = False
+        new_options['api_key'] = ""
+        new_options['x_api_key'] = ""
 
-        config_entry.version = 3
-        hass.config_entries.async_update_entry(config_entry, options=new_options)        
+        config_entry.version = 4
+        hass.config_entries.async_update_entry(config_entry, options=new_options)  
+
+    if config_entry.version == 3:
+
+        new_options = {**config_entry.options}
+        new_options['api_key'] = ""
+        new_options['x_api_key'] = ""
+
+        config_entry.version = 4
+        hass.config_entries.async_update_entry(config_entry, options=new_options)  
 
     _LOGGER.debug("Migration to version %s successful", config_entry.version)
 

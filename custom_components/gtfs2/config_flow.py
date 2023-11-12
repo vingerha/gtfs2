@@ -11,7 +11,15 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
 
-from .const import DEFAULT_PATH, DOMAIN, DEFAULT_REFRESH_INTERVAL
+from .const import (
+    DEFAULT_PATH, 
+    DOMAIN, 
+    DEFAULT_REFRESH_INTERVAL, 
+    CONF_API_KEY, 
+    CONF_X_API_KEY, 
+    CONF_VEHICLE_POSITION_URL, 
+    CONF_TRIP_UPDATE_URL
+)    
 
 from .gtfs_helper import (
     get_gtfs,
@@ -35,7 +43,7 @@ STEP_SOURCE = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for GTFS."""
 
-    VERSION = 3
+    VERSION = 4
 
     def __init__(self) -> None:
         """Init ConfigFlow."""
@@ -284,8 +292,10 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="real_time",
             data_schema=vol.Schema(
                 {
-                    vol.Required("trip_update_url", default=self.config_entry.options.get("trip_update_url")): str,
-                    vol.Required("vehicle_position_url", default=self.config_entry.options.get("vehicle_position_url")): str,
+                    vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
+                    vol.Required(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL)): str,
+                    vol.Optional(CONF_API_KEY, default="na"): str,
+                    vol.Optional(CONF_X_API_KEY,default="na"): str
                 },
             ),
             errors=errors,

@@ -63,7 +63,9 @@
         "description": "Provide url to real time API",
         "data": {
           "trip_update_url": "URL to trip data",
-		  "vehicle_position_url": "URL to vehicle position (can be the same as trip data)"
+		  "vehicle_position_url": "URL to vehicle position (or same as trip data)",
+		  "api_key": "API key, if required",
+		  "x_api_key": "X_API key, if required"
         }
       }
     }
@@ -77,7 +79,7 @@
     },
 	"direction": {
       "options": {
-        "0": "Outward",
+        "0": "Outbound",
         "1": "Return"
       }
     }

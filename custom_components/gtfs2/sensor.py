@@ -361,36 +361,32 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         prefix = "next_departures"
         self._attributes["next_departures"] = []
         if self._next_departures:
-            self._attributes["next_departures"] = self._departure["next_departures"][
-                :10
-            ]
+            self._attributes["next_departures"] = self._departure[
+                "next_departures"][:10]
         # Add next departures with their lines
         prefix = "next_departures_lines"
         self._attributes["next_departures_lines"] = []
         if self._next_departures:
             self._attributes["next_departures_lines"] = self._departure[
-                "next_departures_lines"
-            ][:10]
+                "next_departures_lines"][:10]
             
         # Add next departures with their headsign
         prefix = "next_departures_headsign"
         self._attributes["next_departures_headsign"] = []
         if self._next_departures:
             self._attributes["next_departures_headsign"] = self._departure[
-                "next_departures_headsign"
-            ][:10]            
+                "next_departures_headsign"][:10] 
+
+            self._attributes["gtfs_updated_at"] = self._departure[
+                "gtfs_updated_at"]
         
-        # Add next departure realtime
-        self._attributes["next_departure_realtime"] = self._departure[
-                "next_departure_realtime"
-            ]
-        self._attributes["gtfs_rt_updated_at"] = self._departure[
-                "gtfs_rt_updated_at"
-            ]    
+        _LOGGER.debug("next dep realtime attr: %s", self._departure["next_departure_realtime_attr"])
+        # Add next departure realtime       
+        self._attributes["gtfs_rt_updated_at"] = self._departure["next_departure_realtime_attr"]["gtfs_rt_updated_at"]
+        self._attributes["latitude"] = self._departure["next_departure_realtime_attr"]["latitude"] 
+        self._attributes["longitude"] = self._departure["next_departure_realtime_attr"]["longitude"]
+        self._attributes["next_departure_realtime"] = self._departure["next_departure_realtime_attr"]["Due in"]
         
-        self._attributes["gtfs_updated_at"] = self._departure[
-                "gtfs_updated_at"
-            ]
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes
 

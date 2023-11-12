@@ -236,3 +236,37 @@ WHEELCHAIR_ACCESS_OPTIONS = {1: True, 2: False}
 WHEELCHAIR_BOARDING_DEFAULT = STATE_UNKNOWN
 WHEELCHAIR_BOARDING_OPTIONS = {1: True, 2: False}
 
+#gtfs_rt
+ATTR_STOP_ID = "Stop ID"
+ATTR_ROUTE = "Route"
+ATTR_DIRECTION_ID = "Direction ID"
+ATTR_DUE_IN = "Due in"
+ATTR_DUE_AT = "Due at"
+ATTR_NEXT_UP = "Next Service"
+ATTR_ICON = "Icon"
+ATTR_UNIT_OF_MEASUREMENT = "unit_of_measurement"
+ATTR_DEVICE_CLASS = "device_class"
+ATTR_LATITUDE = "latitude"
+ATTR_LONGITUDE = "longitude"
+ATTR_RT_UPDATED_AT = "gtfs_rt_updated_at"
+
+CONF_API_KEY = "api_key"
+CONF_X_API_KEY = "x_api_key"
+CONF_STOP_ID = "stopid"
+CONF_ROUTE = "route"
+CONF_DIRECTION_ID = "directionid"
+CONF_DEPARTURES = "departures"
+CONF_TRIP_UPDATE_URL = "trip_update_url"
+CONF_VEHICLE_POSITION_URL = "vehicle_position_url"
+CONF_ROUTE_DELIMITER = "route_delimiter"
+CONF_ICON = "icon"
+CONF_SERVICE_TYPE = "service_type"
+CONF_RELATIVE_TIME = "show_relative_time"
+
+DEFAULT_SERVICE = "Service"
+DEFAULT_ICON = "mdi:bus"
+DEFAULT_DIRECTION = "0"
+
+TIME_STR_FORMAT = "%H:%M"
+
+

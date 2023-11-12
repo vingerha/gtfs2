@@ -13,63 +13,36 @@ from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
 
-ATTR_STOP_ID = "Stop ID"
-ATTR_ROUTE = "Route"
-ATTR_DIRECTION_ID = "Direction ID"
-ATTR_DUE_IN = "Due in"
-ATTR_DUE_AT = "Due at"
-ATTR_NEXT_UP = "Next Service"
-ATTR_ICON = "Icon"
-ATTR_UNIT_OF_MEASUREMENT = "unit_of_measurement"
-ATTR_DEVICE_CLASS = "device_class"
+from .const import (
 
-CONF_API_KEY = "api_key"
-CONF_X_API_KEY = "x_api_key"
-CONF_STOP_ID = "stopid"
-CONF_ROUTE = "route"
-CONF_DIRECTION_ID = "directionid"
-CONF_DEPARTURES = "departures"
-CONF_TRIP_UPDATE_URL = "trip_update_url"
-CONF_VEHICLE_POSITION_URL = "vehicle_position_url"
-CONF_ROUTE_DELIMITER = "route_delimiter"
-CONF_ICON = "icon"
-CONF_SERVICE_TYPE = "service_type"
-CONF_RELATIVE_TIME = "show_relative_time"
+    ATTR_STOP_ID,
+    ATTR_ROUTE,
+    ATTR_DIRECTION_ID,
+    ATTR_DUE_IN,
+    ATTR_DUE_AT,
+    ATTR_NEXT_UP,
+    ATTR_ICON,
+    ATTR_UNIT_OF_MEASUREMENT,
+    ATTR_DEVICE_CLASS,
 
-DEFAULT_SERVICE = "Service"
-DEFAULT_ICON = "mdi:bus"
-DEFAULT_DIRECTION = "0"
+    CONF_API_KEY,
+    CONF_X_API_KEY,
+    CONF_STOP_ID,
+    CONF_ROUTE,
+    CONF_DIRECTION_ID,
+    CONF_DEPARTURES,
+    CONF_TRIP_UPDATE_URL,
+    CONF_VEHICLE_POSITION_URL,
+    CONF_ROUTE_DELIMITER,
+    CONF_ICON,
+    CONF_SERVICE_TYPE,
+    CONF_RELATIVE_TIME,
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
-TIME_STR_FORMAT = "%H:%M"
+    DEFAULT_SERVICE,
+    DEFAULT_ICON,
+    DEFAULT_DIRECTION,
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_TRIP_UPDATE_URL): cv.string,
-        vol.Optional(CONF_API_KEY): cv.string,
-        vol.Optional(CONF_X_API_KEY): cv.string,
-        vol.Optional(CONF_VEHICLE_POSITION_URL): cv.string,
-        vol.Optional(CONF_ROUTE_DELIMITER): cv.string,
-        
-        vol.Optional(CONF_DEPARTURES): [
-            {
-                vol.Required(CONF_NAME): cv.string,
-                vol.Required(CONF_STOP_ID): cv.string,
-                vol.Required(CONF_ROUTE): cv.string,
-                vol.Optional(CONF_RELATIVE_TIME, default=True): cv.boolean,
-                vol.Optional(
-                    CONF_DIRECTION_ID,
-                    default=DEFAULT_DIRECTION,  # type: ignore
-                ): str,
-                vol.Optional(
-                    CONF_ICON, default=DEFAULT_ICON  # type: ignore
-                ): cv.string,
-                vol.Optional(
-                    CONF_SERVICE_TYPE, default=DEFAULT_SERVICE  # type: ignore
-                ): cv.string,
-            }
-        ],
-    }
+    TIME_STR_FORMAT
 )
 
 def due_in_minutes(timestamp):
@@ -98,6 +71,7 @@ def log_debug(data: list, indent_level: int) -> None:
 
 
 def get_gtfs_feed_entities(url: str, headers, label: str):
+    _LOGGER.debug(f"GTFS RT get_feed_entities for url: {url} , headers: {headers}, label: {label}")
     feed = gtfs_realtime_pb2.FeedMessage()  # type: ignore
 
     # TODO add timeout to requests call
@@ -114,21 +88,17 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
             0,
         )
 
-    feed.ParseFromString(response.content)
+    feed.ParseFromString(response.content) 
+    
     return feed.entity
-
-
-       
-## reworked for gtfs2
 
 def get_next_services(self):
     self.data = self._get_rt_route_statuses
     self._stop = self._stop_id
     self._route = self._route_id
     self._direction = self._direction
-    _LOGGER.debug("Get Next Services, route/direction/stop: %s", self.data.get(self._route, {}).get(self._direction, {}).get(self._stop, []))
-    
     next_services = self.data.get(self._route, {}).get(self._direction, {}).get(self._stop, [])
+    
     if self.hass.config.time_zone is None:
         _LOGGER.error("Timezone is not set in Home Assistant configuration")
         timezone = "UTC"
@@ -136,23 +106,61 @@ def get_next_services(self):
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     
     if self._relative :
-        return (
+        due_in = (
             due_in_minutes(next_services[0].arrival_time)
             if len(next_services) > 0
             else "-"
         )
     else:
-        return (
+        due_in = (
             next_services[0].arrival_time.replace(tzinfo=timezone)
             if len(next_services) > 0
             else "-"
         )
 
+    attrs = {
+        ATTR_DUE_IN: due_in,
+        ATTR_STOP_ID: self._stop,
+        ATTR_ROUTE: self._route,
+        ATTR_DIRECTION_ID: self._direction,
+    }
+    if len(next_services) > 0:
+        attrs[ATTR_DUE_AT] = (
+            next_services[0].arrival_time.strftime(TIME_STR_FORMAT)
+            if len(next_services) > 0
+            else "-"
+        )
+        attrs[ATTR_LATITUDE] = ""
+        attrs[ATTR_LONGITUDE] = ""
+        if next_services[0].position:
+            attrs[ATTR_LATITUDE] = next_services[0].position.latitude
+            attrs[ATTR_LONGITUDE] = next_services[0].position.longitude
+    if len(next_services) > 1:
+        attrs[ATTR_NEXT_UP] = (
+            next_services[1].arrival_time.strftime(TIME_STR_FORMAT)
+            if len(next_services) > 1
+            else "-"
+        )
+    if self._relative :
+        attrs[ATTR_UNIT_OF_MEASUREMENT] = "min"
+    else :
+        attrs[ATTR_DEVICE_CLASS] = (
+            "timestamp" 
+            if len(next_services) > 0
+            else ""
+        )
+
+    _LOGGER.debug("GTFS RT next services attributes: %s", attrs)
+    return attrs
+    
 def get_rt_route_statuses(self):
-        
+
     vehicle_positions = {}
     
-
+    if self._vehicle_position_url != "" :   
+        vehicle_positions = get_rt_vehicle_positions(self)
+           
+        
     class StopDetails:
         def __init__(self, arrival_time, position):
             self.arrival_time = arrival_time
@@ -283,7 +291,6 @@ def get_rt_vehicle_positions(self):
         headers=self._headers,
         label="vehicle positions",
     )
-
     for entity in feed_entities:
         vehicle = entity.vehicle
 
