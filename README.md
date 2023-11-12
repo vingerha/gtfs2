@@ -68,6 +68,7 @@ or via yaml
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
+- @mark1foley for his gtfs real time integration which I managed to alter/integrate
 
 
 
