@@ -62,8 +62,18 @@ or via yaml
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/2fea7926-a64d-43b6-a653-c95f1f01c66d)
 
+## Known issues/challenges with source data
 
+Static gtfs:
+- not complying to the pygtfs unpacking library, examples: missing dates in feed_info > manual fix
+- calendar not showing if a service is run on a specific day > fix via adding calendar_dates to filter, only works if (!) calendar_dates is used alternatively for the same purpose
+- missing routes/stops/times, transport runs but gtfs does nto show it > report issue with your gtfs data provider
+- routes show A > B (outward) but stop selection shows inversed B > A, within one gtfs source both good as incorrect start/end can show up  > report issue with your gtfs data provider
 
+Realtime gtfs
+- few realtiem providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
+- format incorrect of incomming json/feed > report issue with your gtfs data provider, they should adhere to standards
+- realtime data not always available, few refreshes are fine then nothing then fine again, often related to timeout from provider > report issue with your gtfs data provider
 
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
