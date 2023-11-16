@@ -24,6 +24,8 @@ from .const import (
     ATTR_ICON,
     ATTR_UNIT_OF_MEASUREMENT,
     ATTR_DEVICE_CLASS,
+    ATTR_LATITUDE,
+    ATTR_LONGITUDE,
 
     CONF_API_KEY,
     CONF_X_API_KEY,
@@ -113,7 +115,7 @@ def get_next_services(self):
         )
     else:
         due_in = (
-            next_services[0].arrival_time.replace(tzinfo=timezone)
+            dt_util.as_utc(next_services[0].arrival_time)
             if len(next_services) > 0
             else "-"
         )
@@ -123,6 +125,8 @@ def get_next_services(self):
         ATTR_STOP_ID: self._stop,
         ATTR_ROUTE: self._route,
         ATTR_DIRECTION_ID: self._direction,
+        ATTR_LATITUDE: "",
+        ATTR_LONGITUDE: ""
     }
     if len(next_services) > 0:
         attrs[ATTR_DUE_AT] = (
@@ -130,8 +134,6 @@ def get_next_services(self):
             if len(next_services) > 0
             else "-"
         )
-        attrs[ATTR_LATITUDE] = ""
-        attrs[ATTR_LONGITUDE] = ""
         if next_services[0].position:
             attrs[ATTR_LATITUDE] = next_services[0].position.latitude
             attrs[ATTR_LONGITUDE] = next_services[0].position.longitude
@@ -301,6 +303,10 @@ def get_rt_vehicle_positions(self):
             [
                 "Adding position for trip ID",
                 vehicle.trip.trip_id,
+                "route ID",
+                vehicle.trip.route_id,
+                "direction ID",
+                vehicle.trip.direction_id,
                 "position latitude",
                 vehicle.position.latitude,
                 "longitude",

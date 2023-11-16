@@ -54,7 +54,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             self.hass, DEFAULT_PATH, data, False
         )
         previous_data = None if self.data is None else self.data.copy()
-       
+  
         if previous_data is not None and (previous_data["next_departure"]["gtfs_updated_at"] + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.now().replace(tzinfo=None):
             # do nothing awaiting refresh interval
             self._data = previous_data
@@ -85,7 +85,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         
         # collect and return rt attributes
         # STILL REQUIRES A SOLUTION IF TIMING OUT
-        self._data["next_departure"]["next_departure_realtime_attr"] = {ATTR_RT_UPDATED_AT: "", ATTR_DUE_IN: "-", ATTR_LATITUDE: "", ATTR_LONGITUDE: ""}
         if "real_time" in options:
             if options["real_time"]:
                 self._get_next_service = {}
@@ -108,13 +107,12 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 try:
                     self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
+                    self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
+                    self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.now().replace(tzinfo=None)
                 except Exception as ex:  # pylint: disable=broad-except
                     _LOGGER.error("Error getting gtfs realtime data: %s", ex)
-                    self._get_next_service = "error"
-                self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
-                self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.now().replace(tzinfo=None)
             else:
-                _LOGGER.info("GTFS RT: RealTime = false, selected in entity options") 
+                _LOGGER.info("GTFS RT: RealTime = false, selected in entity options")            
         else:
             _LOGGER.debug("GTFS RT: RealTime not selected in entity options")
         return self._data

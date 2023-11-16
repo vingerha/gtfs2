@@ -208,16 +208,16 @@ def get_next_departure(self):
     timetable_remaining = []
     for key in sorted(timetable.keys()):
         if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
-            timetable_remaining.append(key)
+            timetable_remaining.append(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat())
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining
     )
     # create upcoming timetable with line info
     timetable_remaining_line = []
-    for key2, value in sorted(timetable.items()):
-        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+    for key, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             timetable_remaining_line.append(
-                str(key2) + " (" + str(value["route_long_name"]) + ")"
+                str(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat()) + " (" + str(value["route_long_name"]) + ")"
             )
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, per line: %s",
@@ -225,10 +225,10 @@ def get_next_departure(self):
     )
     # create upcoming timetable with headsign
     timetable_remaining_headsign = []
-    for key2, value in sorted(timetable.items()):
-        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+    for key, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             timetable_remaining_headsign.append(
-                str(key2) + " (" + str(value["trip_headsign"]) + ")"
+                str(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat()) + " (" + str(value["trip_headsign"]) + ")"
             )
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
@@ -260,9 +260,18 @@ def get_next_departure(self):
     dest_depart_time = (
         f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
     )
-
-    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)
+    # align on timezone
+    #_LOGGER.error("dest_depart NEW: %s", dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat())
+    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)    
     arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone)
+    #_LOGGER.error("dest_depart: %s", dest_depart)
+    #_LOGGER.error("depart_time: %s", depart_time)
+    origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    
+    #_LOGGER.error("dtutil now: %s", dt_util.now())
 
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
