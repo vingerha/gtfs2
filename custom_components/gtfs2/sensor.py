@@ -381,11 +381,12 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                 "gtfs_updated_at"]
         
         _LOGGER.debug("next dep realtime attr: %s", self._departure["next_departure_realtime_attr"])
-        # Add next departure realtime to the right level 
-        self._attributes["gtfs_rt_updated_at"] = self._departure["next_departure_realtime_attr"]["gtfs_rt_updated_at"]
-        self._attributes["next_departure_realtime"] = self._departure["next_departure_realtime_attr"]["Due in"]
-        self._attributes["latitude"] = self._departure["next_departure_realtime_attr"]["latitude"]
-        self._attributes["longitude"] = self._departure["next_departure_realtime_attr"]["longitude"]
+        # Add next departure realtime to the right level, only if populated
+        if "gtfs_rt_updated_at" in self._departure["next_departure_realtime_attr"]:
+            self._attributes["gtfs_rt_updated_at"] = self._departure["next_departure_realtime_attr"]["gtfs_rt_updated_at"]
+            self._attributes["next_departure_realtime"] = self._departure["next_departure_realtime_attr"]["Due in"]
+            self._attributes["latitude"] = self._departure["next_departure_realtime_attr"]["latitude"]
+            self._attributes["longitude"] = self._departure["next_departure_realtime_attr"]["longitude"]
 
         
         self._attr_extra_state_attributes = self._attributes

@@ -1,6 +1,7 @@
 """Data Update coordinator for the GTFS integration."""
 from __future__ import annotations
 
+import datetime
 from datetime import timedelta
 import logging
 
@@ -54,12 +55,12 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             self.hass, DEFAULT_PATH, data, False
         )
         previous_data = None if self.data is None else self.data.copy()
-  
-        if previous_data is not None and (previous_data["next_departure"]["gtfs_updated_at"] + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.now().replace(tzinfo=None):
+
+        if previous_data is not None and (datetime.datetime.strptime(previous_data["next_departure"]["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :
             # do nothing awaiting refresh interval
             self._data = previous_data
  
-        if previous_data is None or (previous_data["next_departure"]["gtfs_updated_at"] + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) <  dt_util.now().replace(tzinfo=None):
+        if previous_data is None or  (datetime.datetime.strptime(previous_data["next_departure"]["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) <  dt_util.utcnow() + timedelta(seconds=1):
             self._data = {
                 "schedule": self._pygtfs,
                 "origin": data["origin"].split(": ")[0],
@@ -108,7 +109,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
                     self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
-                    self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.now().replace(tzinfo=None)
+                    self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()
                 except Exception as ex:  # pylint: disable=broad-except
                     _LOGGER.error("Error getting gtfs realtime data: %s", ex)
             else:
