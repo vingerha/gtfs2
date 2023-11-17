@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime, timedelta
+import json
+import os
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
@@ -43,6 +45,8 @@ from .const import (
     DEFAULT_SERVICE,
     DEFAULT_ICON,
     DEFAULT_DIRECTION,
+    DEFAULT_PATH,
+    DEFAULT_PATH_GEOJSON,
 
     TIME_STR_FORMAT
 )
@@ -293,9 +297,12 @@ def get_rt_vehicle_positions(self):
         headers=self._headers,
         label="vehicle positions",
     )
+    #_LOGGER.error("GTFS RT feed entities: %s", feed_entities)
+    geojson_body = []
+    geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
         vehicle = entity.vehicle
-
+        
         if not vehicle.trip.trip_id:
             # Vehicle is not in service
             continue
@@ -314,8 +321,40 @@ def get_rt_vehicle_positions(self):
             ],
             2,
         )
+        positions[vehicle.trip.trip_id] = vehicle.position        
+        
+        #construct geojson only for configured rout/direction
+        if str(self._route_id) == str(vehicle.trip.route_id) and str(self._direction) == str(vehicle.trip.direction_id):
+            geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
+            geojson_element["geometry"]["coordinates"] = []
+            geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
+            geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
+            geojson_element["properties"]["id"] = vehicle.trip.trip_id
+            geojson_element["properties"]["title"] = vehicle.trip.trip_id
+            geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
+            geojson_element["properties"]["route_id"] = vehicle.trip.route_id
+            geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
+            geojson_element["properties"]["vehicle_id"] = "tbd"
+            geojson_element["properties"]["vehicle_label"] = "tbd"
+            geojson_body.append(geojson_element)
+    
+    self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
+        
 
-        positions[vehicle.trip.trip_id] = vehicle.position
-
+    #_LOGGER.error("GTFS RT Positions: %s", positions)
+    _LOGGER.error("GTFS RT geojson body: %s", json.dumps(self.geojson))
+    self._route_dir = self._route_id + "_" + self._direction
+    update_geojson(self)
     return positions
+    
+    
+def update_geojson(self):    
+    geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
+    os.makedirs(geojson_dir, exist_ok=True)
+    file = os.path.join(geojson_dir, self._route_dir + ".json")
+    #_LOGGER.error("gtfs geojson file: %s", file)
+    with open(file, "w") as outfile:
+        json.dump(self.geojson, outfile)
+    
+    
         
