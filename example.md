@@ -39,6 +39,20 @@ You can add a optional area
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/f2f855f9-bc07-405d-8b0b-09b3da7e4f79)
 
+## CONFIGURE Options 
+
+After setup you can change the refresh interval and add real-time source(s)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/03135ba3-e9ff-4fe6-a23b-bb1f0a44c6ea)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/11de0f3c-ac1b-4b4d-8712-38764dfc5bd4)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/5895e947-882d-444e-9259-e56d7d5e426a)
+
+
+
+
+
 Sample of the entity and its attributes
 ```
 arrival: "2023-11-04T09:42:29+00:00"
