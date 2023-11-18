@@ -368,7 +368,7 @@ def get_route_list(schedule):
         row = row_cursor._asdict()
         routes_list.append(list(row_cursor))
     for x in routes_list:
-        val = x[0] + ": " + x[1] + " (" + x[2] + ")"
+        val = str(x[0]) + ": " + str(x[1]) + " (" + str(x[2]) + ")"
         routes.append(val)
     _LOGGER.debug(f"routes: {routes}")
     return routes
