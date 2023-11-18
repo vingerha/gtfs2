@@ -138,9 +138,9 @@ def get_next_services(self):
             if len(next_services) > 0
             else "-"
         )
-        if next_services[0].position:
-            attrs[ATTR_LATITUDE] = next_services[0].position.latitude
-            attrs[ATTR_LONGITUDE] = next_services[0].position.longitude
+        if next_services[0].position[0]:
+            attrs[ATTR_LATITUDE] = next_services[0].position[0][1]
+            attrs[ATTR_LONGITUDE] = next_services[0].position[0][0]
     if len(next_services) > 1:
         attrs[ATTR_NEXT_UP] = (
             next_services[1].arrival_time.strftime(TIME_STR_FORMAT)
@@ -165,8 +165,7 @@ def get_rt_route_statuses(self):
     
     if self._vehicle_position_url != "" :   
         vehicle_positions = get_rt_vehicle_positions(self)
-           
-        
+              
     class StopDetails:
         def __init__(self, arrival_time, position):
             self.arrival_time = arrival_time
@@ -270,9 +269,7 @@ def get_rt_route_statuses(self):
 
                     details = StopDetails(
                         datetime.fromtimestamp(stop_time),
-                        vehicle_positions.get(
-                            entity.trip_update.trip.trip_id
-                        ),
+                        [d["properties"].get(entity.trip_update.trip.trip_id) for d in vehicle_positions],
                     )
                     departure_times[route_id][direction_id][
                         stop_id
@@ -291,13 +288,11 @@ def get_rt_route_statuses(self):
     return departure_times
 
 def get_rt_vehicle_positions(self):
-    positions = {}
     feed_entities = get_gtfs_feed_entities(
         url=self._vehicle_position_url,
         headers=self._headers,
         label="vehicle positions",
     )
-    #_LOGGER.error("GTFS RT feed entities: %s", feed_entities)
     geojson_body = []
     geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
@@ -320,8 +315,7 @@ def get_rt_vehicle_positions(self):
                 vehicle.position.longitude,
             ],
             2,
-        )
-        positions[vehicle.trip.trip_id] = vehicle.position        
+        )    
         
         #construct geojson only for configured rout/direction
         if str(self._route_id) == str(vehicle.trip.route_id) and str(self._direction) == str(vehicle.trip.direction_id):
@@ -329,30 +323,29 @@ def get_rt_vehicle_positions(self):
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
             geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
-            geojson_element["properties"]["id"] = vehicle.trip.trip_id
-            geojson_element["properties"]["title"] = vehicle.trip.trip_id
+            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
+            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
             geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
             geojson_element["properties"]["route_id"] = vehicle.trip.route_id
             geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
             geojson_element["properties"]["vehicle_id"] = "tbd"
             geojson_element["properties"]["vehicle_label"] = "tbd"
+            geojson_element["properties"][vehicle.trip.trip_id] = geojson_element["geometry"]["coordinates"]
             geojson_body.append(geojson_element)
     
     self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
         
-
-    #_LOGGER.error("GTFS RT Positions: %s", positions)
-    _LOGGER.error("GTFS RT geojson body: %s", json.dumps(self.geojson))
+    _LOGGER.debug("GTFS RT geojson: %s", json.dumps(self.geojson))
     self._route_dir = self._route_id + "_" + self._direction
     update_geojson(self)
-    return positions
+    return geojson_body
     
     
 def update_geojson(self):    
     geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
     os.makedirs(geojson_dir, exist_ok=True)
     file = os.path.join(geojson_dir, self._route_dir + ".json")
-    #_LOGGER.error("gtfs geojson file: %s", file)
+    _LOGGER.debug("gtfs geojson file: %s", file)
     with open(file, "w") as outfile:
         json.dump(self.geojson, outfile)
     
