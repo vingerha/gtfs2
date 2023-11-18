@@ -138,9 +138,10 @@ def get_next_services(self):
             if len(next_services) > 0
             else "-"
         )
-        if next_services[0].position[0]:
-            attrs[ATTR_LATITUDE] = next_services[0].position[0][1]
-            attrs[ATTR_LONGITUDE] = next_services[0].position[0][0]
+        if next_services[0].position:
+            if next_services[0].position[0]:
+                attrs[ATTR_LATITUDE] = next_services[0].position[0][1]
+                attrs[ATTR_LONGITUDE] = next_services[0].position[0][0]
     if len(next_services) > 1:
         attrs[ATTR_NEXT_UP] = (
             next_services[1].arrival_time.strftime(TIME_STR_FORMAT)
