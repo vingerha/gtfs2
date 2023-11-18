@@ -49,6 +49,12 @@ Use the workflow
 
 Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
+## Real Time vehicle tracking
+
+As per v1.6, the vehicle tracking output coordinates to geojson file in your www folder, which in turn can then be consumed by the geosjon integration and map card https://www.home-assistant.io/integrations/geo_json_events/
+![image](https://github.com/vingerha/gtfs2/assets/44190435/a3cbea60-46f1-40e9-88c5-4b9a0519c782)
+
+
 **IMPORTANT**
 
 - certain providers publish large zip-files which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
@@ -67,12 +73,7 @@ or via yaml
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/0d50bb87-c081-4cd6-8dc5-9603a44c21a4)
 
 
-
-
-
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
-
-
-
+- @mark1foley for his gtfs real time integration which was enhanced with its integration in GTFS2
