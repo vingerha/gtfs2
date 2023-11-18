@@ -55,11 +55,11 @@ As per v1.6, the vehicle tracking output coordinates to geojson file in your www
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/a3cbea60-46f1-40e9-88c5-4b9a0519c782)
 
 
-**IMPORTANT**
-
+## **IMPORTANT**
+- sources need to adhere to GTFS standards both for static data (zip/sqlite) as well as for real-time data (binary). 
 - certain providers publish large zip-files which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
-- for these large db, performance may be slow too, there is a PR to improve this by adding indexes to the stop_times table
 - the integration uses folder /config/gtfs2 to store the datafiles (zip and sqlite)
+- the integration uses folder /config/www for geojson files, only available when using verhical tracking sources
 
 ## Data add / update
 Data can be updated at your own discretion by a service, e.g. you can have a weekly automation to run the service
