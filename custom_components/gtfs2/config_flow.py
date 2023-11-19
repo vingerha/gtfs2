@@ -293,7 +293,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
-                    vol.Required(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL)): str,
+                    vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL)): str,
                     vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY, "na")): str,
                     vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY, "na")): str
                 },

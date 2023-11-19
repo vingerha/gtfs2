@@ -74,7 +74,7 @@
     "extract_from": {
       "options": {
         "zip": "ZIP: attend un fichier dans dossier 'gtfs2' avec le même nom, sans extension .zip",
-        "url": "URL: utilise l'URL below, laisse 'na' si zip"
+        "url": "URL: utilise l'URL, laisse 'na' si zip"
       }
     },
 	"direction": {
@@ -83,5 +83,23 @@
         "1": "Retour"
       }
     }
+  },
+  "services": {
+    "update_gtfs": {
+      "name": "MAJ d'un GTFS2 datasource",
+      "description": "Utiliser un lien ou placer votre fichier ZIP dans le dossier gtfs2",
+      "fields": {
+        "extract_from": {
+          "name": "Collecte données de:"
+		},
+		"file": {
+          "name": "Nom du Service, sans ajouter .zip, "
+		},
+		"url": {
+          "name": "URL externe vers le fichier (zip) des données GTFS, laisse 'na' si zip",
+		  "description": "A noter: si déjà existant, l'ancien sera remplacé"
+		}
+	  }
+	}
   }
 }

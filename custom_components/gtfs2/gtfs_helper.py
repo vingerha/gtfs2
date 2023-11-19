@@ -4,6 +4,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+import json
 import requests
 import pygtfs
 from sqlalchemy.sql import text
@@ -11,6 +12,8 @@ import multiprocessing
 
 import homeassistant.util.dt as dt_util
 from homeassistant.core import HomeAssistant
+
+from .const import DEFAULT_PATH_GEOJSON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -329,8 +332,10 @@ def get_gtfs(hass, path, data, update=False):
     if os.path.exists(journal) :
         _LOGGER.debug("Still unpacking %s", filename)
         return "extracting"
-    if update and os.path.exists(os.path.join(gtfs_dir, file)):
+    if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
+    if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)):
+        os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
         if not os.path.exists(os.path.join(gtfs_dir, file)):
             _LOGGER.error("The given GTFS zipfile was not found")
@@ -437,11 +442,20 @@ def check_datasource_index(schedule):
     WHERE
     type= 'index' and tbl_name = 'stop_times' and name like '%stop_id%';
     """
+    sql_index_3 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'shapes' and name like '%shape_id%';
+    """
     sql_add_index_1 = f"""
     create index gtfs2_stop_times_trip_id on stop_times(trip_id)
     """
     sql_add_index_2 = f"""
     create index gtfs2_stop_times_stop_id on stop_times(stop_id)
+    """
+    sql_add_index_3 = f"""
+    create index gtfs2_shapes_shape_id on shapes(shape_id)
     """
     result_1a = schedule.engine.connect().execute(
         text(sql_index_1),
@@ -468,3 +482,47 @@ def check_datasource_index(schedule):
             text(sql_add_index_2),
             {"q": "q"},
             )
+            
+    result_3a = schedule.engine.connect().execute(
+        text(sql_index_3),
+        {"q": "q"},
+    )
+    for row_cursor in result_3a:
+        _LOGGER.debug("IDX result3: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checkidx'] == 0:
+            _LOGGER.info("Adding index 3 to improve performance")
+            result_3b = schedule.engine.connect().execute(
+            text(sql_add_index_3),
+            {"q": "q"},
+            )            
+            
+def create_trip_geojson(self):
+    #_LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)
+    schedule = self._data["schedule"]
+    self._trip_id = self._data["next_departure"]["trip_id"]
+    sql_shape = f"""
+    SELECT t.trip_id, s.shape_pt_lat, s.shape_pt_lon
+    FROM trips t, shapes s
+    WHERE
+    t.shape_id = s.shape_id
+    and t.trip_id = '{self._trip_id}'
+    order by s.shape_pt_sequence
+    """
+    result = schedule.engine.connect().execute(
+        text(sql_shape),
+        {"q": "q"},
+    )
+    
+    shapes_list = []
+    coordinates = []
+    for row_cursor in result:
+        row = row_cursor._asdict()
+        shapes_list.append(list(row_cursor))
+    for x in shapes_list:
+        coordinate = []
+        coordinate.append(x[2])
+        coordinate.append(x[1])
+        coordinates.append(coordinate)
+    self.geojson = {"features": [{"geometry": {"coordinates": coordinates, "type": "LineString"}, "properties": {"id": self._trip_id, "title": self._trip_id}, "type": "Feature"}], "type": "FeatureCollection"}    
+    #_LOGGER.error("Geojson: %s", json.dumps(self.geojson))
+    return None

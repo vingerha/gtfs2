@@ -83,5 +83,24 @@
         "1": "Return"
       }
     }
+  },
+  "services": {
+    "update_gtfs": {
+      "name": "Updates a GTFS2 datasource",
+      "description": "Either via Link or placing a Zip yourselves in gtfs2",
+      "fields": {
+        "extract_from": {
+          "name": "Indicate source to use zip or url"
+		},
+		"file": {
+          "name": "Name of the transport service, without .zip",
+		  "description": "If you use the same name as an existing one, the existing one will be overwitten"
+		},
+		"url": {
+          "name": "URL",
+		  "description": "provide the full path to the zip file itself"
+		}
+	  }
+	}
   }
 }

@@ -21,7 +21,7 @@ from .const import (
     ATTR_LONGITUDE,
     ATTR_RT_UPDATED_AT
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson
 from .gtfs_rt_helper import get_rt_route_statuses, get_next_services
 
 _LOGGER = logging.getLogger(__name__)
@@ -79,6 +79,9 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._data["next_departure"] = await self.hass.async_add_executor_job(
                     get_next_departure, self
                 )
+                trip_shape = await self.hass.async_add_executor_job(
+                    create_trip_geojson, self
+                )
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.error("Error getting gtfs data from generic helper: %s", ex)
                 return None
@@ -115,7 +118,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
                     self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()
                 except Exception as ex:  # pylint: disable=broad-except
-                    _LOGGER.error("Error getting gtfs realtime data: %s", ex)
+                    _LOGGER.error("Error getting gtfs realtime data, for origin: %s with error: %s", data["origin"], ex)
             else:
                 _LOGGER.info("GTFS RT: RealTime = false, selected in entity options")            
         else:
