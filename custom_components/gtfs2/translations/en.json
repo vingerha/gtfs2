@@ -90,7 +90,8 @@
       "description": "Either via Link or placing a Zip yourselves in gtfs2",
       "fields": {
         "extract_from": {
-          "name": "Indicate source to use zip or url"
+          "name": "Indicate source to use zip or url",
+	  "description": ""		
 		},
 		"file": {
           "name": "Name of the transport service, without .zip",
