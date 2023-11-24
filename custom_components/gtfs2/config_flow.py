@@ -15,6 +15,7 @@ from .const import (
     DEFAULT_PATH, 
     DOMAIN, 
     DEFAULT_REFRESH_INTERVAL, 
+    DEFAULT_OFFSET,
     CONF_API_KEY, 
     CONF_X_API_KEY, 
     CONF_VEHICLE_POSITION_URL, 
@@ -43,7 +44,7 @@ STEP_SOURCE = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for GTFS."""
 
-    VERSION = 4
+    VERSION = 5
 
     def __init__(self) -> None:
         """Init ConfigFlow."""
@@ -179,7 +180,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required("origin"): vol.In(stops),
                         vol.Required("destination", default=last_stop): vol.In(stops),
                         vol.Required("name"): str,
-                        vol.Optional("offset", default=0): int,
                         vol.Optional("include_tomorrow", default = False): selector.BooleanSelector(),
                     },
                 ),
@@ -216,7 +216,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "schedule": self._pygtfs,
             "origin": data["origin"].split(": ")[0],
             "destination": data["destination"].split(": ")[0],
-            "offset": data["offset"],
+            "offset": 0,
             "include_tomorrow": data["include_tomorrow"],
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
@@ -261,7 +261,6 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             if user_input['real_time']:
                 self._user_inputs.update(user_input)
-                _LOGGER.debug(f"GTFS Options with realtime: {self._user_inputs}")
                 return await self.async_step_real_time()    
             else: 
                 self._user_inputs.update(user_input)
@@ -270,6 +269,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
         
         opt1_schema = {
                     vol.Optional("refresh_interval", default=self.config_entry.options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL)): int,
+                    vol.Optional("offset", default=self.config_entry.options.get("offset", DEFAULT_OFFSET)): int,
                     vol.Optional("real_time", default=self.config_entry.options.get("real_time")): selector.BooleanSelector()
                 }
         
@@ -286,6 +286,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
         errors: dict[str, str] = {}
         if user_input is not None:
             self._user_inputs.update(user_input)
+            _LOGGER.debug(f"GTFS Options with realtime: {self._user_inputs}")
             return self.async_create_entry(title="", data=self._user_inputs)
 
         return self.async_show_form(
@@ -293,7 +294,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
-                    vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL)): str,
+                    vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL,"")): str,
                     vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY, "na")): str,
                     vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY, "na")): str
                 },

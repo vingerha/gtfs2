@@ -31,7 +31,7 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['x_api_key'] = ""
         
         config_entry.version = 4
-        hass.config_entries.async_update_entry(config_entry, data=new)
+        hass.config_entries.async_update_entry(config_entry, data=new_data)
         hass.config_entries.async_update_entry(config_entry, options=new_options)
     
     if config_entry.version == 2:
@@ -52,6 +52,17 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
 
         config_entry.version = 4
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
+        
+    if config_entry.version == 4:
+
+        new_options = {**config_entry.options}
+        new_data = {**config_entry.data}
+        new_options['offset'] = 0
+        new_data.pop('offset')
+
+        config_entry.version = 5
+        hass.config_entries.async_update_entry(config_entry, data=new_data)
+        hass.config_entries.async_update_entry(config_entry, options=new_options)          
 
     _LOGGER.debug("Migration to version %s successful", config_entry.version)
 

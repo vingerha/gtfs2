@@ -205,6 +205,10 @@ def get_next_departure(self):
             break
 
     if item == {}:
+        data_returned = {        
+        "gtfs_updated_at": dt_util.utcnow().isoformat(),
+        }
+        _LOGGER.debug("No items found in gtfs")
         return {}
 
     # create upcoming timetable
@@ -264,11 +268,8 @@ def get_next_departure(self):
         f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
     )
     # align on timezone
-    #_LOGGER.error("dest_depart NEW: %s", dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat())
     depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)    
     arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone)
-    #_LOGGER.error("dest_depart: %s", dest_depart)
-    #_LOGGER.error("depart_time: %s", depart_time)
     origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
@@ -297,8 +298,8 @@ def get_next_departure(self):
         "Sequence": item["dest_stop_sequence"],
         "Timepoint": item["dest_stop_timepoint"],
     }
-
-    return {
+    
+    data_returned = {
         "trip_id": item["trip_id"],
         "route_id": item["route_id"],
         "day": item["day"],
@@ -314,7 +315,9 @@ def get_next_departure(self):
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
         "next_departure_realtime_attr": {},
     }
-
+    _LOGGER.debug("Data returned: %s", data_returned)
+    
+    return data_returned
 
 def get_gtfs(hass, path, data, update=False):
     """Get gtfs file."""

@@ -55,17 +55,30 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             self.hass, DEFAULT_PATH, data, False
         )
         previous_data = None if self.data is None else self.data.copy()
-
-        if previous_data is not None and (datetime.datetime.strptime(previous_data["next_departure"]["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :
+        _LOGGER.debug("Previous data: %s", previous_data)
+        # determin static + rt or only static (refresh schedule depending)
+        #1. sensor exists but no gtfs data, e.g. after reboot after last transport
+        #if previous_data is not None and (not "gtfs_update_at" in previous_data["next_departure"]):
+        #    run_static = True
+        #    _LOGGER.debug("Run static refresh 1: sensor with gtfs data but incomplete for name: %s", data["name"])
+        #1. sensor exists with data but refresh interval not yet reached, use existing data
+        if previous_data is not None and (datetime.datetime.strptime(previous_data["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :        
+            run_static = False
+            _LOGGER.debug("Do not Run static refresh: sensor exists but not yet refresh for name: %s", data["name"])
+        #2. sensor exists and refresh interval reached, get static data
+        else:
+            run_static = True
+            _LOGGER.debug("Run static refresh 2: sensor without gtfs data OR refresh for name: %s", data["name"])
+        
+        if not run_static:
             # do nothing awaiting refresh interval
             self._data = previous_data
- 
-        if previous_data is None or  (datetime.datetime.strptime(previous_data["next_departure"]["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) <  dt_util.utcnow() + timedelta(seconds=1):
+        else:
             self._data = {
                 "schedule": self._pygtfs,
                 "origin": data["origin"].split(": ")[0],
                 "destination": data["destination"].split(": ")[0],
-                "offset": data["offset"],
+                "offset": options["offset"] if "offset" in options else 0,
                 "include_tomorrow": data["include_tomorrow"],
                 "gtfs_dir": DEFAULT_PATH,
                 "name": data["name"],
@@ -79,9 +92,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._data["next_departure"] = await self.hass.async_add_executor_job(
                     get_next_departure, self
                 )
-                trip_shape = await self.hass.async_add_executor_job(
-                    create_trip_geojson, self
-                )
+                self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat()
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.error("Error getting gtfs data from generic helper: %s", ex)
                 return None
@@ -123,5 +134,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("GTFS RT: RealTime = false, selected in entity options")            
         else:
             _LOGGER.debug("GTFS RT: RealTime not selected in entity options")
+        
         return self._data
 

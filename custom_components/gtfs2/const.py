@@ -5,6 +5,7 @@ DOMAIN = "gtfs2"
 
 # default values for options
 DEFAULT_REFRESH_INTERVAL = 15
+DEFAULT_OFFSET = 0
 
 DEFAULT_NAME = "GTFS Sensor2"
 DEFAULT_PATH = "gtfs2"

@@ -26,7 +26,6 @@
           "origin": "Arrêt d'origine",
           "destination": "Arrêt de destination",
           "name": "Nom de la ligne",
-          "offset": "Décalage en minutes",
           "refresh_interval": "Intervalle d'actualisation en minutes",
           "include_tomorrow": "Inclure le lendemain?"
         }
@@ -56,6 +55,7 @@
         "description": "Personnalisez le fonctionnement de l'intégration",
         "data": {
           "refresh_interval": "Intervalle d'actualisation en minutes",
+		  "offset": "Décalage en minutes",
 		  "real_time": "Ajoute intégration temps réel? \n (nécessite données de la même source)"
         }
       },

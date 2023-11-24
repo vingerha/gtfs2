@@ -180,22 +180,23 @@ def get_rt_route_statuses(self):
 
     for entity in feed_entities:
         if entity.HasField("trip_update"):
+            # OUTCOMMENTED as spamming even debig log 
             # If delimiter specified split the route ID in the gtfs rt feed
-            log_debug(
-                [
-                    "Received Trip ID",
-                    entity.trip_update.trip.trip_id,
-                    "Route ID:",
-                    entity.trip_update.trip.route_id,
-                    "direction ID",
-                    entity.trip_update.trip.direction_id,
-                    "Start Time:",
-                    entity.trip_update.trip.start_time,
-                    "Start Date:",
-                    entity.trip_update.trip.start_date,
-                ],
-                1,
-            )
+            #log_debug(
+            #    [
+            #        "Received Trip ID",
+            #        entity.trip_update.trip.trip_id,
+            #        "Route ID:",
+            #        entity.trip_update.trip.route_id,
+            #        "direction ID",
+            #        entity.trip_update.trip.direction_id,
+            #        "Start Time:",
+            #        entity.trip_update.trip.start_time,
+            #        "Start Date:",
+            #        entity.trip_update.trip.start_date,
+            #    ],
+            #    1,
+            #)
             if self._route_delimiter is not None:
                 route_id_split = entity.trip_update.trip.route_id.split(
                     self._route_delimiter
@@ -204,15 +205,16 @@ def get_rt_route_statuses(self):
                     route_id = entity.trip_update.trip.route_id
                 else:
                     route_id = route_id_split[0]
-                log_debug(
-                    [
-                        "Feed Route ID",
-                        entity.trip_update.trip.route_id,
-                        "changed to",
-                        route_id,
-                    ],
-                    1,
-                )
+                # OUTCOMMENTED as spamming even debig log
+                #log_debug(
+                #    [
+                #        "Feed Route ID",
+                #        entity.trip_update.trip.route_id,
+                #        "changed to",
+                #        route_id,
+                #    ],
+                #    1,
+                #)
 
             else:
                 route_id = entity.trip_update.trip.route_id

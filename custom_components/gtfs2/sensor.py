@@ -336,10 +336,11 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             )
         else:
             self.remove_keys(prefix)
-
-        _LOGGER.debug(
-            "Destination_stop_time %s", self._departure["destination_stop_time"]
-        )
+        
+        if "destination_stop_time" in self._departure:
+            _LOGGER.debug("Destination_stop_time %s", self._departure["destination_stop_time"])
+        else:
+            _LOGGER.debug("No destination_stop_time")
         prefix = "destination_stop"
         if self._departure:
             self.append_keys(self._departure["destination_stop_time"], prefix)
@@ -377,18 +378,20 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self._attributes["next_departures_headsign"] = self._departure[
                 "next_departures_headsign"][:10] 
 
-            self._attributes["gtfs_updated_at"] = self._departure[
-                "gtfs_updated_at"]
+        self._attributes["gtfs_updated_at"] = self.coordinator.data[
+            "gtfs_updated_at"]
         
-        _LOGGER.debug("next dep realtime attr: %s", self._departure["next_departure_realtime_attr"])
-        # Add next departure realtime to the right level, only if populated
-        if "gtfs_rt_updated_at" in self._departure["next_departure_realtime_attr"]:
-            self._attributes["gtfs_rt_updated_at"] = self._departure["next_departure_realtime_attr"]["gtfs_rt_updated_at"]
-            self._attributes["next_departure_realtime"] = self._departure["next_departure_realtime_attr"]["Due in"]
-            self._attributes["latitude"] = self._departure["next_departure_realtime_attr"]["latitude"]
-            self._attributes["longitude"] = self._departure["next_departure_realtime_attr"]["longitude"]
-
-        
+        if "next_departure_realtime_attr" in self._departure:
+            _LOGGER.debug("next dep realtime attr: %s", self._departure["next_departure_realtime_attr"])
+            # Add next departure realtime to the right level, only if populated
+            if "gtfs_rt_updated_at" in self._departure["next_departure_realtime_attr"]:
+                self._attributes["gtfs_rt_updated_at"] = self._departure["next_departure_realtime_attr"]["gtfs_rt_updated_at"]
+                self._attributes["next_departure_realtime"] = self._departure["next_departure_realtime_attr"]["Due in"]
+                self._attributes["latitude"] = self._departure["next_departure_realtime_attr"]["latitude"]
+                self._attributes["longitude"] = self._departure["next_departure_realtime_attr"]["longitude"]
+        else:
+            _LOGGER.debug("No next departure realtime attributes")            
+               
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes
 
