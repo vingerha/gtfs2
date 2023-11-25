@@ -91,7 +91,7 @@
       "fields": {
         "extract_from": {
           "name": "Indicate source to use zip or url",
-	  "description": ""		
+		  "description": ""
 		},
 		"file": {
           "name": "Name of the transport service, without .zip",

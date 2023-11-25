@@ -124,9 +124,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
         try:
             removed = remove_datasource(self.hass, DEFAULT_PATH, user_input["file"])
-            _LOGGER.debug(f"removed value: {removed}")
+            _LOGGER.debug(f"Removed gtfs data source: {removed}")
         except Exception as ex:
-            _LOGGER.info("Error while deleting : %s", {ex})
+            _LOGGER.error("Error while deleting : %s", {ex})
             return "generic_failure"
         return self.async_abort(reason="files_deleted")
 
@@ -221,6 +221,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "next_departure": None,
+            "file": data["file"],
         }
 
         try:
@@ -228,7 +229,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 get_next_departure, self
             )
         except Exception as ex:  # pylint: disable=broad-except
-            _LOGGER.info(
+            _LOGGER.error(
                 "Config: error getting gtfs data from generic helper: %s",
                 {ex},
                 exc_info=1,

@@ -348,7 +348,7 @@ def update_geojson(self):
     geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
     os.makedirs(geojson_dir, exist_ok=True)
     file = os.path.join(geojson_dir, self._route_dir + ".json")
-    _LOGGER.debug("gtfs geojson file: %s", file)
+    _LOGGER.debug("GTFS RT geojson file: %s", file)
     with open(file, "w") as outfile:
         json.dump(self.geojson, outfile)
     

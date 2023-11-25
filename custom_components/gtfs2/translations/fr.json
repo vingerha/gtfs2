@@ -90,13 +90,15 @@
       "description": "Utiliser un lien ou placer votre fichier ZIP dans le dossier gtfs2",
       "fields": {
         "extract_from": {
-          "name": "Collecte données de:"
+          "name": "Collecte données de:",
+		  "description": ""
 		},
 		"file": {
-          "name": "Nom du Service, sans ajouter .zip, "
+          "name": "Nom du Service, sans ajouter .zip",
+		  "description": "A noter: si déjà existant, l'ancien sera remplacé"
 		},
 		"url": {
-          "name": "URL externe vers le fichier (zip) des données GTFS, laisse 'na' si zip",
+          "name": "URL externe vers le fichier (zip) des données GTFS, laissez le 'na' si zip",
 		  "description": "A noter: si déjà existant, l'ancien sera remplacé"
 		}
 	  }

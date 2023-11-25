@@ -133,15 +133,15 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._route = None
         self._agency = None
         # Fetch valid stop information once
-        if not self._origin:
+        if not self._origin and self._departure:
             stops = self._pygtfs.stops_by_id(self.origin)
             if not stops:
                 self._available = False
                 _LOGGER.warning("Origin stop ID %s not found", self.origin)
                 return
-            self._origin = stops[0]
+            self._origin = stops[0]         
 
-        if not self._destination:
+        if not self._destination and self._departure:
             stops = self._pygtfs.stops_by_id(self.destination)
             if not stops:
                 self._available = False
@@ -257,9 +257,9 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
 
         if self._state is None:
             self._attributes[ATTR_INFO] = (
-                "No more departures"
+                "No more departures or extracting new data"
                 if self._include_tomorrow
-                else "No more departures today"
+                else "No more departures today or extracting new data"
             )
         elif ATTR_INFO in self._attributes:
             del self._attributes[ATTR_INFO]
@@ -340,7 +340,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         if "destination_stop_time" in self._departure:
             _LOGGER.debug("Destination_stop_time %s", self._departure["destination_stop_time"])
         else:
-            _LOGGER.debug("No destination_stop_time")
+            _LOGGER.warning("No destination_stop_time")
         prefix = "destination_stop"
         if self._departure:
             self.append_keys(self._departure["destination_stop_time"], prefix)

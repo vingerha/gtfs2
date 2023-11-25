@@ -20,6 +20,13 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_next_departure(self):
     _LOGGER.debug("Get next departure with data: %s", self._data)
+    gtfs_dir = self.hass.config.path(self._data["gtfs_dir"])
+    filename = self._data["file"]
+    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
+    if os.path.exists(journal) :
+        _LOGGER.error("Cannot use this datasource as still unpacking: %s", filename)
+        return {}
+
     """Get next departures from data."""
     if self.hass.config.time_zone is None:
         _LOGGER.error("Timezone is not set in Home Assistant configuration")
@@ -208,7 +215,7 @@ def get_next_departure(self):
         data_returned = {        
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
         }
-        _LOGGER.debug("No items found in gtfs")
+        _LOGGER.info("No items found in gtfs")
         return {}
 
     # create upcoming timetable
@@ -275,8 +282,6 @@ def get_next_departure(self):
     dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     
-    #_LOGGER.error("dtutil now: %s", dt_util.now())
-
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
         "Departure Time": origin_depart_time,
@@ -329,15 +334,12 @@ def get_gtfs(hass, path, data, update=False):
     file = data["file"] + ".zip"
     sqlite = data["file"] + ".sqlite"
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    _LOGGER.debug("filename__: %s", filename[-2:])
-    _LOGGER.debug("journal: %s", journal)
-    _LOGGER.debug("journal exist: %s", os.path.exists(journal))
-    if os.path.exists(journal) :
-        _LOGGER.debug("Still unpacking %s", filename)
+    if os.path.exists(journal) and not update :
+        _LOGGER.warning("Cannot use this datasource as still unpacking %s", filename)
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
-    if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)):
+    if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
         os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
         if not os.path.exists(os.path.join(gtfs_dir, file)):
@@ -413,14 +415,12 @@ def get_datasources(hass, path) -> dict[str]:
     _LOGGER.debug(f"Datasources path: {path}")
     gtfs_dir = hass.config.path(path)
     os.makedirs(gtfs_dir, exist_ok=True)
-    _LOGGER.debug(f"Datasources folder: {gtfs_dir}")
     files = os.listdir(gtfs_dir)
-    _LOGGER.debug(f"Datasources files: {files}")
     datasources = []
     for file in files:
         if file.endswith(".sqlite"):
             datasources.append(file.split(".")[0])        
-    _LOGGER.debug(f"datasources: {datasources}")
+    _LOGGER.debug(f"Datasources in folder: {datasources}")
     return datasources
 
 
@@ -432,7 +432,15 @@ def remove_datasource(hass, path, filename):
     return "removed"
 
 
-def check_datasource_index(schedule):
+def check_datasource_index(self):
+    _LOGGER.debug("Check datasource with data: %s", self._data)
+    gtfs_dir = self.hass.config.path(self._data["gtfs_dir"])
+    filename = self._data["file"]
+    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
+    if os.path.exists(journal) :
+        _LOGGER.warning("Cannot check indexes on this datasource as still unpacking: %s", filename)
+        return
+    schedule=self._pygtfs
     sql_index_1 = f"""
     SELECT count(*) as checkidx
     FROM sqlite_master
@@ -467,7 +475,7 @@ def check_datasource_index(schedule):
     for row_cursor in result_1a:
         _LOGGER.debug("IDX result1: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.info("Adding index 1 to improve performance")
+            _LOGGER.debug("Adding index 1 to improve performance")
             result_1b = schedule.engine.connect().execute(
             text(sql_add_index_1),
             {"q": "q"},
@@ -480,7 +488,7 @@ def check_datasource_index(schedule):
     for row_cursor in result_2a:
         _LOGGER.debug("IDX result2: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.info("Adding index 2 to improve performance")
+            _LOGGER.debug("Adding index 2 to improve performance")
             result_2b = schedule.engine.connect().execute(
             text(sql_add_index_2),
             {"q": "q"},
@@ -493,14 +501,14 @@ def check_datasource_index(schedule):
     for row_cursor in result_3a:
         _LOGGER.debug("IDX result3: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.info("Adding index 3 to improve performance")
+            _LOGGER.debug("Adding index 3 to improve performance")
             result_3b = schedule.engine.connect().execute(
             text(sql_add_index_3),
             {"q": "q"},
             )            
             
 def create_trip_geojson(self):
-    #_LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)
+    _LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)
     schedule = self._data["schedule"]
     self._trip_id = self._data["next_departure"]["trip_id"]
     sql_shape = f"""
@@ -527,5 +535,5 @@ def create_trip_geojson(self):
         coordinate.append(x[1])
         coordinates.append(coordinate)
     self.geojson = {"features": [{"geometry": {"coordinates": coordinates, "type": "LineString"}, "properties": {"id": self._trip_id, "title": self._trip_id}, "type": "Feature"}], "type": "FeatureCollection"}    
-    #_LOGGER.error("Geojson: %s", json.dumps(self.geojson))
+    _LOGGER.debug("Geojson: %s", json.dumps(self.geojson))
     return None
