@@ -20,11 +20,8 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_next_departure(self):
     _LOGGER.debug("Get next departure with data: %s", self._data)
-    gtfs_dir = self.hass.config.path(self._data["gtfs_dir"])
-    filename = self._data["file"]
-    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    if os.path.exists(journal) :
-        _LOGGER.error("Cannot use this datasource as still unpacking: %s", filename)
+    if check_extracting(self):
+        _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
         return {}
 
     """Get next departures from data."""
@@ -335,7 +332,7 @@ def get_gtfs(hass, path, data, update=False):
     sqlite = data["file"] + ".sqlite"
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
     if os.path.exists(journal) and not update :
-        _LOGGER.warning("Cannot use this datasource as still unpacking %s", filename)
+        _LOGGER.warning("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
@@ -430,15 +427,21 @@ def remove_datasource(hass, path, filename):
     os.remove(os.path.join(gtfs_dir, filename + ".zip"))
     os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
     return "removed"
-
-
-def check_datasource_index(self):
-    _LOGGER.debug("Check datasource with data: %s", self._data)
+    
+def check_extracting(self):
     gtfs_dir = self.hass.config.path(self._data["gtfs_dir"])
     filename = self._data["file"]
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
     if os.path.exists(journal) :
-        _LOGGER.warning("Cannot check indexes on this datasource as still unpacking: %s", filename)
+        _LOGGER.debug("check extracting: yes")
+        return True
+    return False    
+
+
+def check_datasource_index(self):
+    _LOGGER.debug("Check datasource with data: %s", self._data)
+    if check_extracting(self):
+        _LOGGER.warning("Cannot check indexes on this datasource as still unpacking: %s", self._data["file"])
         return
     schedule=self._pygtfs
     sql_index_1 = f"""

@@ -21,7 +21,7 @@ from .const import (
     ATTR_LONGITUDE,
     ATTR_RT_UPDATED_AT
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
 from .gtfs_rt_helper import get_rt_route_statuses, get_next_services
 
 _LOGGER = logging.getLogger(__name__)
@@ -50,9 +50,31 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
         data = self.config_entry.data
         options = self.config_entry.options
-        
         previous_data = None if self.data is None else self.data.copy()
-        _LOGGER.debug("Previous data: %s", previous_data)
+        _LOGGER.debug("Previous data: %s", previous_data)  
+
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )        
+        self._data = {
+            "schedule": self._pygtfs,
+            "origin": data["origin"].split(": ")[0],
+            "destination": data["destination"].split(": ")[0],
+            "offset": options["offset"] if "offset" in options else 0,
+            "include_tomorrow": data["include_tomorrow"],
+            "gtfs_dir": DEFAULT_PATH,
+            "name": data["name"],
+            "file": data["file"],
+            "extracting": False,
+            "next_departure": {}
+        }           
+
+        if check_extracting(self):    
+            _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data["extracting"] = True
+            return previous_data
+        
+
         # determin static + rt or only static (refresh schedule depending)
         #1. sensor exists with data but refresh interval not yet reached, use existing data
         if previous_data is not None and (datetime.datetime.strptime(previous_data["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :        
@@ -67,20 +89,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             # do nothing awaiting refresh interval and use existing data
             self._data = previous_data
         else:
-            self._pygtfs = get_gtfs(
-                self.hass, DEFAULT_PATH, data, False
-            )
-            self._data = {
-                "schedule": self._pygtfs,
-                "origin": data["origin"].split(": ")[0],
-                "destination": data["destination"].split(": ")[0],
-                "offset": options["offset"] if "offset" in options else 0,
-                "include_tomorrow": data["include_tomorrow"],
-                "gtfs_dir": DEFAULT_PATH,
-                "name": data["name"],
-                "file": data["file"],
-            }
-            
             check_index = await self.hass.async_add_executor_job(
                     check_datasource_index, self
                 )

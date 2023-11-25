@@ -119,6 +119,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         _LOGGER.debug(f"SENSOR update attr DATA: {self.coordinator.data}")
         self._pygtfs = self.coordinator.data["schedule"]
         self.origin = self.coordinator.data["origin"].split(": ")[0]
+        self.extracting = self.coordinator.data["extracting"]
         self.destination = self.coordinator.data["destination"].split(": ")[0]
         self._include_tomorrow = self.coordinator.data["include_tomorrow"]
         self._offset = self.coordinator.data["offset"]
@@ -132,34 +133,18 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._trip = None
         self._route = None
         self._agency = None
-        # Fetch valid stop information once
-        if not self._origin and self._departure:
-            stops = self._pygtfs.stops_by_id(self.origin)
-            if not stops:
-                self._available = False
-                _LOGGER.warning("Origin stop ID %s not found", self.origin)
-                return
-            self._origin = stops[0]         
-
-        if not self._destination and self._departure:
-            stops = self._pygtfs.stops_by_id(self.destination)
-            if not stops:
-                self._available = False
-                _LOGGER.warning("Destination stop ID %s not found", self.destination)
-                return
-            self._destination = stops[0]
 
         # Fetch trip and route details once, unless updated
         if not self._departure:
             self._trip = None
         else:
             trip_id = self._departure["trip_id"]
-            if not self._trip or self._trip.trip_id != trip_id:
+            if not self.extracting and (not self._trip or self._trip.trip_id != trip_id):
                 _LOGGER.debug("Fetching trip details for %s", trip_id)
                 self._trip = self._pygtfs.trips_by_id(trip_id)[0]
 
             route_id = self._departure["route_id"]
-            if not self._route or self._route.route_id != route_id:
+            if not self.extracting and (not self._route or self._route.route_id != route_id):
                 _LOGGER.debug("Fetching route details for %s", route_id)
                 self._route = self._pygtfs.routes_by_id(route_id)[0]
 
