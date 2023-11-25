@@ -37,21 +37,29 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
     if config_entry.version == 2:
 
         new_options = {**config_entry.options}
+        new_data = {**config_entry.data}
         new_options['real_time'] = False
         new_options['api_key'] = ""
         new_options['x_api_key'] = ""
+        new_options['offset'] = 0
+        new_data.pop('offset')
 
         config_entry.version = 4
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
+        hass.config_entries.async_update_entry(config_entry, data=new_data)        
 
     if config_entry.version == 3:
 
         new_options = {**config_entry.options}
+        new_data = {**config_entry.data}
         new_options['api_key'] = ""
         new_options['x_api_key'] = ""
+        new_options['offset'] = 0
+        new_data.pop('offset')
 
         config_entry.version = 4
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
+        hass.config_entries.async_update_entry(config_entry, data=new_data)
         
     if config_entry.version == 4:
 
