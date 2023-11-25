@@ -29,8 +29,10 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['refresh_interval'] = 15
         new_options['api_key'] = ""
         new_options['x_api_key'] = ""
+        new_options['offset'] = 0
+        new_data.pop('offset')
         
-        config_entry.version = 4
+        config_entry.version = 5
         hass.config_entries.async_update_entry(config_entry, data=new_data)
         hass.config_entries.async_update_entry(config_entry, options=new_options)
     
@@ -44,7 +46,7 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['offset'] = 0
         new_data.pop('offset')
 
-        config_entry.version = 4
+        config_entry.version = 5
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
         hass.config_entries.async_update_entry(config_entry, data=new_data)        
 
@@ -57,7 +59,7 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['offset'] = 0
         new_data.pop('offset')
 
-        config_entry.version = 4
+        config_entry.version = 5
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
         hass.config_entries.async_update_entry(config_entry, data=new_data)
         
