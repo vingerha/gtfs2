@@ -1,4 +1,5 @@
 {
   "name": "GTFS2 for HomeAssistant",
+  "render_readme": true,
   "homeassistant": "2023.10.1"
 }
