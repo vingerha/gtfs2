@@ -118,8 +118,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
     def _update_attrs(self):  # noqa: C901 PLR0911
         _LOGGER.debug(f"SENSOR update attr DATA: {self.coordinator.data}")
         self._pygtfs = self.coordinator.data["schedule"]
-        self.origin = self.coordinator.data["origin"].split(": ")[0]
         self.extracting = self.coordinator.data["extracting"]
+        self.origin = self.coordinator.data["origin"].split(": ")[0]
         self.destination = self.coordinator.data["destination"].split(": ")[0]
         self._include_tomorrow = self.coordinator.data["include_tomorrow"]
         self._offset = self.coordinator.data["offset"]
@@ -128,11 +128,30 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._icon = ICON
         self._state: datetime.datetime | None = None
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
-        self._origin = None
-        self._destination = None
         self._trip = None
         self._route = None
         self._agency = None
+        self._origin = None
+        self._destination = None        
+        # Fetch valid stop information once
+        if not self._origin and not self.extracting:
+            stops = self._pygtfs.stops_by_id(self.origin)
+            if not stops:
+                self._available = False
+                _LOGGER.warning("Origin stop ID %s not found", self.origin)
+                return
+            self._origin = stops[0]
+
+        if not self._destination and not self.extracting:
+            stops = self._pygtfs.stops_by_id(self.destination)
+            if not stops:
+                self._available = False
+                _LOGGER.warning(
+                    "Destination stop ID %s not found", self.destination
+                )
+                return
+            self._destination = stops[0]
+        
 
         # Fetch trip and route details once, unless updated
         if not self._departure:
@@ -204,7 +223,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
 
         name = (
             f"{getattr(self._agency, 'agency_name', DEFAULT_NAME)} "
-            f"{self.origin} to {self.destination} next departure"
+            f"{self._origin} to {self._destination} next departure"
         )
         if not self._departure:
             name = f"{DEFAULT_NAME}"

@@ -254,21 +254,21 @@ def get_rt_route_statuses(self):
                 #)
                 # Ignore arrival times in the past
                 if due_in_minutes(datetime.fromtimestamp(stop_time)) >= 0:
-                    #log_debug(
-                    #    [
-                    #        "Adding route ID",
-                    #        route_id,
-                    #        "trip ID",
-                    #        entity.trip_update.trip.trip_id,
-                    #        "direction ID",
-                    #        entity.trip_update.trip.direction_id,
-                    #        "stop ID",
-                    #        stop_id,
-                    #        "stop time",
-                    #        stop_time,
-                    #    ],
-                    #    3,
-                    #)
+                    log_debug(
+                        [
+                            "Adding route ID",
+                            route_id,
+                            "trip ID",
+                            entity.trip_update.trip.trip_id,
+                            "direction ID",
+                            entity.trip_update.trip.direction_id,
+                            "stop ID",
+                            stop_id,
+                            "stop time",
+                            stop_time,
+                        ],
+                        3,
+                    )
 
                     details = StopDetails(
                         datetime.fromtimestamp(stop_time),
