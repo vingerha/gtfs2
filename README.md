@@ -38,12 +38,11 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 
 ## Installation via HACS :
 
-In  HACS, select the 3-dots and then custom repositories
-Add :
+1. In  HACS, select the 3-dots and then custom repositories, add :
 - URL : https://github.com/vingerha/gtfs2
 - Category : Integration
 
-In Settings > Devices & Sevices
+2. In Settings > Devices & Sevices
 - add the integration, note that this is GTFS2
 
 ## Configuration
