@@ -1,4 +1,4 @@
-![GitHub release (with filter)](https://img.shields.io/github/v/release/aohzan/hass-prixcarburant) ![GitHub](https://img.shields.io/github/license/aohzan/hass-prixcarburant)[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/aohzan/hass-prixcarburant) ![GitHub](https://img.shields.io/github/license/aohzan/hass-prixcarburant) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # GTFS2
 This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
