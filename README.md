@@ -20,18 +20,17 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 
 ## Updates
 
-20231126
+v0.1.6
 - realtime vehile tracking with geojson output
 - workflow tweaks
 - extend update service call
 - increase stability with reboots, loss of data(source)
-20231110: adding features:
+v0.1.5: adding features:
 - new attribute: next_departure_headsigns
 - adding route shortname in selection/list to overcome data discrepancies been short name and long name
 - for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
 - timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
-
-20231104: initial version
+v0.1.9: initial version
 
 
 ## ToDo's / In Development / Known Issues
