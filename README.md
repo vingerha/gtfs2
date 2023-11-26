@@ -84,12 +84,13 @@ Static gtfs:
 - routes show A > B (outward) but stop selection shows inversed B > A, within one gtfs source both good as incorrect start/end can show up  > report issue with your gtfs data provider
 
 Realtime gtfs
-- few realtiem providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
+- only a few realtime providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
 - format incorrect of incomming json/feed > report issue with your gtfs data provider, they should adhere to standards
 - realtime data not always available, few refreshes are fine then nothing then fine again, often related to timeout from provider > report issue with your gtfs data provider
 
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
+- @Pulpyyyy for testing, ideas
 - @mark1foley for his gtfs real time integration which was enhanced with its integration in GTFS2
 
