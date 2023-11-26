@@ -66,7 +66,8 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "name": data["name"],
             "file": data["file"],
             "extracting": False,
-            "next_departure": {}
+            "next_departure": {},
+            "next_departure_realtime_attr": {}
         }           
 
         if check_extracting(self):    
@@ -126,15 +127,15 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.error("Error getting entity route_id for realtime data, for origin: %s with error: %s", data["origin"], ex)
                     self._route_id = data["route"].split(": ")[0]
                 self._stop_id = data["origin"].split(": ")[0]
-                self._trip_id = self._data["next_departure"]["trip_id"]                
+                self._trip_id = self._data.get('next_departure', {}).get('trip_id', None) 
                 self._direction = data["direction"]
                 self._relative = False
                 try:
                     self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
                     self._get_rt_trip_statuses = await self.hass.async_add_executor_job(get_rt_trip_statuses, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
-                    self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
-                    self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()
+                    self._data["next_departure_realtime_attr"] = self._get_next_service
+                    self._data["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()
                 except Exception as ex:  # pylint: disable=broad-except
                     _LOGGER.error("Error getting gtfs realtime data, for origin: %s with error: %s", data["origin"], ex)
             else:

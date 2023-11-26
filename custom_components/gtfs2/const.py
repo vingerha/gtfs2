@@ -26,6 +26,7 @@ ATTR_FIRST = "first"
 ATTR_DROP_OFF_DESTINATION = "destination_stop_drop_off_type_state"
 ATTR_DROP_OFF_ORIGIN = "origin_stop_drop_off_type_state"
 ATTR_INFO = "info"
+ATTR_INFO_RT = "info_realtime"
 ATTR_OFFSET = CONF_OFFSET
 ATTR_LAST = "last"
 ATTR_LOCATION_DESTINATION = "destination_station_location_type_name"
