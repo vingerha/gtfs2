@@ -33,9 +33,8 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 20231104: initial version
 
 ## ToDo's / In Development / Known Issues
-- Issue when updating the source db, it throws a db locked error OR pygtfs. This when an existing entity for the same db starts polling it at the same time
 - Issue when updating the source db: pygtfs error: at the moment unclear as errors fluctuate, posisbly a lack of resources (mem/cpu)
-- bypass setup control for routes that have no trips 'today'. The configuration does a spot-check if start/end actually return data with the idea to validate the setup. However, this only checks for 'today' so if your route actually has no transport running at the day of setup (say Sunday or Holiday) then it will reject it.
+- get realtime data for sources that donot base on routes, e.g. France's TER realtime source only uses trip_id
 
 ## Installation via HACS :
 
