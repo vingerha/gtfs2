@@ -19,6 +19,7 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 ***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
+
 20231126
 - realtime vehile tracking with geojson output
 - workflow tweaks
@@ -31,6 +32,7 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 - timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
 
 20231104: initial version
+
 
 ## ToDo's / In Development / Known Issues
 - Issue when updating the source db: pygtfs error: at the moment unclear as errors fluctuate, posisbly a lack of resources (mem/cpu)
@@ -68,13 +70,25 @@ Data can be updated at your own discretion by a service, e.g. you can have a wee
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/2d639afa-376b-4956-8223-2c982dc537cb)
 
-
 or via yaml
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/0d50bb87-c081-4cd6-8dc5-9603a44c21a4)
+=======
+## Known issues/challenges with source data
 
+Static gtfs:
+- not complying to the pygtfs unpacking library, examples: missing dates in feed_info > manual fix
+- calendar not showing if a service is run on a specific day > fix via adding calendar_dates to filter, only works if (!) calendar_dates is used alternatively for the same purpose
+- missing routes/stops/times, transport runs but gtfs does nto show it > report issue with your gtfs data provider
+- routes show A > B (outward) but stop selection shows inversed B > A, within one gtfs source both good as incorrect start/end can show up  > report issue with your gtfs data provider
+
+Realtime gtfs
+- few realtiem providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
+- format incorrect of incomming json/feed > report issue with your gtfs data provider, they should adhere to standards
+- realtime data not always available, few refreshes are fine then nothing then fine again, often related to timeout from provider > report issue with your gtfs data provider
 
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
 - @mark1foley for his gtfs real time integration which was enhanced with its integration in GTFS2
+

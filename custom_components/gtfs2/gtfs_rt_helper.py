@@ -1,7 +1,9 @@
 import logging
 from datetime import datetime, timedelta
+
 import json
 import os
+
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
@@ -50,6 +52,7 @@ from .const import (
     DEFAULT_PATH_GEOJSON,
 
     TIME_STR_FORMAT
+
 )
 
 def due_in_minutes(timestamp):
@@ -79,6 +82,7 @@ def log_debug(data: list, indent_level: int) -> None:
 
 def get_gtfs_feed_entities(url: str, headers, label: str):
     _LOGGER.debug(f"GTFS RT get_feed_entities for url: {url} , headers: {headers}, label: {label}")
+
     feed = gtfs_realtime_pb2.FeedMessage()  # type: ignore
 
     # TODO add timeout to requests call
@@ -126,6 +130,7 @@ def get_next_services(self):
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     
     if self._relative :
+
         due_in = (
             due_in_minutes(next_services[0].arrival_time)
             if len(next_services) > 0
@@ -182,6 +187,7 @@ def get_rt_route_statuses(self):
     if self._vehicle_position_url != "" :   
         vehicle_positions = get_rt_vehicle_positions(self)
               
+
     class StopDetails:
         def __init__(self, arrival_time, position):
             self.arrival_time = arrival_time
@@ -195,7 +201,7 @@ def get_rt_route_statuses(self):
 
     for entity in feed_entities:
         if entity.HasField("trip_update"):
-            # OUTCOMMENTED as spamming even debig log 
+            # OUTCOMMENTED as spamming even debug log 
             # If delimiter specified split the route ID in the gtfs rt feed
             #log_debug(
                 #[
@@ -220,7 +226,7 @@ def get_rt_route_statuses(self):
                     route_id = entity.trip_update.trip.route_id
                 else:
                     route_id = route_id_split[0]
-                # OUTCOMMENTED as spamming even debig log
+                # OUTCOMMENTED as spamming even debug log
                 #log_debug(
                 #    [
                 #        "Feed Route ID",
@@ -231,12 +237,13 @@ def get_rt_route_statuses(self):
                 #    1,
                 #)
 
+
             else:
                 route_id = entity.trip_update.trip.route_id
 
             if route_id not in departure_times:
-                departure_times[route_id] = {}
-            
+                departure_times[route_id] = {}         
+
             if entity.trip_update.trip.direction_id is not None:
                 direction_id = str(entity.trip_update.trip.direction_id)
             else:
@@ -302,6 +309,7 @@ def get_rt_route_statuses(self):
                 )
 
     self.info = departure_times
+
     #_LOGGER.debug("Departure times: %s", departure_times)
     return departure_times
     
@@ -411,7 +419,6 @@ def get_rt_vehicle_positions(self):
     geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
         vehicle = entity.vehicle
-        
         if not vehicle.trip.trip_id:
             # Vehicle is not in service
             continue
@@ -462,6 +469,4 @@ def update_geojson(self):
     _LOGGER.debug("GTFS RT geojson file: %s", file)
     with open(file, "w") as outfile:
         json.dump(self.geojson, outfile)
-    
-    
         

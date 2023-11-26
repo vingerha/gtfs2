@@ -20,6 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_next_departure(self):
     _LOGGER.debug("Get next departure with data: %s", self._data)
+
     if check_extracting(self):
         _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
         return {}
@@ -279,6 +280,7 @@ def get_next_departure(self):
     dest_depart_time = (
         f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
     )
+
     # align on timezone
     depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)    
     arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone)
@@ -286,7 +288,7 @@ def get_next_departure(self):
     origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
     dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    
+
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
         "Departure Time": origin_depart_time,
@@ -342,6 +344,7 @@ def get_gtfs(hass, path, data, update=False):
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
+
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
         os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":

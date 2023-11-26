@@ -9,6 +9,7 @@ from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
 import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant, callback
+
 from homeassistant.helpers import selector
 
 from .const import (
@@ -21,6 +22,7 @@ from .const import (
     CONF_VEHICLE_POSITION_URL, 
     CONF_TRIP_UPDATE_URL
 )    
+
 
 from .gtfs_helper import (
     get_gtfs,
@@ -45,6 +47,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for GTFS."""
 
     VERSION = 5
+
 
     def __init__(self) -> None:
         """Init ConfigFlow."""
@@ -86,6 +89,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_source(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
         errors: dict[str, str] = {}
+
         if user_input is None:
             return self.async_show_form(
                 step_id="source",
@@ -107,6 +111,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._user_inputs.update(user_input)
             _LOGGER.debug(f"UserInputs Data: {self._user_inputs}")
             return await self.async_step_route()            
+
 
     async def async_step_remove(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
@@ -181,6 +186,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required("destination", default=last_stop): vol.In(stops),
                         vol.Required("name"): str,
                         vol.Optional("include_tomorrow", default = False): selector.BooleanSelector(),
+
                     },
                 ),
                 errors=errors,
@@ -260,6 +266,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
+
             if user_input['real_time']:
                 self._user_inputs.update(user_input)
                 return await self.async_step_real_time()    
