@@ -42,116 +42,113 @@ You can add a optional area
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/f2f855f9-bc07-405d-8b0b-09b3da7e4f79)
 
+## CONFIGURE Options 
+
+After setup you can change the refresh interval and add real-time source(s)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/03135ba3-e9ff-4fe6-a23b-bb1f0a44c6ea)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/11de0f3c-ac1b-4b4d-8712-38764dfc5bd4)
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/5895e947-882d-444e-9259-e56d7d5e426a)
+
+
+
+
+
 Sample of the entity and its attributes
 ```
-arrival: "2023-11-04T09:42:29+00:00"
+arrival: 2023-11-18T12:18:00+00:00
 day: today
 first: false
 last: false
 offset: 0
-agency_agency_id: LE MET
-agency_agency_name: LE MET'
-agency_agency_url: https://lemet.fr
+agency_agency_id: None
+agency_agency_name: TAO (Orléans)
+agency_agency_url: http://reseau-tao.fr/
 agency_agency_timezone: Europe/Paris
-agency_agency_lang: FR
-agency_agency_phone: 0.800.00.29.38
-agency_agency_fare_url: https://services.lemet.fr/fr/billetterie
-agency_agency_email: contact@lemet.fr
-origin_station_stop_id: "6010"
+agency_agency_lang: fr
+agency_agency_phone: 0800012000
+agency_agency_fare_url: None
+agency_agency_email: None
+origin_station_stop_id: ORLEANS:StopArea:00026500
 origin_station_stop_code: None
-origin_station_stop_name: P+R WOIPPY
+origin_station_stop_name: Gaston Galloux
 origin_station_stop_desc: None
-origin_station_stop_lat: "49.150349"
-origin_station_stop_lon: "6.173323"
+origin_station_stop_lat: 47.884827
+origin_station_stop_lon: 1.924645
 origin_station_zone_id: None
-origin_station_stop_url: https://services.lemet.fr/fr/biv/arret/1627
-origin_station_location_type: "0"
+origin_station_stop_url: None
+origin_station_location_type: 0
 origin_station_parent_station: None
-origin_station_stop_timezone: None
-origin_station_wheelchair_boarding: "1"
+origin_station_stop_timezone: Europe/Paris
+origin_station_wheelchair_boarding: 0
 origin_station_platform_code: None
 origin_station_location_type_name: Station
-origin_station_wheelchair_boarding_available: true
-destination_station_stop_id: "6180"
+origin_station_wheelchair_boarding_available: unknown
+destination_station_stop_id: ORLEANS:StopArea:01001712
 destination_station_stop_code: None
-destination_station_stop_name: FELIX ALCAN
+destination_station_stop_name: Gare d'Orléans - Quai E
 destination_station_stop_desc: None
-destination_station_stop_lat: "49.112572"
-destination_station_stop_lon: "6.199158"
+destination_station_stop_lat: 47.907085
+destination_station_stop_lon: 1.90578
 destination_station_zone_id: None
-destination_station_stop_url: https://services.lemet.fr/fr/biv/arret/7324
-destination_station_location_type: "0"
+destination_station_stop_url: None
+destination_station_location_type: 0
 destination_station_parent_station: None
-destination_station_stop_timezone: None
-destination_station_wheelchair_boarding: "1"
+destination_station_stop_timezone: Europe/Paris
+destination_station_wheelchair_boarding: 0
 destination_station_platform_code: None
 destination_station_location_type_name: Station
-destination_station_wheelchair_boarding_available: true
-route_route_id: A-98
-route_agency_id: LE MET
-route_route_short_name: MA
-route_route_long_name: METTIS A
+destination_station_wheelchair_boarding_available: unknown
+route_route_id: ORLEANS:Line:40
+route_agency_id: None
+route_route_short_name: 40
+route_route_long_name: GARE ORLEANS - PETITE MERIE
 route_route_desc: None
-route_route_type: "3"
+route_route_type: 3
 route_route_url: None
-route_route_color: F0980C
-route_route_text_color: FFFFFF
+route_route_color: 24A472
+route_route_text_color: 000000
 route_type_name: Bus
-trip_route_id: A-98
-trip_service_id: HIV2324-Sam_Sp23-Samedi-21
-trip_trip_id: 1281546-HIV2324-Sam_Sp23-Samedi-21
-trip_trip_headsign: MA - BORNY
+trip_route_id: ORLEANS:Line:40
+trip_service_id: chouette:TimeTable:4f12e6e5-93ca-4af2-b493-0858f5c73e39:LOC
+trip_trip_id: ORLEANS:VehicleJourney:40_A_56_16_4002_6_124300
+trip_trip_headsign: None
 trip_trip_short_name: None
-trip_direction_id: "0"
-trip_block_id: "196205"
-trip_shape_id: A0014
-trip_wheelchair_accessible: "1"
-trip_bikes_allowed: "2"
-trip_bikes_allowed_state: false
-trip_wheelchair_access_available: true
-origin_stop_arrival_time: "2023-11-04 10:16:00"
-origin_stop_departure_time: "2023-11-04 10:16:00"
-origin_stop_drop_off_type: 0
+trip_direction_id: 0
+trip_block_id: None
+trip_shape_id: PME-CNY-POSC-GARE
+trip_wheelchair_accessible: None
+trip_bikes_allowed: None
+trip_bikes_allowed_state: unknown
+trip_wheelchair_access_available: unknown
+origin_stop_arrival_time: 2023-11-18T12:09:05+00:00
+origin_stop_departure_time: 2023-11-18T12:09:05+00:00
 origin_stop_pickup_type: 0
-origin_stop_sequence: 1
-origin_stop_drop_off_type_state: Regular
+origin_stop_sequence: 17
+origin_stop_drop_off_type_state: unknown
 origin_stop_pickup_type_state: Regular
 origin_stop_timepoint_exact: true
-destination_stop_arrival_time: "2023-11-04 10:42:29"
-destination_stop_departure_time: "2023-11-04 10:42:29"
-destination_stop_drop_off_type: 0
+destination_stop_arrival_time: 2023-11-18T12:18:00+00:00
+destination_stop_departure_time: 2023-11-18T12:18:00+00:00
 destination_stop_pickup_type: 0
-destination_stop_sequence: 19
-destination_stop_drop_off_type_state: Regular
+destination_stop_sequence: 23
+destination_stop_drop_off_type_state: unknown
 destination_stop_pickup_type_state: Regular
 destination_stop_timepoint_exact: true
-next_departures:
-  - "2023-11-04 10:16:00"
-  - "2023-11-04 10:31:00"
-  - "2023-11-04 10:46:00"
-  - "2023-11-04 11:01:00"
-  - "2023-11-04 11:16:00"
-  - "2023-11-04 11:31:00"
-  - "2023-11-04 11:46:00"
-  - "2023-11-04 12:01:00"
-  - "2023-11-04 12:16:00"
-  - "2023-11-04 12:31:00"
-next_departures_lines:
-  - 2023-11-04 10:16:00 (METTIS A)
-  - 2023-11-04 10:31:00 (METTIS A)
-  - 2023-11-04 10:46:00 (METTIS A)
-  - 2023-11-04 11:01:00 (METTIS A)
-  - 2023-11-04 11:16:00 (METTIS A)
-  - 2023-11-04 11:31:00 (METTIS A)
-  - 2023-11-04 11:46:00 (METTIS A)
-  - 2023-11-04 12:01:00 (METTIS A)
-  - 2023-11-04 12:16:00 (METTIS A)
-  - 2023-11-04 12:31:00 (METTIS A)
-updated_at: "2023-11-04T10:07:07.085514"
-attribution: LE MET'
+next_departures: 2023-11-18T12:09:05+00:00, 2023-11-18T12:39:05+00:00, 2023-11-18T13:10:05+00:00, 2023-11-18T13:40:05+00:00, 2023-11-18T14:10:05+00:00, 2023-11-18T14:40:05+00:00, 2023-11-18T15:11:05+00:00, 2023-11-18T15:41:05+00:00, 2023-11-18T16:12:05+00:00, 2023-11-18T16:42:05+00:00
+next_departures_lines: 2023-11-18T12:09:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T12:39:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T13:10:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T13:40:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T14:10:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T14:40:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T15:11:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T15:41:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T16:12:05+00:00 (GARE ORLEANS - PETITE MERIE), 2023-11-18T16:42:05+00:00 (GARE ORLEANS - PETITE MERIE)
+next_departures_headsign: 2023-11-18T12:09:05+00:00 (None), 2023-11-18T12:39:05+00:00 (None), 2023-11-18T13:10:05+00:00 (None), 2023-11-18T13:40:05+00:00 (None), 2023-11-18T14:10:05+00:00 (None), 2023-11-18T14:40:05+00:00 (None), 2023-11-18T15:11:05+00:00 (None), 2023-11-18T15:41:05+00:00 (None), 2023-11-18T16:12:05+00:00 (None), 2023-11-18T16:42:05+00:00 (None)
+gtfs_updated_at: 2023-11-18T11:38:52.654949+00:00
+gtfs_rt_updated_at: 2023-11-18T11:40:59.832457+00:00
+next_departure_realtime: 2023-11-18T12:09:30+00:00
+latitude: 
+longitude: 
+attribution: TAO (Orléans)
 device_class: timestamp
 icon: mdi:bus
-friendly_name: MyRouteInMetz
+friendly_name: Orleans 40 outbound
 ```
 
 

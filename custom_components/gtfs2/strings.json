@@ -50,7 +50,8 @@
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
       "files_deleted": "Datasource deleted, this may affect existing routes",
       "stop_incorrect": "Start and/or End destination incorrect, possibly not in same direction, check logs",
-	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder"
+	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder",
+	  "extracting": "Extracting data, this can take a while"
     }
   },
   "options": {
@@ -65,7 +66,9 @@
         "description": "Provide url to real time API",
         "data": {
           "trip_update_url": "URL to trip data",
-		  "vehicle_position_url": "URL to vehicle position (can be the same as trip data)"
+		  "vehicle_position_url": "URL to vehicle position (can be the same as trip data)",
+		  "api_key": "API key, if required",
+		  "x_api_key": "X_API key, if required"
         }
       }
     }

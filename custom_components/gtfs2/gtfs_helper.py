@@ -4,18 +4,27 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+import json
 import requests
 import pygtfs
 from sqlalchemy.sql import text
+import multiprocessing
 
 import homeassistant.util.dt as dt_util
 from homeassistant.core import HomeAssistant
+
+from .const import DEFAULT_PATH_GEOJSON
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def get_next_departure(self):
     _LOGGER.debug("Get next departure with data: %s", self._data)
+
+    if check_extracting(self):
+        _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
+        return {}
+
     """Get next departures from data."""
     if self.hass.config.time_zone is None:
         _LOGGER.error("Timezone is not set in Home Assistant configuration")
@@ -39,6 +48,7 @@ def get_next_departure(self):
     # days.
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_where = tomorrow_order = ""
+    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today)"
     if include_tomorrow:
         _LOGGER.debug("Include Tomorrow")
         limit = int(limit / 2 * 3)
@@ -46,6 +56,7 @@ def get_next_departure(self):
         tomorrow_select = f"calendar.{tomorrow_name} AS tomorrow,"
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
+        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)"
 
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
@@ -135,7 +146,7 @@ def get_next_departure(self):
 		WHERE start_station.stop_id = :origin_station_id
 		AND end_station.stop_id = :end_station_id
 		AND origin_stop_sequence < dest_stop_sequence
-		AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)
+		{tomorrow_calendar_date_where}
         ORDER BY today_cd, origin_depart_time
         """  # noqa: S608
     result = schedule.engine.connect().execute(
@@ -199,24 +210,29 @@ def get_next_departure(self):
                 "Departure found for station %s @ %s -> %s", start_station_id, key, item
             )
             break
-
+    _LOGGER.debug("item: %s", item)
+    
     if item == {}:
+        data_returned = {        
+        "gtfs_updated_at": dt_util.utcnow().isoformat(),
+        }
+        _LOGGER.info("No items found in gtfs")
         return {}
 
     # create upcoming timetable
     timetable_remaining = []
     for key in sorted(timetable.keys()):
         if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
-            timetable_remaining.append(key)
+            timetable_remaining.append(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat())
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining
     )
     # create upcoming timetable with line info
     timetable_remaining_line = []
-    for key2, value in sorted(timetable.items()):
-        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+    for key, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             timetable_remaining_line.append(
-                str(key2) + " (" + str(value["route_long_name"]) + ")"
+                str(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat()) + " (" + str(value["route_long_name"]) + ")"
             )
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, per line: %s",
@@ -224,10 +240,10 @@ def get_next_departure(self):
     )
     # create upcoming timetable with headsign
     timetable_remaining_headsign = []
-    for key2, value in sorted(timetable.items()):
-        if datetime.datetime.strptime(key2, "%Y-%m-%d %H:%M:%S") > now:
+    for key, value in sorted(timetable.items()):
+        if datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S") > now:
             timetable_remaining_headsign.append(
-                str(key2) + " (" + str(value["trip_headsign"]) + ")"
+                str(dt_util.as_utc(datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S")).isoformat()) + " (" + str(value["trip_headsign"]) + ")"
             )
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
@@ -236,7 +252,15 @@ def get_next_departure(self):
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
+    _tomorrow = item.get("tomorrow")
     origin_arrival = now
+    dest_arrival = now
+    origin_depart_time = f"{now_date} {item['origin_depart_time']}"
+    if _tomorrow == 1:
+        origin_arrival = tomorrow
+        dest_arrival = tomorrow
+        origin_depart_time = f"{tomorrow_date} {item['origin_depart_time']}"
+    
     if item["origin_arrival_time"] > item["origin_depart_time"]:
         origin_arrival -= datetime.timedelta(days=1)
     origin_arrival_time = (
@@ -244,11 +268,8 @@ def get_next_departure(self):
         f"{item['origin_arrival_time']}"
     )
 
-    origin_depart_time = f"{now_date} {item['origin_depart_time']}"
-
-    dest_arrival = now
     if item["dest_arrival_time"] < item["origin_depart_time"]:
-        dest_arrival += datetime.timedelta(days=1)
+        dest_arrival += datetime.timedelta(days=1)   
     dest_arrival_time = (
         f"{dest_arrival.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_arrival_time']}"
     )
@@ -260,8 +281,13 @@ def get_next_departure(self):
         f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
     )
 
-    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)
+    # align on timezone
+    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)    
     arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone)
+    origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
 
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
@@ -284,8 +310,8 @@ def get_next_departure(self):
         "Sequence": item["dest_stop_sequence"],
         "Timepoint": item["dest_stop_timepoint"],
     }
-
-    return {
+    
+    data_returned = {
         "trip_id": item["trip_id"],
         "route_id": item["route_id"],
         "day": item["day"],
@@ -299,18 +325,28 @@ def get_next_departure(self):
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,
     }
-
+    _LOGGER.debug("Data returned: %s", data_returned)
+    
+    return data_returned
 
 def get_gtfs(hass, path, data, update=False):
     """Get gtfs file."""
     _LOGGER.debug("Getting gtfs with data: %s", data)
+    gtfs_dir = hass.config.path(path)
+    os.makedirs(gtfs_dir, exist_ok=True)
     filename = data["file"]
     url = data["url"]
     file = data["file"] + ".zip"
-    gtfs_dir = hass.config.path(path)
-    os.makedirs(gtfs_dir, exist_ok=True)
-    if update and os.path.exists(os.path.join(gtfs_dir, file)):
+    sqlite = data["file"] + ".sqlite"
+    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
+    if os.path.exists(journal) and not update :
+        _LOGGER.warning("Cannot use this datasource as still unpacking: %s", filename)
+        return "extracting"
+    if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
         remove_datasource(hass, path, filename)
+
+    if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
+        os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
         if not os.path.exists(os.path.join(gtfs_dir, file)):
             _LOGGER.error("The given GTFS zipfile was not found")
@@ -326,17 +362,12 @@ def get_gtfs(hass, path, data, update=False):
     (gtfs_root, _) = os.path.splitext(file)
 
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
-    joined_path = os.path.join(gtfs_dir, sqlite_file)
-    _LOGGER.debug("unpacking: %s", joined_path)
-    gtfs = pygtfs.Schedule(joined_path)
-    # check or wait for unpack
-    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    while os.path.isfile(journal):
-        time.sleep(10)
+    joined_path = os.path.join(gtfs_dir, sqlite_file) 
+    gtfs = pygtfs.Schedule(joined_path) 
     if not gtfs.feeds:
+        _LOGGER.info("Starting gtfs file unpacking: %s", joined_path)
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     return gtfs
-
 
 def get_route_list(schedule):
     sql_routes = f"""
@@ -353,7 +384,7 @@ def get_route_list(schedule):
         row = row_cursor._asdict()
         routes_list.append(list(row_cursor))
     for x in routes_list:
-        val = x[0] + ": " + x[1] + " (" + x[2] + ")"
+        val = str(x[0]) + ": " + str(x[1]) + " (" + str(x[2]) + ")"
         routes.append(val)
     _LOGGER.debug(f"routes: {routes}")
     return routes
@@ -390,14 +421,12 @@ def get_datasources(hass, path) -> dict[str]:
     _LOGGER.debug(f"Datasources path: {path}")
     gtfs_dir = hass.config.path(path)
     os.makedirs(gtfs_dir, exist_ok=True)
-    _LOGGER.debug(f"Datasources folder: {gtfs_dir}")
     files = os.listdir(gtfs_dir)
-    _LOGGER.debug(f"Datasources files: {files}")
     datasources = []
     for file in files:
         if file.endswith(".sqlite"):
-            datasources.append(file.split(".")[0])
-    _LOGGER.debug(f"datasources: {datasources}")
+            datasources.append(file.split(".")[0])        
+    _LOGGER.debug(f"Datasources in folder: {datasources}")
     return datasources
 
 
@@ -407,9 +436,23 @@ def remove_datasource(hass, path, filename):
     os.remove(os.path.join(gtfs_dir, filename + ".zip"))
     os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
     return "removed"
+    
+def check_extracting(self):
+    gtfs_dir = self.hass.config.path(self._data["gtfs_dir"])
+    filename = self._data["file"]
+    journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
+    if os.path.exists(journal) :
+        _LOGGER.debug("check extracting: yes")
+        return True
+    return False    
 
 
-def check_datasource_index(schedule):
+def check_datasource_index(self):
+    _LOGGER.debug("Check datasource with data: %s", self._data)
+    if check_extracting(self):
+        _LOGGER.warning("Cannot check indexes on this datasource as still unpacking: %s", self._data["file"])
+        return
+    schedule=self._pygtfs
     sql_index_1 = f"""
     SELECT count(*) as checkidx
     FROM sqlite_master
@@ -422,11 +465,20 @@ def check_datasource_index(schedule):
     WHERE
     type= 'index' and tbl_name = 'stop_times' and name like '%stop_id%';
     """
+    sql_index_3 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'shapes' and name like '%shape_id%';
+    """
     sql_add_index_1 = f"""
     create index gtfs2_stop_times_trip_id on stop_times(trip_id)
     """
     sql_add_index_2 = f"""
     create index gtfs2_stop_times_stop_id on stop_times(stop_id)
+    """
+    sql_add_index_3 = f"""
+    create index gtfs2_shapes_shape_id on shapes(shape_id)
     """
     result_1a = schedule.engine.connect().execute(
         text(sql_index_1),
@@ -435,7 +487,7 @@ def check_datasource_index(schedule):
     for row_cursor in result_1a:
         _LOGGER.debug("IDX result1: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.info("Adding index 1 to improve performance")
+            _LOGGER.debug("Adding index 1 to improve performance")
             result_1b = schedule.engine.connect().execute(
             text(sql_add_index_1),
             {"q": "q"},
@@ -448,8 +500,52 @@ def check_datasource_index(schedule):
     for row_cursor in result_2a:
         _LOGGER.debug("IDX result2: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.info("Adding index 2 to improve performance")
+            _LOGGER.debug("Adding index 2 to improve performance")
             result_2b = schedule.engine.connect().execute(
             text(sql_add_index_2),
             {"q": "q"},
             )
+            
+    result_3a = schedule.engine.connect().execute(
+        text(sql_index_3),
+        {"q": "q"},
+    )
+    for row_cursor in result_3a:
+        _LOGGER.debug("IDX result3: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checkidx'] == 0:
+            _LOGGER.debug("Adding index 3 to improve performance")
+            result_3b = schedule.engine.connect().execute(
+            text(sql_add_index_3),
+            {"q": "q"},
+            )            
+            
+def create_trip_geojson(self):
+    _LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)
+    schedule = self._data["schedule"]
+    self._trip_id = self._data["next_departure"]["trip_id"]
+    sql_shape = f"""
+    SELECT t.trip_id, s.shape_pt_lat, s.shape_pt_lon
+    FROM trips t, shapes s
+    WHERE
+    t.shape_id = s.shape_id
+    and t.trip_id = '{self._trip_id}'
+    order by s.shape_pt_sequence
+    """
+    result = schedule.engine.connect().execute(
+        text(sql_shape),
+        {"q": "q"},
+    )
+    
+    shapes_list = []
+    coordinates = []
+    for row_cursor in result:
+        row = row_cursor._asdict()
+        shapes_list.append(list(row_cursor))
+    for x in shapes_list:
+        coordinate = []
+        coordinate.append(x[2])
+        coordinate.append(x[1])
+        coordinates.append(coordinate)
+    self.geojson = {"features": [{"geometry": {"coordinates": coordinates, "type": "LineString"}, "properties": {"id": self._trip_id, "title": self._trip_id}, "type": "Feature"}], "type": "FeatureCollection"}    
+    _LOGGER.debug("Geojson: %s", json.dumps(self.geojson))
+    return None

@@ -1,6 +1,10 @@
 import logging
 from datetime import datetime, timedelta
 
+import json
+import os
+
+
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
 import requests
@@ -13,63 +17,42 @@ from homeassistant.util import Throttle
 
 _LOGGER = logging.getLogger(__name__)
 
-ATTR_STOP_ID = "Stop ID"
-ATTR_ROUTE = "Route"
-ATTR_DIRECTION_ID = "Direction ID"
-ATTR_DUE_IN = "Due in"
-ATTR_DUE_AT = "Due at"
-ATTR_NEXT_UP = "Next Service"
-ATTR_ICON = "Icon"
-ATTR_UNIT_OF_MEASUREMENT = "unit_of_measurement"
-ATTR_DEVICE_CLASS = "device_class"
+from .const import (
 
-CONF_API_KEY = "api_key"
-CONF_X_API_KEY = "x_api_key"
-CONF_STOP_ID = "stopid"
-CONF_ROUTE = "route"
-CONF_DIRECTION_ID = "directionid"
-CONF_DEPARTURES = "departures"
-CONF_TRIP_UPDATE_URL = "trip_update_url"
-CONF_VEHICLE_POSITION_URL = "vehicle_position_url"
-CONF_ROUTE_DELIMITER = "route_delimiter"
-CONF_ICON = "icon"
-CONF_SERVICE_TYPE = "service_type"
-CONF_RELATIVE_TIME = "show_relative_time"
+    ATTR_STOP_ID,
+    ATTR_ROUTE,
+    ATTR_TRIP,
+    ATTR_DIRECTION_ID,
+    ATTR_DUE_IN,
+    ATTR_DUE_AT,
+    ATTR_NEXT_UP,
+    ATTR_ICON,
+    ATTR_UNIT_OF_MEASUREMENT,
+    ATTR_DEVICE_CLASS,
+    ATTR_LATITUDE,
+    ATTR_LONGITUDE,
 
-DEFAULT_SERVICE = "Service"
-DEFAULT_ICON = "mdi:bus"
-DEFAULT_DIRECTION = "0"
+    CONF_API_KEY,
+    CONF_X_API_KEY,
+    CONF_STOP_ID,
+    CONF_ROUTE,
+    CONF_DIRECTION_ID,
+    CONF_DEPARTURES,
+    CONF_TRIP_UPDATE_URL,
+    CONF_VEHICLE_POSITION_URL,
+    CONF_ROUTE_DELIMITER,
+    CONF_ICON,
+    CONF_SERVICE_TYPE,
+    CONF_RELATIVE_TIME,
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
-TIME_STR_FORMAT = "%H:%M"
+    DEFAULT_SERVICE,
+    DEFAULT_ICON,
+    DEFAULT_DIRECTION,
+    DEFAULT_PATH,
+    DEFAULT_PATH_GEOJSON,
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_TRIP_UPDATE_URL): cv.string,
-        vol.Optional(CONF_API_KEY): cv.string,
-        vol.Optional(CONF_X_API_KEY): cv.string,
-        vol.Optional(CONF_VEHICLE_POSITION_URL): cv.string,
-        vol.Optional(CONF_ROUTE_DELIMITER): cv.string,
-        
-        vol.Optional(CONF_DEPARTURES): [
-            {
-                vol.Required(CONF_NAME): cv.string,
-                vol.Required(CONF_STOP_ID): cv.string,
-                vol.Required(CONF_ROUTE): cv.string,
-                vol.Optional(CONF_RELATIVE_TIME, default=True): cv.boolean,
-                vol.Optional(
-                    CONF_DIRECTION_ID,
-                    default=DEFAULT_DIRECTION,  # type: ignore
-                ): str,
-                vol.Optional(
-                    CONF_ICON, default=DEFAULT_ICON  # type: ignore
-                ): cv.string,
-                vol.Optional(
-                    CONF_SERVICE_TYPE, default=DEFAULT_SERVICE  # type: ignore
-                ): cv.string,
-            }
-        ],
-    }
+    TIME_STR_FORMAT
+
 )
 
 def due_in_minutes(timestamp):
@@ -98,6 +81,8 @@ def log_debug(data: list, indent_level: int) -> None:
 
 
 def get_gtfs_feed_entities(url: str, headers, label: str):
+    _LOGGER.debug(f"GTFS RT get_feed_entities for url: {url} , headers: {headers}, label: {label}")
+
     feed = gtfs_realtime_pb2.FeedMessage()  # type: ignore
 
     # TODO add timeout to requests call
@@ -114,21 +99,30 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
             0,
         )
 
-    feed.ParseFromString(response.content)
+    feed.ParseFromString(response.content) 
+    #_LOGGER.debug("Feed entity: %s", feed.entity)
     return feed.entity
 
-
-       
-## reworked for gtfs2
-
 def get_next_services(self):
-    self.data = self._data
+    self.data = self._get_rt_route_statuses
     self._stop = self._stop_id
     self._route = self._route_id
+    self._trip = self._trip_id
     self._direction = self._direction
-    _LOGGER.debug("Get Next Services, route/direction/stop: %s", self.data.get(self._route, {}).get(self._direction, {}).get(self._stop, []))
-    
+    _LOGGER.debug("RT route: %s", self._route)
+    _LOGGER.debug("RT trip: %s", self._trip)
+    _LOGGER.debug("RT stop: %s", self._stop)
+    _LOGGER.debug("RT direction: %s", self._direction)
     next_services = self.data.get(self._route, {}).get(self._direction, {}).get(self._stop, [])
+    _LOGGER.debug("Next services route_id: %s", next_services)
+    if not next_services:
+        self._direction = 0
+        self.data2 = self._get_rt_trip_statuses
+        next_services = self.data2.get(self._trip, {}).get(self._direction, {}).get(self._stop, [])
+        _LOGGER.debug("Next services trip_id: %s", next_services)
+        if next_services:
+            _LOGGER.debug("Next services trip_id[0].arrival_time: %s", next_services[0].arrival_time)
+        
     if self.hass.config.time_zone is None:
         _LOGGER.error("Timezone is not set in Home Assistant configuration")
         timezone = "UTC"
@@ -136,22 +130,63 @@ def get_next_services(self):
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     
     if self._relative :
-        return (
+
+        due_in = (
             due_in_minutes(next_services[0].arrival_time)
             if len(next_services) > 0
             else "-"
         )
     else:
-        return (
-            next_services[0].arrival_time.replace(tzinfo=timezone)
+        due_in = (
+            dt_util.as_utc(next_services[0].arrival_time)
             if len(next_services) > 0
             else "-"
         )
 
+    attrs = {
+        ATTR_DUE_IN: due_in,
+        ATTR_STOP_ID: self._stop,
+        ATTR_ROUTE: self._route,
+        ATTR_TRIP: self._trip,
+        ATTR_DIRECTION_ID: self._direction,
+        ATTR_LATITUDE: "",
+        ATTR_LONGITUDE: ""
+    }
+    if len(next_services) > 0:
+        attrs[ATTR_DUE_AT] = (
+            next_services[0].arrival_time.strftime(TIME_STR_FORMAT)
+            if len(next_services) > 0
+            else "-"
+        )
+        if next_services[0].position:
+            if next_services[0].position[0]:
+                attrs[ATTR_LATITUDE] = next_services[0].position[0][1]
+                attrs[ATTR_LONGITUDE] = next_services[0].position[0][0]
+    if len(next_services) > 1:
+        attrs[ATTR_NEXT_UP] = (
+            next_services[1].arrival_time.strftime(TIME_STR_FORMAT)
+            if len(next_services) > 1
+            else "-"
+        )
+    if self._relative :
+        attrs[ATTR_UNIT_OF_MEASUREMENT] = "min"
+    else :
+        attrs[ATTR_DEVICE_CLASS] = (
+            "timestamp" 
+            if len(next_services) > 0
+            else ""
+        )
+
+    _LOGGER.debug("GTFS RT next services attributes: %s", attrs)
+    return attrs
+    
 def get_rt_route_statuses(self):
-        
+
     vehicle_positions = {}
     
+    if self._vehicle_position_url != "" :   
+        vehicle_positions = get_rt_vehicle_positions(self)
+              
 
     class StopDetails:
         def __init__(self, arrival_time, position):
@@ -166,22 +201,23 @@ def get_rt_route_statuses(self):
 
     for entity in feed_entities:
         if entity.HasField("trip_update"):
+            # OUTCOMMENTED as spamming even debug log 
             # If delimiter specified split the route ID in the gtfs rt feed
-            log_debug(
-                [
-                    "Received Trip ID",
-                    entity.trip_update.trip.trip_id,
-                    "Route ID:",
-                    entity.trip_update.trip.route_id,
-                    "direction ID",
-                    entity.trip_update.trip.direction_id,
-                    "Start Time:",
-                    entity.trip_update.trip.start_time,
-                    "Start Date:",
-                    entity.trip_update.trip.start_date,
-                ],
-                1,
-            )
+            #log_debug(
+                #[
+                #    "Received Trip ID",
+                #    entity.trip_update.trip.trip_id,
+                #    "Route ID:",
+                #    entity.trip_update.trip.route_id,
+                #    "direction ID",
+                #    entity.trip_update.trip.direction_id,
+                #    "Start Time:",
+                #    entity.trip_update.trip.start_time,
+                #    "Start Date:",
+                #    entity.trip_update.trip.start_date,
+                #],
+                #1,
+            #)
             if self._route_delimiter is not None:
                 route_id_split = entity.trip_update.trip.route_id.split(
                     self._route_delimiter
@@ -190,21 +226,23 @@ def get_rt_route_statuses(self):
                     route_id = entity.trip_update.trip.route_id
                 else:
                     route_id = route_id_split[0]
-                log_debug(
-                    [
-                        "Feed Route ID",
-                        entity.trip_update.trip.route_id,
-                        "changed to",
-                        route_id,
-                    ],
-                    1,
-                )
+                # OUTCOMMENTED as spamming even debug log
+                #log_debug(
+                #    [
+                #        "Feed Route ID",
+                #        entity.trip_update.trip.route_id,
+                #        "changed to",
+                #        route_id,
+                #    ],
+                #    1,
+                #)
+
 
             else:
                 route_id = entity.trip_update.trip.route_id
 
             if route_id not in departure_times:
-                departure_times[route_id] = {}
+                departure_times[route_id] = {}         
 
             if entity.trip_update.trip.direction_id is not None:
                 direction_id = str(entity.trip_update.trip.direction_id)
@@ -225,40 +263,38 @@ def get_rt_route_statuses(self):
                     stop_time = stop.departure.time
                 else:
                     stop_time = stop.arrival.time
-                log_debug(
-                    [
-                        "Stop:",
-                        stop_id,
-                        "Stop Sequence:",
-                        stop.stop_sequence,
-                        "Stop Time:",
-                        stop_time,
-                    ],
-                    2,
-                )
+                #log_debug(
+                #    [
+                #        "Stop:",
+                #        stop_id,
+                #        "Stop Sequence:",
+                #        stop.stop_sequence,
+                #        "Stop Time:",
+                #        stop_time,
+                #    ],
+                #    2,
+                #)
                 # Ignore arrival times in the past
                 if due_in_minutes(datetime.fromtimestamp(stop_time)) >= 0:
-                    log_debug(
-                        [
-                            "Adding route ID",
-                            route_id,
-                            "trip ID",
-                            entity.trip_update.trip.trip_id,
-                            "direction ID",
-                            entity.trip_update.trip.direction_id,
-                            "stop ID",
-                            stop_id,
-                            "stop time",
-                            stop_time,
-                        ],
-                        3,
-                    )
+                    #log_debug(
+                    #    [
+                    #        "Adding route ID",
+                    #        route_id,
+                    #        "trip ID",
+                    #        entity.trip_update.trip.trip_id,
+                    #        "direction ID",
+                    #        entity.trip_update.trip.direction_id,
+                    #        "stop ID",
+                    #        stop_id,
+                    #        "stop time",
+                    #        stop_time,
+                    #    ],
+                    #    3,
+                    #)
 
                     details = StopDetails(
                         datetime.fromtimestamp(stop_time),
-                        vehicle_positions.get(
-                            entity.trip_update.trip.trip_id
-                        ),
+                        [d["properties"].get(entity.trip_update.trip.trip_id) for d in vehicle_positions],
                     )
                     departure_times[route_id][direction_id][
                         stop_id
@@ -273,20 +309,116 @@ def get_rt_route_statuses(self):
                 )
 
     self.info = departure_times
-    
+
+    #_LOGGER.debug("Departure times: %s", departure_times)
     return departure_times
+    
+def get_rt_trip_statuses(self):
+
+    vehicle_positions = {}
+    
+    if self._vehicle_position_url != "" :   
+        vehicle_positions = get_rt_vehicle_positions(self)
+              
+    class StopDetails:
+        def __init__(self, arrival_time, position):
+            self.arrival_time = arrival_time
+            self.position = position
+
+    departure_times = {}
+
+    feed_entities = get_gtfs_feed_entities(
+        url=self._trip_update_url, headers=self._headers, label="trip data"
+    )
+
+    for entity in feed_entities:
+        if entity.HasField("trip_update"):
+            trip_id = entity.trip_update.trip.trip_id
+            #_LOGGER.debug("RT Trip, trip: %s", trip)
+            #_LOGGER.debug("RT Trip, trip_id: %s", self._trip_id)
+            
+            if trip_id == self._trip_id:
+                _LOGGER.debug("RT Trip, found trip: %s", trip_id)
+
+                if trip_id not in departure_times:
+                    departure_times[trip_id] = {}
+                
+                if entity.trip_update.trip.direction_id is not None:
+                    direction_id = str(entity.trip_update.trip.direction_id)
+                else:
+                    direction_id = DEFAULT_DIRECTION
+                if direction_id not in departure_times[trip_id]:
+                    departure_times[trip_id][direction_id] = {}
+
+                for stop in entity.trip_update.stop_time_update:
+                    stop_id = stop.stop_id
+                    if not departure_times[trip_id][direction_id].get(
+                        stop_id
+                    ):
+                        departure_times[trip_id][direction_id][stop_id] = []
+                    # Use stop arrival time;
+                    # fall back on departure time if not available
+                    if stop.arrival.time == 0:
+                        stop_time = stop.departure.time
+                    else:
+                        stop_time = stop.arrival.time
+                    #log_debug(
+                    #    [
+                    #        "Stop:",
+                    #        stop_id,
+                    #        "Stop Sequence:",
+                    #        stop.stop_sequence,
+                    #        "Stop Time:",
+                    #        stop_time,
+                    #    ],
+                    #    2,
+                    #)
+                    # Ignore arrival times in the past
+                    if due_in_minutes(datetime.fromtimestamp(stop_time)) >= 0:
+                        #log_debug(
+                        #    [
+                        #        "Adding trip ID",
+                        #        entity.trip_update.trip.trip_id,
+                        #        "direction ID",
+                        #        entity.trip_update.trip.direction_id,
+                        #        "stop ID",
+                        #        stop_id,
+                        #        "stop time",
+                        #        stop_time,
+                        #    ],
+                        #    3,
+                        #)
+
+                        details = StopDetails(
+                            datetime.fromtimestamp(stop_time),
+                            [d["properties"].get(entity.trip_update.trip.trip_id) for d in vehicle_positions],
+                        )
+                        departure_times[trip_id][direction_id][
+                            stop_id
+                        ].append(details)
+
+    # Sort by arrival time
+    for trip in departure_times:
+        for direction in departure_times[trip]:
+            for stop in departure_times[trip][direction]:
+                departure_times[trip][direction][stop].sort(
+                    key=lambda t: t.arrival_time
+                )
+
+    self.info = departure_times
+    #_LOGGER.debug("Departure times Trip: %s", departure_times)
+    return departure_times    
 
 def get_rt_vehicle_positions(self):
-    positions = {}
     feed_entities = get_gtfs_feed_entities(
         url=self._vehicle_position_url,
         headers=self._headers,
         label="vehicle positions",
     )
-
+    geojson_body = []
+    geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
         vehicle = entity.vehicle
-
         if not vehicle.trip.trip_id:
             # Vehicle is not in service
             continue
@@ -294,15 +426,47 @@ def get_rt_vehicle_positions(self):
             [
                 "Adding position for trip ID",
                 vehicle.trip.trip_id,
+                "route ID",
+                vehicle.trip.route_id,
+                "direction ID",
+                vehicle.trip.direction_id,
                 "position latitude",
                 vehicle.position.latitude,
                 "longitude",
                 vehicle.position.longitude,
             ],
             2,
-        )
-
-        positions[vehicle.trip.trip_id] = vehicle.position
-
-    return positions
+        )    
+        
+        #construct geojson only for configured rout/direction
+        if str(self._route_id) == str(vehicle.trip.route_id) and str(self._direction) == str(vehicle.trip.direction_id):
+            geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
+            geojson_element["geometry"]["coordinates"] = []
+            geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
+            geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
+            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
+            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
+            geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
+            geojson_element["properties"]["route_id"] = vehicle.trip.route_id
+            geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
+            geojson_element["properties"]["vehicle_id"] = "tbd"
+            geojson_element["properties"]["vehicle_label"] = "tbd"
+            geojson_element["properties"][vehicle.trip.trip_id] = geojson_element["geometry"]["coordinates"]
+            geojson_body.append(geojson_element)
+    
+    self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
+        
+    _LOGGER.debug("GTFS RT geojson: %s", json.dumps(self.geojson))
+    self._route_dir = self._route_id + "_" + self._direction
+    update_geojson(self)
+    return geojson_body
+    
+    
+def update_geojson(self):    
+    geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
+    os.makedirs(geojson_dir, exist_ok=True)
+    file = os.path.join(geojson_dir, self._route_dir + ".json")
+    _LOGGER.debug("GTFS RT geojson file: %s", file)
+    with open(file, "w") as outfile:
+        json.dump(self.geojson, outfile)
         

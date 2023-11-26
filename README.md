@@ -1,13 +1,15 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gtfs2) ![GitHub](https://img.shields.io/github/license/vingerha/gtfs2) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
-# GTFS2
-This is an adaptation of the GTFS integration in HA Core, enhancements:
+# GTFS2 for Static and RealTime 
+This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
 - Uses selected route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
-- allows to load/update/delete datasources in gtfs2 folder
-- added a sservice to update the GTFS datasource, e.g. calling the service via automation
-- translations: at present only English and French
+- allows to load/update/delete datasources in gtfs2 folder from the GUI
+- Option to add gtfs realtime source/url
+- Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
+- A service to update the GTFS datasource, e.g. for calling the service via automation
+- translations: English and French
 
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
@@ -17,6 +19,12 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 ***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
+
+20231126
+- realtime vehile tracking with geojson output
+- workflow tweaks
+- extend update service call
+- increase stability with reboots, loss of data(source)
 20231110: adding features:
 - new attribute: next_departure_headsigns
 - adding route shortname in selection/list to overcome data discrepancies been short name and long name
@@ -25,20 +33,18 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 
 20231104: initial version
 
-## ToDo's / In Development
-- Issue when updating the source db, it throws a db locked error. This when an existing entity for the same db starts polling it at the same time
-- (DONE) Icon for the integration (brands)
-- bypass setup control for routes that have no trips 'today'. The configuration does a spot-check if start/end actually return data with the idea to validate the setup. However, this only checks for 'today' so if your route actually has no transport running at the day of setup (say Sunday or Holiday) then it will reject it.
-- (in DEV release) adding real-time data for providers that offer these for the same gtfs data: initally time and lat/long
+
+## ToDo's / In Development / Known Issues
+- Issue when updating the source db: pygtfs error: at the moment unclear as errors fluctuate, posisbly a lack of resources (mem/cpu)
+- get realtime data for sources that donot base on routes, e.g. France's TER realtime source only uses trip_id
 
 ## Installation via HACS :
 
-In  HACS, select the 3-dots and then custom repositories
-Add :
+1. In  HACS, select the 3-dots and then custom repositories, add :
 - URL : https://github.com/vingerha/gtfs2
 - Category : Integration
 
-In Settings > Devices & Sevices
+2. In Settings > Devices & Sevices
 - add the integration, note that this is GTFS2
 
 ## Configuration
@@ -46,22 +52,28 @@ Use the workflow
 
 Example: https://github.com/vingerha/gtfs2/blob/main/example.md
 
-**IMPORTANT**
+## Real Time vehicle tracking
 
+As per v1.6, the vehicle tracking output coordinates to geojson file in your www folder, which in turn can then be consumed by the geosjon integration and map card https://www.home-assistant.io/integrations/geo_json_events/
+![image](https://github.com/vingerha/gtfs2/assets/44190435/a3cbea60-46f1-40e9-88c5-4b9a0519c782)
+
+
+## **IMPORTANT**
+- sources need to adhere to GTFS standards both for static data (zip/sqlite) as well as for real-time data (binary). 
 - certain providers publish large zip-files which in turn will result in much larger db files. Unpacking may take a long time (depending HA server perf.). Example for a 117Mb zip: ~2hrs to unpack to a 7Gb sqlite
-- for these large db, performance may be slow too, there is a PR to improve this by adding indexes to the stop_times table
 - the integration uses folder /config/gtfs2 to store the datafiles (zip and sqlite)
+- the integration uses folder /config/www for geojson files, only available when using verhical tracking sources
 
 ## Data add / update
 Data can be updated at your own discretion by a service, e.g. you can have a weekly automation to run the service
 **Note:** for "update" to work, the name should be the ***same*** as the existing source. It will first remove the existing one and reload the one as per your URL
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/2defc23d-a1a0-40be-b610-6c5360fbd464)
+![image](https://github.com/vingerha/gtfs2/assets/44190435/2d639afa-376b-4956-8223-2c982dc537cb)
 
 or via yaml
 
-![image](https://github.com/vingerha/gtfs2/assets/44190435/2fea7926-a64d-43b6-a653-c95f1f01c66d)
-
+![image](https://github.com/vingerha/gtfs2/assets/44190435/0d50bb87-c081-4cd6-8dc5-9603a44c21a4)
+=======
 ## Known issues/challenges with source data
 
 Static gtfs:
@@ -78,7 +90,5 @@ Realtime gtfs
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
-- @mark1foley for his gtfs real time integration which I managed to alter/integrate
-
-
+- @mark1foley for his gtfs real time integration which was enhanced with its integration in GTFS2
 
