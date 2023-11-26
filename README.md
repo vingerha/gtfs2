@@ -1,13 +1,15 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 # GTFS2
-This is an adaptation of the GTFS integration in HA Core, enhancements:
+This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
 - Uses selected route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
 - allows to load/update/delete datasources in gtfs2 folder
-- added a sservice to update the GTFS datasource, e.g. calling the service via automation
-- translations: at present only English and French
+- Option to add gtfs realtime source/url
+- Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
+- added a service to update the GTFS datasource, e.g. for calling the service via automation
+- translations: English and French
 
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
@@ -17,10 +19,11 @@ Core GTFS uses start + stop, it then determines every option between them and pr
 ***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
-202311DD
+20231126
 - realtime vehile tracking with geojson output
 - workflow tweaks
 - extend update service call
+- increase stability with reboots, loss of data(source)
 20231110: adding features:
 - new attribute: next_departure_headsigns
 - adding route shortname in selection/list to overcome data discrepancies been short name and long name
