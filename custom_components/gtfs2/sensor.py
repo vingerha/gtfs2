@@ -12,8 +12,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 import homeassistant.util.dt as dt_util
 
-from .coordinator import GTFSRealtimeUpdateCoordinator
-
 from .const import (
     ATTR_ARRIVAL,
     ATTR_BICYCLE,
@@ -404,6 +402,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self._attributes[ATTR_INFO_RT] = (
                 "No realtime information"
             )
+               
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes
 
@@ -431,3 +430,5 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._attributes = {
             k: v for k, v in self._attributes.items() if not k.startswith(prefix)
         }
+
+

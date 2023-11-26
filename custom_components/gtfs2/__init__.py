@@ -8,9 +8,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from datetime import timedelta
 
 from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL
-
-from .coordinator import GTFSUpdateCoordinator, GTFSRealtimeUpdateCoordinator
-
+from .coordinator import GTFSUpdateCoordinator
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
 
@@ -18,7 +16,6 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
     """Migrate old entry."""
-
     _LOGGER.warning("Migrating from version %s", config_entry.version)
 
     if config_entry.version == 1:
@@ -90,10 +87,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     #await coordinator.async_config_entry_first_refresh()
     
-
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
-
+    
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
     }
@@ -129,4 +125,5 @@ def setup(hass, config):
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     hass.data[DOMAIN][entry.entry_id]['coordinator'].update_interval = timedelta(minutes=1)
+
     return True

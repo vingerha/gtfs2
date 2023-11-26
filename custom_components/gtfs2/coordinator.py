@@ -24,7 +24,6 @@ from .const import (
 from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
 from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services
 
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -75,8 +74,9 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
             previous_data["extracting"] = True
             return previous_data
+        
 
-        # determinestatic + rt or only static (refresh schedule depending)
+        # determin static + rt or only static (refresh schedule depending)
         #1. sensor exists with data but refresh interval not yet reached, use existing data
         if previous_data is not None and (datetime.datetime.strptime(previous_data["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :        
             run_static = False
@@ -144,3 +144,4 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("GTFS RT: RealTime not selected in entity options")
         
         return self._data
+
