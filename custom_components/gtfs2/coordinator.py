@@ -22,7 +22,7 @@ from .const import (
     ATTR_RT_UPDATED_AT
 )    
 from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
-from .gtfs_rt_helper import get_rt_route_statuses, get_next_services
+from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,10 +126,12 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.error("Error getting entity route_id for realtime data, for origin: %s with error: %s", data["origin"], ex)
                     self._route_id = data["route"].split(": ")[0]
                 self._stop_id = data["origin"].split(": ")[0]
+                self._trip_id = self._data["next_departure"]["trip_id"]                
                 self._direction = data["direction"]
                 self._relative = False
                 try:
                     self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
+                    self._get_rt_trip_statuses = await self.hass.async_add_executor_job(get_rt_trip_statuses, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
                     self._data["next_departure"]["next_departure_realtime_attr"] = self._get_next_service
                     self._data["next_departure"]["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()

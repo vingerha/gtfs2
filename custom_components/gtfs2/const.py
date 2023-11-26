@@ -241,6 +241,7 @@ WHEELCHAIR_BOARDING_OPTIONS = {1: True, 2: False}
 #gtfs_rt
 ATTR_STOP_ID = "Stop ID"
 ATTR_ROUTE = "Route"
+ATTR_TRIP = "Trip"
 ATTR_DIRECTION_ID = "Direction ID"
 ATTR_DUE_IN = "Due in"
 ATTR_DUE_AT = "Due at"

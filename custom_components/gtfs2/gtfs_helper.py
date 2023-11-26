@@ -47,6 +47,7 @@ def get_next_departure(self):
     # days.
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_where = tomorrow_order = ""
+    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today)"
     if include_tomorrow:
         _LOGGER.debug("Include Tomorrow")
         limit = int(limit / 2 * 3)
@@ -54,6 +55,7 @@ def get_next_departure(self):
         tomorrow_select = f"calendar.{tomorrow_name} AS tomorrow,"
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
+        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)"
 
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
@@ -143,7 +145,7 @@ def get_next_departure(self):
 		WHERE start_station.stop_id = :origin_station_id
 		AND end_station.stop_id = :end_station_id
 		AND origin_stop_sequence < dest_stop_sequence
-		AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)
+		{tomorrow_calendar_date_where}
         ORDER BY today_cd, origin_depart_time
         """  # noqa: S608
     result = schedule.engine.connect().execute(
@@ -207,7 +209,8 @@ def get_next_departure(self):
                 "Departure found for station %s @ %s -> %s", start_station_id, key, item
             )
             break
-
+    _LOGGER.debug("item: %s", item)
+    
     if item == {}:
         data_returned = {        
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
@@ -248,7 +251,15 @@ def get_next_departure(self):
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
+    _tomorrow = item.get("tomorrow")
     origin_arrival = now
+    dest_arrival = now
+    origin_depart_time = f"{now_date} {item['origin_depart_time']}"
+    if _tomorrow == 1:
+        origin_arrival = tomorrow
+        dest_arrival = tomorrow
+        origin_depart_time = f"{tomorrow_date} {item['origin_depart_time']}"
+    
     if item["origin_arrival_time"] > item["origin_depart_time"]:
         origin_arrival -= datetime.timedelta(days=1)
     origin_arrival_time = (
@@ -256,11 +267,8 @@ def get_next_departure(self):
         f"{item['origin_arrival_time']}"
     )
 
-    origin_depart_time = f"{now_date} {item['origin_depart_time']}"
-
-    dest_arrival = now
     if item["dest_arrival_time"] < item["origin_depart_time"]:
-        dest_arrival += datetime.timedelta(days=1)
+        dest_arrival += datetime.timedelta(days=1)   
     dest_arrival_time = (
         f"{dest_arrival.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_arrival_time']}"
     )
