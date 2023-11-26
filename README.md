@@ -9,7 +9,7 @@ This is an adaptation of the GTFS integration in HomeAssistant Core, enhancement
 - Option to add gtfs realtime source/url
 - Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
 - A service to update the GTFS datasource, e.g. for calling the service via automation
-- translations: English and French
+- translations: English and French 
 
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
