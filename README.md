@@ -1,14 +1,14 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gtfs2) ![GitHub](https://img.shields.io/github/license/vingerha/gtfs2) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
-# GTFS2
+# GTFS2 for Static and RealTime 
 This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
 - Uses selected route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
-- allows to load/update/delete datasources in gtfs2 folder
+- allows to load/update/delete datasources in gtfs2 folder from the GUI
 - Option to add gtfs realtime source/url
 - Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
-- added a service to update the GTFS datasource, e.g. for calling the service via automation
+- A service to update the GTFS datasource, e.g. for calling the service via automation
 - translations: English and French
 
 ## Difference with GTFS HA core (outside of GUI setup)
