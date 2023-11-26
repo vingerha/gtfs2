@@ -217,7 +217,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "origin": data["origin"].split(": ")[0],
             "destination": data["destination"].split(": ")[0],
             "offset": 0,
-            "include_tomorrow": data["include_tomorrow"],
+            "include_tomorrow": True,
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "next_departure": None,
