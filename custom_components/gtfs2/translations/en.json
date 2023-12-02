@@ -63,7 +63,8 @@
         "description": "Provide url to real time API",
         "data": {
           "trip_update_url": "URL to trip data",
-		  "vehicle_position_url": "URL to vehicle position (or same as trip data)",
+		  "vehicle_position_url": "URL to vehicle position",
+		  "alerts_url": "URL to alerts",
 		  "api_key": "API key, if required",
 		  "x_api_key": "X_API key, if required"
         }

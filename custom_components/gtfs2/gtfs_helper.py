@@ -81,6 +81,7 @@ def get_next_departure(self):
                {tomorrow_select}
                calendar.start_date AS start_date,
                calendar.end_date AS end_date,
+               "" as calendar_date,
                0 as today_cd
         FROM trips trip
         INNER JOIN calendar calendar
@@ -126,6 +127,7 @@ def get_next_departure(self):
                {tomorrow_select}
                calendar.start_date AS start_date,
                calendar.end_date AS end_date,
+               calendar_date_today.date as calendar_date,
                calendar_date_today.exception_type as today_cd
         FROM trips trip
         INNER JOIN calendar calendar
@@ -146,7 +148,7 @@ def get_next_departure(self):
 		AND end_station.stop_id = :end_station_id
 		AND origin_stop_sequence < dest_stop_sequence
 		{tomorrow_calendar_date_where}
-        ORDER BY today_cd, origin_depart_time
+        ORDER BY calendar_date,origin_depart_date, today_cd, origin_depart_time
         """  # noqa: S608
     result = schedule.engine.connect().execute(
         text(sql_query),
@@ -174,7 +176,7 @@ def get_next_departure(self):
                 idx = f"{now_date} {row['origin_depart_time']}"
                 timetable[idx] = {**row, **extras}
                 yesterday_last = idx
-        if row["today"] == 1 or row["today_cd"] == 1:
+        if row["today"] == 1 or row["today_cd"] > 0:
             extras = {"day": "today", "first": False, "last": False}
             if today_start is None:
                 today_start = row["origin_depart_date"]
@@ -323,7 +325,6 @@ def get_next_departure(self):
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,
     }
-    _LOGGER.debug("Data returned: %s", data_returned)
     
     return data_returned
 

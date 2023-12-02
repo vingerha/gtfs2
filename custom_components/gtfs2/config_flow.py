@@ -19,7 +19,8 @@ from .const import (
     CONF_API_KEY, 
     CONF_X_API_KEY, 
     CONF_VEHICLE_POSITION_URL, 
-    CONF_TRIP_UPDATE_URL
+    CONF_TRIP_UPDATE_URL,
+    CONF_ALERTS_URL
 )    
 
 from .gtfs_helper import (
@@ -296,6 +297,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
                     vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL,"")): str,
+                    vol.Optional(CONF_ALERTS_URL, default=self.config_entry.options.get(CONF_ALERTS_URL,"")): str,
                     vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY, "na")): str,
                     vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY, "na")): str
                 },

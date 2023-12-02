@@ -22,7 +22,7 @@ from .const import (
     ATTR_RT_UPDATED_AT
 )    
 from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
-from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services
+from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services, get_rt_alerts
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -112,7 +112,8 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 """Initialize the info object."""
                 self._trip_update_url = options["trip_update_url"]
                 self._vehicle_position_url = options["vehicle_position_url"]
-                self._route_delimiter = "-"
+                self._alerts_url = options.get("alerts_url", None)
+                self._route_delimiter = None
                 if CONF_API_KEY in options:
                     self._headers = {"Authorization": options[CONF_API_KEY]}
                 elif CONF_X_API_KEY in options:
@@ -132,7 +133,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._relative = False
                 try:
                     self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
-                    self._get_rt_trip_statuses = await self.hass.async_add_executor_job(get_rt_trip_statuses, self)
+                    self._get_rt_alerts = await self.hass.async_add_executor_job(get_rt_alerts, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
                     self._data["next_departure_realtime_attr"] = self._get_next_service
                     self._data["next_departure_realtime_attr"]["gtfs_rt_updated_at"] = dt_util.utcnow()
