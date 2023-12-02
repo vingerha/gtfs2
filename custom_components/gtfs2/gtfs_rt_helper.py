@@ -396,10 +396,13 @@ def get_rt_alerts(self):
             label="alerts",
         )
         for entity in feed_entities:
+            _LOGGER.debug("RT Alert entity: %s", entity)
             if entity.HasField("alert"):
                 for x in entity.alert.informed_entity:
                     if x.HasField("stop_id"):
                         stop_id = x.stop_id 
+                    else:
+                        stop_id = "unknown"
                     if x.HasField("stop_id"):
                         route_id = x.route_id  
                     else:
@@ -410,6 +413,10 @@ def get_rt_alerts(self):
                 if stop_id == self._destination_id and (route_id == "unknown" or route_id == self._route_id): 
                     _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
                     rt_alerts["destination_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                if stop_id == "unknown" and route_id == self._route_id: 
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
+                    rt_alerts["origin_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                    rt_alerts["destination_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')    
                         
     return rt_alerts
     
