@@ -9,29 +9,30 @@ This is an adaptation of the GTFS integration in HomeAssistant Core, enhancement
 - Option to add gtfs realtime source/url
 - Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
 - A service to update the GTFS datasource, e.g. for calling the service via automation
-- translations: English and French
+- translations: English and French 
 
 ## Difference with GTFS HA core (outside of GUI setup)
 Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
 - Pro: you receive the first applicable departure time and just have to check the type of transport (bus/tram/etc.)
-- Con: you have to know exactly which start and stop you want and in the proper direction. Noting that the same stops exist with differnt ID for different routes/trips/directions
+- Con: you have to know exactly which start and stop you want and in the proper direction. Noting that the same stops exist with different ID for different routes/trips/directions
 
 ***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
 
 ## Updates
 
-20231126
+v0.1.6, stabilizing
 - realtime vehile tracking with geojson output
 - workflow tweaks
 - extend update service call
 - increase stability with reboots, loss of data(source)
-20231110: adding features:
+
+v0.1.5, adding features:
 - new attribute: next_departure_headsigns
 - adding route shortname in selection/list to overcome data discrepancies been short name and long name
 - for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
 - timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
 
-20231104: initial version
+v0.1.9: initial version
 
 
 ## ToDo's / In Development / Known Issues
@@ -83,12 +84,13 @@ Static gtfs:
 - routes show A > B (outward) but stop selection shows inversed B > A, within one gtfs source both good as incorrect start/end can show up  > report issue with your gtfs data provider
 
 Realtime gtfs
-- few realtiem providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
+- only a few realtime providers also add vehicle positions with lat/lon, these are not always up to date > report issue with your gtfs data provider
 - format incorrect of incomming json/feed > report issue with your gtfs data provider, they should adhere to standards
 - realtime data not always available, few refreshes are fine then nothing then fine again, often related to timeout from provider > report issue with your gtfs data provider
 
 ## Thank you
 - @joostlek ... massive thanks to help me through many (!) tech aspects and getting this to the inital version
 - @mxbssn for initiating, bringing ideas, helping with testing
+- @Pulpyyyy for testing, ideas
 - @mark1foley for his gtfs real time integration which was enhanced with its integration in GTFS2
 
