@@ -64,7 +64,6 @@
         "data": {
           "trip_update_url": "URL vers: trip data",
 		  "vehicle_position_url": "URL vers: position véhicule",
-		  "alerts_url": "URL vers: alerts",
 		  "api_key": "API key, si nécessaire",
 		  "x_api_key": "X_API key, si nécessaire"
         }

@@ -103,6 +103,7 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
 def get_next_services(self):
     self.data = self._get_rt_route_statuses
     self._stop = self._stop_id
+    self._destination = self._destination_id
     self._route = self._route_id
     self._trip = self._trip_id
     self._direction = self._direction
@@ -387,28 +388,30 @@ def get_rt_vehicle_positions(self):
     return geojson_body
     
 def get_rt_alerts(self):
+    rt_alerts = {}
     if self._alerts_url:
         feed_entities = get_gtfs_feed_entities(
             url=self._alerts_url,
             headers=self._headers,
             label="alerts",
         )
-        rt_alerts = {}
-        r_id = None
         for entity in feed_entities:
             if entity.HasField("alert"):
-                #_LOGGER.debug("RT alert1, informed entity.alert: %s", entity.alert)
                 for x in entity.alert.informed_entity:
-                    if x.HasField("route_id"):
-                        route_id = x.route_id
-                        if r_id != route_id and route_id == self._route_id:
-                            _LOGGER.debug("RT alert2, x with route_id: %s", x)
-                            #_LOGGER.debug("RT alert3, entity alert: %s", entity.alert)
-                            _LOGGER.debug("RT Alert for route: %s, alert: %s", route_id, entity.alert.header_text)
-                            r_id = route_id
-                           
+                    if x.HasField("stop_id"):
+                        stop_id = x.stop_id 
+                    if x.HasField("stop_id"):
+                        route_id = x.route_id  
+                    else:
+                        route_id = "unknown"
+                if stop_id == self._stop_id and (route_id == "unknown" or route_id == self._route_id): 
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
+                    rt_alerts["origin_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                if stop_id == self._destination_id and (route_id == "unknown" or route_id == self._route_id): 
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
+                    rt_alerts["destination_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
                         
-    return  
+    return rt_alerts
     
     
 def update_geojson(self):    

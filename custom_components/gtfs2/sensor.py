@@ -387,6 +387,11 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._attributes["gtfs_updated_at"] = self.coordinator.data[
             "gtfs_updated_at"]
         
+        self._attributes["origin_stop_alert"] = self.coordinator.data[
+            "alert"].get("origin_stop_alert", None)
+        self._attributes["destination_stop_alert"] = self.coordinator.data[
+            "alert"].get("destination_stop_alert", None)            
+        
         if self._departure_rt:
             _LOGGER.debug("next dep realtime attr: %s", self._departure_rt)
             # Add next departure realtime to the right level, only if populated
