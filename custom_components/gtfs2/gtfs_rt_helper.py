@@ -364,14 +364,14 @@ def get_rt_vehicle_positions(self):
                 2,
             )    
             
-        #construct geojson only for configured rout/direction
+        #construct geojson only for configured route/direction
         if str(self._route_id) == str(vehicle.trip.route_id) and str(self._direction) == str(vehicle.trip.direction_id):
             geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
             geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
-            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
-            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")"
+            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
+            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
             geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
             geojson_element["properties"]["route_id"] = vehicle.trip.route_id
             geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
