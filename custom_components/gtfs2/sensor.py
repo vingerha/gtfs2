@@ -346,7 +346,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         if "destination_stop_time" in self._departure:
             _LOGGER.debug("Destination_stop_time %s", self._departure["destination_stop_time"])
         else:
-            _LOGGER.warning("No destination_stop_time")
+            _LOGGER.debug("No destination_stop_time, possibly no service today")
         prefix = "destination_stop"
         if self._departure:
             self.append_keys(self._departure["destination_stop_time"], prefix)

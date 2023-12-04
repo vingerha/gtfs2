@@ -396,7 +396,6 @@ def get_rt_alerts(self):
             label="alerts",
         )
         for entity in feed_entities:
-            _LOGGER.debug("RT Alert entity: %s", entity)
             if entity.HasField("alert"):
                 for x in entity.alert.informed_entity:
                     if x.HasField("stop_id"):
@@ -428,6 +427,21 @@ def update_geojson(self):
     _LOGGER.debug("GTFS RT geojson file: %s", file)
     with open(file, "w") as outfile:
         json.dump(self.geojson, outfile)
+        
+def get_gtfs_rt_trip(hass, path, data):
+    """Get gtfs rt trip data"""
+    _LOGGER.debug("Getting gtfs rt trip with data: %s", data)
+    gtfs_dir = hass.config.path(path)
+    os.makedirs(gtfs_dir, exist_ok=True)
+    url = data["url"]
+    file = data["entity_id"][0].split('.')[1] + "_rt.trip"
+    try:
+        r = requests.get(url, allow_redirects=True)
+        open(os.path.join(gtfs_dir, file), "wb").write(r.content)
+    except Exception as ex:  # pylint: disable=broad-except
+        _LOGGER.error("The given URL or GTFS data file/folder was not found")
+        return "no_data_file"
+    return None        
     
     
         

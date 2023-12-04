@@ -103,6 +103,20 @@
 		  "description": "provide the full path to the zip file itself"
 		}
 	  }
+	},
+	"download_gtfs_rt_trip": {
+      "name": "Retrieves a GTFS rt trip datasource locally",
+      "description": "",
+      "fields": {
+		"file": {
+          "name": "Name of the transport service",
+		  "description": "the existing one will be overwitten"
+		},
+		"url": {
+          "name": "URL",
+		  "description": "provide the full path"
+		}
+	  }
 	}
   }
 }
