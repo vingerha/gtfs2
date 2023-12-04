@@ -396,7 +396,6 @@ def get_rt_alerts(self):
             label="alerts",
         )
         for entity in feed_entities:
-            _LOGGER.debug("RT Alert entity: %s", entity)
             if entity.HasField("alert"):
                 for x in entity.alert.informed_entity:
                     if x.HasField("stop_id"):
@@ -427,7 +426,7 @@ def update_geojson(self):
     file = os.path.join(geojson_dir, self._route_dir + ".json")
     _LOGGER.debug("GTFS RT geojson file: %s", file)
     with open(file, "w") as outfile:
-        json.dump(self.geojson, outfile)
+        json.dump(self.geojson, outfile)     
     
     
         

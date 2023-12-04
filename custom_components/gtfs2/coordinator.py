@@ -123,10 +123,9 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     self._headers = None
                 self._headers = None
                 self.info = {}
-                try: 
-                    self._route_id = self._data["next_departure"]["route_id"]
-                except Exception as ex:  # pylint: disable=broad-except
-                    _LOGGER.error("Error getting entity route_id for realtime data, for origin: %s with error: %s", data["origin"], ex)
+                self._route_id = self._data["next_departure"].get("route_id", None)
+                if self._route_id == None:
+                    _LOGGER.debug("GTFS RT: no route_id in sensor data, using route_id from config_entry")
                     self._route_id = data["route"].split(": ")[0]
                 self._stop_id = data["origin"].split(": ")[0]
                 self._destination_id = data["destination"].split(": ")[0]
