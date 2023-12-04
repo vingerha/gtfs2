@@ -370,8 +370,8 @@ def get_rt_vehicle_positions(self):
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
             geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
-            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
-            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
+            geojson_element["properties"]["id"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-2:]
+            geojson_element["properties"]["title"] = str(vehicle.trip.route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-2:]
             geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
             geojson_element["properties"]["route_id"] = vehicle.trip.route_id
             geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
