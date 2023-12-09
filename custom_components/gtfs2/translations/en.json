@@ -92,7 +92,7 @@
     },
 	"route_type": {
       "options": {
-        "0: Tram": "Tram, Streetcar, Light rail.",
+        "0: Tram": "Tram, Streetcar, Light rail",
         "1: Metro": "Subway, Metro. Any underground rail system",
 		"2: Rail": "Rail, intercity or long-distance travel",
 		"3: Bus": "Bus, short- and long-distance bus routes",
