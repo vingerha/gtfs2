@@ -31,8 +31,9 @@ def get_next_departure(self):
     else:
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     schedule = self._data["schedule"]
-    start_station_id = self._data["origin"]
-    end_station_id = self._data["destination"]
+    start_station_id = str(self._data['origin'].split(': ')[1])
+    end_station_id = str(self._data['destination'].split(': ')[1])
+    _LOGGER.debug("Start / end : %s / %s", start_station_id, end_station_id)
     offset = self._data["offset"]
     include_tomorrow = self._data["include_tomorrow"]
     now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
@@ -98,8 +99,8 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         LEFT OUTER JOIN calendar_dates calendar_date_today
             on trip.service_id = calendar_date_today.service_id
-        WHERE start_station.stop_id = :origin_station_id
-                   AND end_station.stop_id = :end_station_id
+		WHERE start_station.stop_id in (select stop_id from stops where stop_name = :origin_station_id)
+            AND end_station.stop_id in (select stop_id from stops where stop_name = :end_station_id)
         AND origin_stop_sequence < dest_stop_sequence
         AND calendar.start_date <= :today
         AND calendar.end_date >= :today
@@ -144,9 +145,10 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         INNER JOIN calendar_dates calendar_date_today
 				   ON trip.service_id = calendar_date_today.service_id
-		WHERE start_station.stop_id = :origin_station_id
-		AND end_station.stop_id = :end_station_id
+		WHERE start_station.stop_id in (select stop_id from stops where stop_name = :origin_station_id)
+		AND end_station.stop_id in (select stop_id from stops where stop_name = :end_station_id)
 		AND origin_stop_sequence < dest_stop_sequence
+        AND today_cd = 1
 		{tomorrow_calendar_date_where}
         ORDER BY calendar_date,origin_depart_date, today_cd, origin_depart_time
         """  # noqa: S608
@@ -176,7 +178,7 @@ def get_next_departure(self):
                 idx = f"{now_date} {row['origin_depart_time']}"
                 timetable[idx] = {**row, **extras}
                 yesterday_last = idx
-        if row["today"] == 1 or row["today_cd"] > 0:
+        if row["today"] == 1 or row["today_cd"] == 1:
             extras = {"day": "today", "first": False, "last": False}
             if today_start is None:
                 today_start = row["origin_depart_date"]
@@ -367,9 +369,13 @@ def get_gtfs(hass, path, data, update=False):
         pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     return gtfs
 
-def get_route_list(schedule):
+def get_route_list(schedule, data):
+    route_type_where = ""
+    if data["route_type"].split(": ")[0] != 99:
+        route_type_where = f"where route_type = {data['route_type'].split(': ')[0]}"
     sql_routes = f"""
     SELECT route_id, route_short_name, route_long_name from routes
+    {route_type_where}
     order by cast(route_id as decimal)
     """  # noqa: S608
     result = schedule.engine.connect().execute(
@@ -392,11 +398,10 @@ def get_stop_list(schedule, route_id, direction):
     sql_stops = f"""
     SELECT distinct(s.stop_id), s.stop_name
     from trips t
-    inner join routes r on r.route_id = t.route_id
     inner join stop_times st on st.trip_id = t.trip_id
     inner join stops s on s.stop_id = st.stop_id
-    where  r.route_id = '{route_id}'
-    and t.direction_id = {direction}
+    where  t.route_id = '{route_id}'
+    and (t.direction_id = {direction} or t.direction_id is null)
     order by st.stop_sequence
     """  # noqa: S608
     result = schedule.engine.connect().execute(

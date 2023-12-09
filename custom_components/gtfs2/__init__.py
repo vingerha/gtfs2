@@ -12,7 +12,6 @@ from homeassistant.const import CONF_HOST
 from .coordinator import GTFSUpdateCoordinator
 import voluptuous as vol
 from .gtfs_helper import get_gtfs
-from .gtfs_rt_helper import get_gtfs_rt_trip
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -109,14 +108,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
-    
-async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Remove a config entry."""
-    await hass.async_add_executor_job(_remove_token_file, hass, entry.data[CONF_HOST])
-    if DOMAIN in hass.data:
-        hass.data[DOMAIN].pop(entry.entry_id, None)
-        if not hass.data[DOMAIN]:
-            hass.data.pop(DOMAIN)    
+     
 
 def setup(hass, config):
     """Setup the service component."""
@@ -125,24 +117,11 @@ def setup(hass, config):
         """My GTFS service."""
         _LOGGER.debug("Updating GTFS with: %s", call.data)
         get_gtfs(hass, DEFAULT_PATH, call.data, True)
-        return True
-        
-    def download_gtfs_rt_trip(call: ServiceCall):
-        """My GTFS service."""
-        _LOGGER.debug("Updating GTFS with: %s", call.data)
-        _LOGGER.debug("Updating GTFS with entity: %s", dir(call))
-        _LOGGER.debug("Updating GTFS with entity2: %s", dir(call.context))
-        _LOGGER.debug("Updating GTFS with entity3: %s", call.return_response)
-        _LOGGER.debug("Updating GTFS with entity4: %s", call.service)
-        
-       
-        get_gtfs_rt_trip(hass, DEFAULT_PATH, call.data)
-        return True        
+        return True     
 
     hass.services.register(
         DOMAIN, "update_gtfs", update_gtfs)
-    hass.services.register(
-        DOMAIN, "download_gtfs_rt_trip", download_gtfs_rt_trip)        
+     
     return True
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):

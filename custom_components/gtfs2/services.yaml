@@ -30,33 +30,3 @@ update_gtfs:
       example: "https://path-to-my-zip-file-location/filename.zip"
       selector:
         text:            
-download_gtfs_rt_trip:
-  name: Downloads GTFS RealTime Trip Data
-  description: Stored in gtfs2 folder
-  fields:
-    entity_id:
-      name: Name of the transport service
-      description: the existing one will be overwitten
-      required: false
-      example: "mytransportservice"       
-      selector:
-        entity:
-          multiple: false
-          domain: sensor
-          integration: gtfs2
-    url:
-      name: URL
-      description: provide the full path to the zip file itself
-      required: true
-      default: "na"
-      example: "https://path-to-my-rt-trip-data"
-      selector:
-        text: 
-    file:
-      name: Name of the file, without extension
-      description: the existing one will be overwitten
-      required: true
-      example: "mytransportservice"       
-      selector:
-        text:
-      

@@ -15,6 +15,12 @@
         },
         "description": "NOTE: with a new url/zip, this may take quite a bit of time, \n depending on file-size and system performance"
       },
+      "route_type": {
+        "data": {
+          "route_type": "Select the type of transport"
+        },
+		"description": "Select from the options below"
+      },	  
       "route": {
         "data": {
           "route": "Name of the route",
@@ -83,6 +89,16 @@
         "0": "Outbound",
         "1": "Return"
       }
+    },
+	"route_type": {
+      "options": {
+        "0: Tram": "Tram, Streetcar, Light rail.",
+        "1: Metro": "Subway, Metro. Any underground rail system",
+		"2: Rail": "Rail, intercity or long-distance travel",
+		"3: Bus": "Bus, short- and long-distance bus routes",
+		"4: Ferry": "Ferries, short- and long-distance boat service",
+		"99: All": "All, this includes also more obscure ones not in above"
+      }
     }
   },
   "services": {
@@ -101,20 +117,6 @@
 		"url": {
           "name": "URL",
 		  "description": "provide the full path to the zip file itself"
-		}
-	  }
-	},
-	"download_gtfs_rt_trip": {
-      "name": "Retrieves a GTFS rt trip datasource locally",
-      "description": "",
-      "fields": {
-		"file": {
-          "name": "Name of the transport service",
-		  "description": "the existing one will be overwitten"
-		},
-		"url": {
-          "name": "URL",
-		  "description": "provide the full path"
 		}
 	  }
 	}

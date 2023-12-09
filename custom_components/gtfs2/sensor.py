@@ -16,11 +16,16 @@ from .const import (
     ATTR_ARRIVAL,
     ATTR_BICYCLE,
     ATTR_DAY,
+    ATTR_DUE_IN,
+    ATTR_DELAY,
     ATTR_DROP_OFF_DESTINATION,
     ATTR_DROP_OFF_ORIGIN,
     ATTR_FIRST,
+    ATTR_RT_UPDATED_AT,
     ATTR_INFO,
     ATTR_INFO_RT,
+    ATTR_LATITUDE,
+    ATTR_LONGITUDE,
     ATTR_LAST,
     ATTR_LOCATION_DESTINATION,
     ATTR_LOCATION_ORIGIN,
@@ -375,7 +380,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._attributes["next_departures_lines"] = []
         if self._next_departures:
             self._attributes["next_departures_lines"] = self._departure[
-                "next_departures_lines"][:10]
+                "next_departures_lines"][:10]                         
             
         # Add next departures with their headsign
         prefix = "next_departures_headsign"
@@ -388,18 +393,19 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             "gtfs_updated_at"]
         
         self._attributes["origin_stop_alert"] = self.coordinator.data[
-            "alert"].get("origin_stop_alert", None)
+            "alert"].get("origin_stop_alert", "no info")
         self._attributes["destination_stop_alert"] = self.coordinator.data[
-            "alert"].get("destination_stop_alert", None)            
+            "alert"].get("destination_stop_alert", "no info")            
         
         if self._departure_rt:
             _LOGGER.debug("next dep realtime attr: %s", self._departure_rt)
             # Add next departure realtime to the right level, only if populated
             if "gtfs_rt_updated_at" in self._departure_rt:
-                self._attributes["gtfs_rt_updated_at"] = self._departure_rt["gtfs_rt_updated_at"]
-                self._attributes["next_departure_realtime"] = self._departure_rt["Due in"]
-                self._attributes["latitude"] = self._departure_rt["latitude"]
-                self._attributes["longitude"] = self._departure_rt["longitude"]
+                self._attributes["gtfs_rt_updated_at"] = self._departure_rt[ATTR_RT_UPDATED_AT]
+                self._attributes["next_departure_realtime"] = self._departure_rt[ATTR_DUE_IN]
+                self._attributes["delay"] = self._departure_rt[ATTR_DELAY]
+                self._attributes["latitude"] = self._departure_rt[ATTR_LATITUDE]
+                self._attributes["longitude"] = self._departure_rt[ATTR_LONGITUDE]
             if ATTR_INFO_RT in self._attributes:
                 del self._attributes[ATTR_INFO_RT]    
         else:
