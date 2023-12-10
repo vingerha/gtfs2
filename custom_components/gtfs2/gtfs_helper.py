@@ -31,9 +31,19 @@ def get_next_departure(self):
     else:
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     schedule = self._data["schedule"]
-    start_station_id = str(self._data['origin'].split(': ')[1])
-    end_station_id = str(self._data['destination'].split(': ')[1])
+    route_type = self._data["route_type"]
+    if route_type == "2":
+        start_station_id = str(self._data['origin'])+'%'
+        end_station_id = str(self._data['destination'])+'%'
+        start_station_where = f"AND start_station.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
+        end_station_where = f"AND end_station.stop_id in (select stop_id from stops where stop_name like :end_station_id)"
+    else:
+        start_station_id = self._data['origin'].split(': ')[0]
+        end_station_id = self._data['destination'].split(': ')[0]
+        start_station_where = f"AND start_station.stop_id = :origin_station_id"
+        end_station_where = f"AND end_station.stop_id = :end_station_id"
     _LOGGER.debug("Start / end : %s / %s", start_station_id, end_station_id)
+    _LOGGER.debug("Query : %s", end_station_where)
     offset = self._data["offset"]
     include_tomorrow = self._data["include_tomorrow"]
     now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
@@ -99,8 +109,9 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         LEFT OUTER JOIN calendar_dates calendar_date_today
             on trip.service_id = calendar_date_today.service_id
-		WHERE start_station.stop_id in (select stop_id from stops where stop_name = :origin_station_id)
-            AND end_station.stop_id in (select stop_id from stops where stop_name = :end_station_id)
+		WHERE route_type = {route_type}
+        {start_station_where}
+        {end_station_where}
         AND origin_stop_sequence < dest_stop_sequence
         AND calendar.start_date <= :today
         AND calendar.end_date >= :today
@@ -145,8 +156,9 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         INNER JOIN calendar_dates calendar_date_today
 				   ON trip.service_id = calendar_date_today.service_id
-		WHERE start_station.stop_id in (select stop_id from stops where stop_name = :origin_station_id)
-		AND end_station.stop_id in (select stop_id from stops where stop_name = :end_station_id)
+		WHERE route_type = {route_type}
+        {start_station_where}
+        {end_station_where}
 		AND origin_stop_sequence < dest_stop_sequence
         AND today_cd = 1
 		{tomorrow_calendar_date_where}
@@ -160,6 +172,7 @@ def get_next_departure(self):
             "today": now_date,
             "tomorrow": tomorrow_date,
             "limit": limit,
+            "route_type": route_type,
         },
     )
     # Create lookup timetable for today and possibly tomorrow, taking into
@@ -371,8 +384,8 @@ def get_gtfs(hass, path, data, update=False):
 
 def get_route_list(schedule, data):
     route_type_where = ""
-    if data["route_type"].split(": ")[0] != 99:
-        route_type_where = f"where route_type = {data['route_type'].split(': ')[0]}"
+    if data["route_type"] != 99:
+        route_type_where = f"where route_type = {data['route_type']}"
     sql_routes = f"""
     SELECT route_id, route_short_name, route_long_name from routes
     {route_type_where}
@@ -474,6 +487,12 @@ def check_datasource_index(self):
     WHERE
     type= 'index' and tbl_name = 'shapes' and name like '%shape_id%';
     """
+    sql_index_4 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'stops' and name like '%stop_name%';
+    """
     sql_add_index_1 = f"""
     create index gtfs2_stop_times_trip_id on stop_times(trip_id)
     """
@@ -483,6 +502,9 @@ def check_datasource_index(self):
     sql_add_index_3 = f"""
     create index gtfs2_shapes_shape_id on shapes(shape_id)
     """
+    sql_add_index_4 = f"""
+    create index gtfs2_stops_stop_name on stops(stop_name)
+    """    
     result_1a = schedule.engine.connect().execute(
         text(sql_index_1),
         {"q": "q"},
@@ -490,7 +512,7 @@ def check_datasource_index(self):
     for row_cursor in result_1a:
         _LOGGER.debug("IDX result1: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.debug("Adding index 1 to improve performance")
+            _LOGGER.warning("Adding index 1 to improve performance")
             result_1b = schedule.engine.connect().execute(
             text(sql_add_index_1),
             {"q": "q"},
@@ -503,7 +525,7 @@ def check_datasource_index(self):
     for row_cursor in result_2a:
         _LOGGER.debug("IDX result2: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.debug("Adding index 2 to improve performance")
+            _LOGGER.warning("Adding index 2 to improve performance")
             result_2b = schedule.engine.connect().execute(
             text(sql_add_index_2),
             {"q": "q"},
@@ -516,11 +538,23 @@ def check_datasource_index(self):
     for row_cursor in result_3a:
         _LOGGER.debug("IDX result3: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.debug("Adding index 3 to improve performance")
+            _LOGGER.warning("Adding index 3 to improve performance")
             result_3b = schedule.engine.connect().execute(
             text(sql_add_index_3),
             {"q": "q"},
-            )            
+            )    
+    result_4a = schedule.engine.connect().execute(
+        text(sql_index_4),
+        {"q": "q"},
+    )
+    for row_cursor in result_4a:
+        _LOGGER.debug("IDX result4: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checkidx'] == 0:
+            _LOGGER.warning("Adding index 4 to improve performance")
+            result_4b = schedule.engine.connect().execute(
+            text(sql_add_index_4),
+            {"q": "q"},
+            )  
             
 def create_trip_geojson(self):
     _LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)

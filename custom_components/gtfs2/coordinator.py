@@ -65,6 +65,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],
+            "route_type": data["route_type"],
             "extracting": False,
             "next_departure": {},
             "next_departure_realtime_attr": {},

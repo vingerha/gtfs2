@@ -35,6 +35,15 @@
           "refresh_interval": "Refresh interval in minutes",
           "include_tomorrow": "Include tomorrow"
         }
+      },
+	  "stops_train": {
+        "data": {
+          "origin": "Enter the city of departure",
+          "destination": "Enter the city of arrival",
+          "name": "Name of the route",
+          "refresh_interval": "Refresh interval in minutes",
+          "include_tomorrow": "Include tomorrow"
+        }
       }
     },
     "error": {
@@ -92,12 +101,12 @@
     },
 	"route_type": {
       "options": {
-        "0: Tram": "Tram, Streetcar, Light rail",
-        "1: Metro": "Subway, Metro. Any underground rail system",
-		"2: Rail": "Rail, intercity or long-distance travel",
-		"3: Bus": "Bus, short- and long-distance bus routes",
-		"4: Ferry": "Ferries, short- and long-distance boat service",
-		"99: All": "All, this includes also more obscure ones not in above"
+        "0": "Tram, Streetcar, Light rail.",
+        "1": "Subway, Metro. Any underground rail system",
+		"2": "Rail, intercity or long-distance travel",
+		"3": "Bus, short- and long-distance bus routes",
+		"4": "Ferries, short- and long-distance boat service",
+		"99": "All, this includes also more obscure ones not in above"
       }
     }
   },

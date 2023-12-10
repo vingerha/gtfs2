@@ -131,6 +131,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._offset = self.coordinator.data["offset"]
         self._departure = self.coordinator.data.get("next_departure",None)
         self._departure_rt = self.coordinator.data.get("next_departure_realtime_attr",None)
+        self._route_type = self.coordinator.data["route_type"]
         self._available = False
         self._icon = ICON
         self._state: datetime.datetime | None = None
@@ -141,15 +142,18 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._origin = None
         self._destination = None        
         # Fetch valid stop information once
-        if not self._origin and not self.extracting:
+        # exclude check if route_type =2 (trains) as no ID is used
+        if not self._origin and not self.extracting and self._route_type != "2":
             stops = self._pygtfs.stops_by_id(self.origin)
             if not stops:
                 self._available = False
                 _LOGGER.warning("Origin stop ID %s not found", self.origin)
                 return
             self._origin = stops[0]
-
-        if not self._destination and not self.extracting:
+        else: 
+            self._origin = self.origin
+        # exclude check if route_type =2 (trains) as no ID is used
+        if not self._destination and not self.extracting and self._route_type != "2":
             stops = self._pygtfs.stops_by_id(self.destination)
             if not stops:
                 self._available = False
@@ -158,7 +162,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                 )
                 return
             self._destination = stops[0]
-        
+        else:
+            self._destination = self.destination
 
         # Fetch trip and route details once, unless updated
         if not self._departure:
@@ -281,7 +286,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self.append_keys(self.dict_for_table(self._agency), "Agency")
 
         key = "origin_station_stop_id"
-        if self._origin and key not in self._attributes:
+        # exclude check if route_type =2 (trains) as no ID is used
+        if self._origin and key not in self._attributes and self._route_type != "2":
             self.append_keys(self.dict_for_table(self._origin), "Origin Station")
             self._attributes[ATTR_LOCATION_ORIGIN] = LOCATION_TYPE_OPTIONS.get(
                 self._origin.location_type, LOCATION_TYPE_DEFAULT
@@ -291,7 +297,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             )
 
         key = "destination_station_stop_id"
-        if self._destination and key not in self._attributes:
+        # exclude check if route_type =2 (trains) as no ID is used
+        if self._destination and key not in self._attributes and self._route_type != "2":
             self.append_keys(
                 self.dict_for_table(self._destination), "Destination Station"
             )
