@@ -401,7 +401,7 @@ def get_rt_vehicle_positions(self):
     self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
         
     _LOGGER.debug("GTFS RT geojson: %s", json.dumps(self.geojson))
-    self._route_dir = self._route_id + "_" + self._direction
+    self._route_dir = str(self._route_id) + "_" + str(self._direction)
     update_geojson(self)
     return geojson_body
     
