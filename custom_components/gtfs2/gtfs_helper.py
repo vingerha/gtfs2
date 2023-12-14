@@ -9,6 +9,7 @@ import requests
 import pygtfs
 from sqlalchemy.sql import text
 import multiprocessing
+from multiprocessing import Process
 
 import homeassistant.util.dt as dt_util
 from homeassistant.core import HomeAssistant
@@ -32,12 +33,16 @@ def get_next_departure(self):
         timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     schedule = self._data["schedule"]
     route_type = self._data["route_type"]
+    
+    # if type 2 (train) then filter on that and use name-like search 
     if route_type == "2":
+        route_type_where = f"route_type = :route_type"
         start_station_id = str(self._data['origin'])+'%'
         end_station_id = str(self._data['destination'])+'%'
         start_station_where = f"AND start_station.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
         end_station_where = f"AND end_station.stop_id in (select stop_id from stops where stop_name like :end_station_id)"
     else:
+        route_type_where = "1=1"
         start_station_id = self._data['origin'].split(': ')[0]
         end_station_id = self._data['destination'].split(': ')[0]
         start_station_where = f"AND start_station.stop_id = :origin_station_id"
@@ -109,7 +114,7 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         LEFT OUTER JOIN calendar_dates calendar_date_today
             on trip.service_id = calendar_date_today.service_id
-		WHERE route_type = {route_type}
+		WHERE {route_type_where}
         {start_station_where}
         {end_station_where}
         AND origin_stop_sequence < dest_stop_sequence
@@ -156,7 +161,7 @@ def get_next_departure(self):
                    ON route.route_id = trip.route_id 
         INNER JOIN calendar_dates calendar_date_today
 				   ON trip.service_id = calendar_date_today.service_id
-		WHERE route_type = {route_type}
+		WHERE {route_type_where}
         {start_station_where}
         {end_station_where}
 		AND origin_stop_sequence < dest_stop_sequence
@@ -376,15 +381,29 @@ def get_gtfs(hass, path, data, update=False):
 
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
     joined_path = os.path.join(gtfs_dir, sqlite_file) 
-    gtfs = pygtfs.Schedule(joined_path) 
+    gtfs = pygtfs.Schedule(joined_path)
     if not gtfs.feeds:
-        _LOGGER.info("Starting gtfs file unpacking: %s", joined_path)
-        pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
+        extract = Process(target=extract_from_zip(gtfs,gtfs_dir,file))
+        extract.start()
+        extract.join()
+        _LOGGER.info("Exiting main after start subprocess for unpacking: %s", file)
+        return "unpacking"
     return gtfs
+ 
+
+    
+def extract_from_zip(gtfs,gtfs_dir,file):
+    _LOGGER.debug("Extracting gtfs file: %s", file)
+    if os.fork() != 0:
+        return
+    pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
+    
+        
 
 def get_route_list(schedule, data):
+    _LOGGER.debug("Getting routes with data: %s", data)
     route_type_where = ""
-    if data["route_type"] != 99:
+    if data["route_type"] != "99":
         route_type_where = f"where route_type = {data['route_type']}"
     sql_routes = f"""
     SELECT route_id, route_short_name, route_long_name from routes

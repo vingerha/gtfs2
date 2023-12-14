@@ -17,7 +17,7 @@
       },
       "route_type": {
         "data": {
-          "route_type": "Select the type of transport"
+          "route_type": "Train rides are setup between cities, not stops"
         },
 		"description": "Select from the options below"
       },	  
@@ -61,7 +61,7 @@
       "stop_incorrect": "Start and/or End destination incorrect, possibly no transport 'today' or not in same direction, check logs",
 	  "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder",
 	  "no_zip_file": "Data collection issue: ZIP file not existing in the correct folder, note that it is capital-sensitive",
-	  "extracting": "Extracting data, this can take a while"
+	  "extracting": "(Still) extracting data, this will take time (read docu) "
     }
   },
   "options": {
@@ -101,12 +101,8 @@
     },
 	"route_type": {
       "options": {
-        "0": "Tram, Streetcar, Light rail.",
-        "1": "Subway, Metro. Any underground rail system",
-		"2": "Rail, intercity or long-distance travel",
-		"3": "Bus, short- and long-distance bus routes",
-		"4": "Ferries, short- and long-distance boat service",
-		"99": "All, this includes also more obscure ones not in above"
+		"99": "All, excluding trains",
+		"2": "Trains, intercity or long-distance travel"
       }
     }
   },

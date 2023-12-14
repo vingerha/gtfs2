@@ -287,29 +287,35 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
 
         key = "origin_station_stop_id"
         # exclude check if route_type =2 (trains) as no ID is used
-        if self._origin and key not in self._attributes and self._route_type != "2":
-            self.append_keys(self.dict_for_table(self._origin), "Origin Station")
-            self._attributes[ATTR_LOCATION_ORIGIN] = LOCATION_TYPE_OPTIONS.get(
-                self._origin.location_type, LOCATION_TYPE_DEFAULT
-            )
-            self._attributes[ATTR_WHEELCHAIR_ORIGIN] = WHEELCHAIR_BOARDING_OPTIONS.get(
-                self._origin.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
-            )
+        if self._route_type != "2":
+            if self._origin and key not in self._attributes:
+                self.append_keys(self.dict_for_table(self._origin), "Origin Station")
+                self._attributes[ATTR_LOCATION_ORIGIN] = LOCATION_TYPE_OPTIONS.get(
+                    self._origin.location_type, LOCATION_TYPE_DEFAULT
+                )
+                self._attributes[ATTR_WHEELCHAIR_ORIGIN] = WHEELCHAIR_BOARDING_OPTIONS.get(
+                    self._origin.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
+                )
+        else:
+            self._attributes["origin_station_stop_name"] = self._origin
 
         key = "destination_station_stop_id"
         # exclude check if route_type =2 (trains) as no ID is used
-        if self._destination and key not in self._attributes and self._route_type != "2":
-            self.append_keys(
-                self.dict_for_table(self._destination), "Destination Station"
-            )
-            self._attributes[ATTR_LOCATION_DESTINATION] = LOCATION_TYPE_OPTIONS.get(
-                self._destination.location_type, LOCATION_TYPE_DEFAULT
-            )
-            self._attributes[
-                ATTR_WHEELCHAIR_DESTINATION
-            ] = WHEELCHAIR_BOARDING_OPTIONS.get(
-                self._destination.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
-            )
+        if self._route_type != "2":
+            if self._destination and key not in self._attributes:
+                self.append_keys(
+                    self.dict_for_table(self._destination), "Destination Station"
+                )
+                self._attributes[ATTR_LOCATION_DESTINATION] = LOCATION_TYPE_OPTIONS.get(
+                    self._destination.location_type, LOCATION_TYPE_DEFAULT
+                )
+                self._attributes[
+                    ATTR_WHEELCHAIR_DESTINATION
+                ] = WHEELCHAIR_BOARDING_OPTIONS.get(
+                    self._destination.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
+                )
+        else:
+            self._attributes["destination_station_stop_name"] = self._destination        
 
         # Manage Route metadata
         key = "route_id"
