@@ -62,7 +62,7 @@ def get_next_departure(self):
     # up to an overkill maximum in case of a departure every minute for those
     # days.
     limit = 24 * 60 * 60 * 2
-    tomorrow_select = tomorrow_where = tomorrow_order = ""
+    tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
     tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today)"
     if include_tomorrow:
         _LOGGER.debug("Include Tomorrow")
@@ -72,9 +72,11 @@ def get_next_departure(self):
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
         tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)"
-
+        tomorrow_select2 = f"'0' AS tomorrow,"
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
+        	   start_station.stop_id as origin_stop_id,
+               start_station.stop_name as origin_stop_name,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -84,6 +86,7 @@ def get_next_departure(self):
                origin_stop_time.stop_headsign AS origin_stop_headsign,
                origin_stop_time.stop_sequence AS origin_stop_sequence,
                origin_stop_time.timepoint AS origin_stop_timepoint,
+               end_station.stop_name as dest_stop_name,
                time(destination_stop_time.arrival_time) AS dest_arrival_time,
                time(destination_stop_time.departure_time) AS dest_depart_time,
                destination_stop_time.drop_off_type AS dest_drop_off_type,
@@ -112,8 +115,6 @@ def get_next_departure(self):
                    ON destination_stop_time.stop_id = end_station.stop_id
         INNER JOIN routes route
                    ON route.route_id = trip.route_id 
-        LEFT OUTER JOIN calendar_dates calendar_date_today
-            on trip.service_id = calendar_date_today.service_id
 		WHERE {route_type_where}
         {start_station_where}
         {end_station_where}
@@ -122,6 +123,8 @@ def get_next_departure(self):
         AND calendar.end_date >= :today
 		UNION ALL
 	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
+               start_station.stop_id as origin_stop_id,
+               start_station.stop_name as origin_stop_name,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
                date(origin_stop_time.departure_time) AS origin_depart_date,
@@ -131,6 +134,7 @@ def get_next_departure(self):
                origin_stop_time.stop_headsign AS origin_stop_headsign,
                origin_stop_time.stop_sequence AS origin_stop_sequence,
                origin_stop_time.timepoint AS origin_stop_timepoint,
+               end_station.stop_name as dest_stop_name,
                time(destination_stop_time.arrival_time) AS dest_arrival_time,
                time(destination_stop_time.departure_time) AS dest_depart_time,
                destination_stop_time.drop_off_type AS dest_drop_off_type,
@@ -139,16 +143,14 @@ def get_next_departure(self):
                destination_stop_time.stop_headsign AS dest_stop_headsign,
                destination_stop_time.stop_sequence AS dest_stop_sequence,
                destination_stop_time.timepoint AS dest_stop_timepoint,
-               calendar.{yesterday.strftime("%A").lower()} AS yesterday,
-               calendar.{now.strftime("%A").lower()} AS today,
-               {tomorrow_select}
-               calendar.start_date AS start_date,
-               calendar.end_date AS end_date,
+               '0' AS yesterday,
+               '0' AS today,
+               {tomorrow_select2}
+               :today AS start_date,
+               :today AS end_date,
                calendar_date_today.date as calendar_date,
                calendar_date_today.exception_type as today_cd
         FROM trips trip
-        INNER JOIN calendar calendar
-            ON trip.service_id = calendar.service_id
         INNER JOIN stop_times origin_stop_time
                    ON trip.trip_id = origin_stop_time.trip_id
         INNER JOIN stops start_station
@@ -337,10 +339,13 @@ def get_next_departure(self):
         "day": item["day"],
         "first": item["first"],
         "last": item["last"],
+        "origin_stop_id": item["origin_stop_id"],
+        "origin_stop_name": item["origin_stop_name"],
         "departure_time": depart_time,
         "arrival_time": arrival_time,
         "origin_stop_time": origin_stop_time,
         "destination_stop_time": destination_stop_time,
+        "destination_stop_name": item["dest_stop_name"],
         "next_departures": timetable_remaining,
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,

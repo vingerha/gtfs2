@@ -140,7 +140,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="route_type",
                 data_schema=vol.Schema(
                     {
-                        vol.Required("route_type"): selector.SelectSelector(selector.SelectSelectorConfig(options=["2", "99"], translation_key="route_type")),
+                        vol.Required("route_type"): selector.SelectSelector(selector.SelectSelectorConfig(options=["99", "2"], translation_key="route_type")),
                     },
                 ),
                 errors=errors,

@@ -297,7 +297,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                     self._origin.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
                 )
         else:
-            self._attributes["origin_station_stop_name"] = self._origin
+            self._attributes["origin_station_stop_name"] = self._departure.get("origin_stop_name", None)
+            self._attributes["origin_station_stop_id"] =  self._departure.get("origin_stop_id", None)
 
         key = "destination_station_stop_id"
         # exclude check if route_type =2 (trains) as no ID is used
@@ -315,7 +316,7 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                     self._destination.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
                 )
         else:
-            self._attributes["destination_station_stop_name"] = self._destination        
+            self._attributes["destination_station_stop_name"] = self._departure.get("destination_stop_name", None)        
 
         # Manage Route metadata
         key = "route_id"

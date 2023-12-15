@@ -199,7 +199,7 @@ def get_rt_route_statuses(self):
         url=self._trip_update_url, headers=self._headers, label="trip data"
     )
     self._feed_entities = feed_entities
-
+    _LOGGER.debug("Departure times searching for route: %s", self._route_id)
     for entity in feed_entities:
         if entity.HasField("trip_update"):
             
@@ -223,9 +223,8 @@ def get_rt_route_statuses(self):
                 )
             else:
                 route_id = entity.trip_update.trip.route_id
-            
             if route_id == self._route_id:
-                #_LOGGER.debug("Route Statuses Entity: %s", entity)
+                _LOGGER.debug("Route Statuses Entity: %s", entity)
                 
                 if route_id not in departure_times:
                     departure_times[route_id] = {}
@@ -293,11 +292,11 @@ def get_rt_trip_statuses(self):
     departure_times = {}
 
     feed_entities = self._feed_entities
-
+    _LOGGER.debug("Departure times searching for trip: %s", self._trip_id)
     for entity in feed_entities:
 
         if entity.HasField("trip_update"):
-
+            
             trip_id = entity.trip_update.trip.trip_id        
             if trip_id == self._trip_id:
                 _LOGGER.debug("Trip Statuses Entity: %s", entity)
