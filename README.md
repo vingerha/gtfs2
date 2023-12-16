@@ -3,22 +3,25 @@
 # GTFS2 for Static and RealTime Public transport status collecting
 This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
-- Uses selected route to further select start/end stops
+- Uses a route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
 - allows to load/update/delete datasources in gtfs2 folder from the GUI
 - Option to add gtfs realtime source/url
 - Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
-- A service to update the GTFS datasource, e.g. for calling the service via automation
+- Option to add gtfs realtime alerts source/url
+- A service to update the GTFS static datasource, e.g. for calling the service via automation
 - translations: English and French 
 
-## Difference with GTFS HA core (outside of GUI setup)
-Core GTFS uses start + stop, it then determines every option between them and provides the next best option, regardless of the line/route
-- Pro: you receive the first applicable departure time and just have to check the type of transport (bus/tram/etc.)
-- Con: you have to know exactly which start and stop you want and in the proper direction. Noting that the same stops exist with different ID for different routes/trips/directions
-
-***Solution/workaround in GTFS2***: attribute added: next_departure_line shows all next departues with their line/means-of-transport. So even if you select a route first and then two stops, the attibutes will still show alternatives between those 2 stops, if applicable.
-
 ## Updates
+v0.2.0, enhancements
+- split out Trains to avoid having to use all start/stop ID, by selecting connecting cities (manual entry)
+- improve query performance
+- resolve issue with 'hanging' pop-up when loading/extracting zip file
+
+v0.1.9, Finetuning
+- reduce log-spamming messages
+
+v0.1.8 Add gtfs alerts handling
 
 v0.1.6, stabilizing
 - realtime vehile tracking with geojson output
@@ -32,12 +35,10 @@ v0.1.5, adding features:
 - for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
 - timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
 
-v0.1.9: initial version
-
+v0.1.0: initial version
 
 ## ToDo's / In Development / Known Issues
-- Issue when updating the source db: pygtfs error: at the moment unclear as errors fluctuate, posisbly a lack of resources (mem/cpu)
-- get realtime data for sources that donot base on routes, e.g. France's TER realtime source only uses trip_id
+- n.a.
 
 ## Installation via HACS :
 
