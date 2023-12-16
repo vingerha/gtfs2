@@ -1,6 +1,6 @@
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gtfs2) ![GitHub](https://img.shields.io/github/license/vingerha/gtfs2) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
-# GTFS2 for Static and RealTime 
+# GTFS2 for Static and RealTime Public transport status collecting
 This is an adaptation of the GTFS integration in HomeAssistant Core, enhancements:
 - configuration via the GUI, no configuration.yaml needed
 - Uses a route to further select start/end stops
@@ -13,6 +13,12 @@ This is an adaptation of the GTFS integration in HomeAssistant Core, enhancement
 - translations: English and French 
 
 ## Updates info
+
+v0.2.0, enhancements
+- split out Trains to avoid having to use all start/stop ID, by selecting connecting cities (manual entry)
+- improve query performance
+- resolve issue with 'hanging' pop-up when loading/extracting zip file
+
 v0.1.9, Finetuning
 - reduce log-spamming messages
 
