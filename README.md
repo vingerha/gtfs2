@@ -36,12 +36,6 @@ v0.1.5, adding features:
 - for new datasource, allow to use a self-placed zip file in the gtfs2 folder. This for zip that are not available via URL or zip with data that may need modification to comply with extraction conditions by pygtfs
 - timezone for next_departure is now used in order: agency (delivering data), if not > HA system, if not > UTC. This to resolve TZ issues for datasets without agency (timezone)
 
-v0.1.0: initial version
-
-## ToDo's / In Development / Known Issues
-
-- Extraction of static data throws error, due to sometimes very long extraction time. Error can be ignored but should be avoided.
-
 ## Installation via HACS :
 
 1. In  HACS, select the 3-dots and then custom repositories, add :
