@@ -20,7 +20,7 @@ NOTE: this will download and unpack the zip-file to a sqlite database, which can
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/dd26f517-1cd9-4386-b4ea-c605d02a0ac7)
 
 
-## Select the route
+## Select the route ##
 
 After the datasource is retrieved, you can select the route that you'd like to track on 
 By selecting a route and its direction, it allows to filter the proper stops
