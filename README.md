@@ -13,6 +13,12 @@ This is an adaptation of the GTFS integration in HomeAssistant Core, enhancement
 - translations: English and French 
 
 ## Updates info
+
+v0.2.0, enhancements
+- split out Trains to avoid having to use all start/stop ID, by selecting connecting cities (manual entry)
+- improve query performance
+- resolve issue with 'hanging' pop-up when loading/extracting zip file
+
 v0.1.9, Finetuning
 - reduce log-spamming messages
 
