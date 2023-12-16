@@ -120,7 +120,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
-     
 
 def setup(hass, config):
     """Setup the service component."""

@@ -40,6 +40,7 @@ v0.1.0: initial version
 ## ToDo's / In Development / Known Issues
 - n.a.
 
+
 ## Installation via HACS :
 
 1. In  HACS, select the 3-dots and then custom repositories, add :
