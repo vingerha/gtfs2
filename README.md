@@ -6,9 +6,9 @@ This is an adaptation of the GTFS integration in HomeAssistant Core, enhancement
 - Uses a route to further select start/end stops
 - Shows next 10 departures on the same stretch start/end , including alternative transport lines if applicable
 - allows to load/update/delete datasources in gtfs2 folder from the GUI
-- Option to add gtfs realtime source/url
-- Option to add gtfs realtime vehicle location source/url, generates geojson file which can be used for tracking vehicle on map card
-- Option to add gtfs realtime alerts source/url
+- Option to add gtfs **realtime trip updates** source/url
+- Option to add gtfs **realtime vehicle location** source/url, generates geojson file which can be used for tracking vehicle on map card
+- Option to add gtfs **realtime alerts** source/url
 - A service to update the GTFS static datasource, e.g. for calling the service via automation
 - translations: English and French 
 
