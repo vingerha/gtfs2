@@ -1,7 +1,6 @@
 ---
 name: Bug report
-about: Please first check this [section](https://github.com/vingerha/gtfs2/wiki/6.-Issues-&-challenges)
-  before raising a bug/issue
+about: Please first check the wiki pages before raising a ticket
 title: ''
 labels: ''
 assignees: ''
