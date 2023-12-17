@@ -1,17 +1,17 @@
 ## Example new datasource
 
-### Get the url to the gtfs zip file
+### Get the url to the gtfs zip file ###
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/d5402bb0-17a5-41e8-ac95-652ecb06bb98)
 
 In this case that is: https://data.lemet.fr/documents/LEMET-gtfs.zip
 
-### Add new in devices and services
+### Add new in devices and services ###
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/ed7e8fbe-c3b9-4337-982f-74da5ea6e3dd)
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/7dd77425-07f8-45d0-8d0c-d9948fca6fbb)
 
-### Two options, either extract from a file you placed in the gtfs2 folder Or use a url
+### Two options, either extract from a file you placed in the gtfs2 folder Or use a url ###
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/e64cb7d9-7b68-4169-9cc4-e216a303f7d3)
 
@@ -20,14 +20,14 @@ NOTE: this will download and unpack the zip-file to a sqlite database, which can
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/dd26f517-1cd9-4386-b4ea-c605d02a0ac7)
 
 
-## Select the route
+## Select the route ##
 
 After the datasource is retrieved, you can select the route that you'd like to track on 
 By selecting a route and its direction, it allows to filter the proper stops
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/80d133c5-b00e-43f8-aef0-c203eba4eb6b)
 
-## Select the start / end stop
+### Select the start / end stop ###
 
 By default it will show the start and end stop of the chosen route
 Name: select a name that applies to your route, the name is used also for updates
@@ -36,13 +36,13 @@ Refresh interval: reloads the data with the new timings, if your transport has a
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/8007911c-f1c7-406c-9295-4d132df07ab6)
 
-## Added
+### Added ###
 
 You can add a optional area
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/f2f855f9-bc07-405d-8b0b-09b3da7e4f79)
 
-## CONFIGURE Options 
+## CONFIGURE Options ##
 
 After setup you can change the refresh interval and add real-time source(s)
 
@@ -56,7 +56,7 @@ After setup you can change the refresh interval and add real-time source(s)
 
 
 
-Sample of the entity and its attributes
+## Sample of the entity and its attributes ##
 ```
 arrival: 2023-11-18T12:18:00+00:00
 day: today
