@@ -121,6 +121,7 @@ def get_next_departure(self):
         AND origin_stop_sequence < dest_stop_sequence
         AND calendar.start_date <= :today
         AND calendar.end_date >= :today
+        AND trip.service_id not in (select service_id from calendar_dates where date = :today and exception_type = 2)
 		UNION ALL
 	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign,route.route_long_name,
                start_station.stop_id as origin_stop_id,
