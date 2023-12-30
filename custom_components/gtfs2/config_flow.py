@@ -58,12 +58,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input: dict | None = None) -> FlowResult:
         """Handle the source."""
         errors: dict[str, str] = {}
+        
+        return self.async_show_menu(
+            step_id="user",
+            menu_options=["start_end", "local_stops","remove"],
+            description_placeholders={
+                "model": "Example model",
+            }
+        )
+                   
+    async def async_step_start_end(self, user_input: dict | None = None) -> FlowResult:
+        """Handle the source."""
+        errors: dict[str, str] = {}      
         if user_input is None:
             datasources = get_datasources(self.hass, DEFAULT_PATH)
             datasources.append("setup new")
-            datasources.append("remove datasource")
             return self.async_show_form(
-                step_id="user",
+                step_id="start_end",
                 data_schema=vol.Schema(
                     {
                         vol.Required("file", default="setup new"): vol.In(datasources),
@@ -75,16 +86,37 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._user_inputs.update(user_input)
             _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
             return await self.async_step_source()
-        elif user_input["file"] == "remove datasource":
-            self._user_inputs.update(user_input)
-            _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
-            return await self.async_step_remove()
         else:
             user_input["url"] = "na"
             user_input["extract_from"] = "zip"
             self._user_inputs.update(user_input)
-            _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
-            return await self.async_step_agency()
+            _LOGGER.debug(f"UserInputs Start End: {self._user_inputs}")
+            return await self.async_step_agency()            
+            
+    async def async_step_local_stops(self, user_input: dict | None = None) -> FlowResult:
+        """Handle the source."""
+        errors: dict[str, str] = {}       
+        if user_input is None:
+            datasources = get_datasources(self.hass, DEFAULT_PATH)
+            return self.async_show_form(
+                step_id="local_stops",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required("file"): vol.In(datasources),
+                        vol.Required("device_tracker_id"): selector.EntitySelector(
+                            selector.EntitySelectorConfig(domain="person"),                          
+                        ),
+                        vol.Required("name"): str, 
+                    },
+                ),
+            ) 
+        user_input["url"] = "na"
+        user_input["extract_from"] = "zip"            
+        self._user_inputs.update(user_input)
+        _LOGGER.debug(f"UserInputs Local Stops: {self._user_inputs}")
+        return self.async_create_entry(
+            title=user_input["name"], data=self._user_inputs
+            )                
                    
     async def async_step_source(self, user_input: dict | None = None) -> FlowResult:
         """Handle a flow initialized by the user."""
@@ -108,7 +140,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason=check_data)
         else:
             self._user_inputs.update(user_input)
-            _LOGGER.debug(f"UserInputs Data: {self._user_inputs}")
+            _LOGGER.debug(f"UserInputs Source: {self._user_inputs}")
             return await self.async_step_agency()            
 
     async def async_step_remove(self, user_input: dict | None = None) -> FlowResult:
@@ -165,7 +197,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             user_input = {}
             user_input["agency"] = "0: ALL"
         self._user_inputs.update(user_input)
-        _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
+        _LOGGER.debug(f"UserInputs Agency: {self._user_inputs}")
         return await self.async_step_route_type()          
         
     async def async_step_route_type(self, user_input: dict | None = None) -> FlowResult:
@@ -182,7 +214,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )                
         self._user_inputs.update(user_input)
-        _LOGGER.debug(f"UserInputs File: {self._user_inputs}")
+        _LOGGER.debug(f"UserInputs Route Type: {self._user_inputs}")
         if user_input["route_type"] == "2":
             return await self.async_step_stops_train()
         else:
@@ -292,9 +324,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._pygtfs = await self.hass.async_add_executor_job(
             get_gtfs, self.hass, DEFAULT_PATH, data, False
         )
-        _LOGGER.debug("Checkdata: %s ", self._pygtfs)
+        _LOGGER.debug("Checkdata pygtfs: %s with data: ", self._pygtfs, data)
         if self._pygtfs in ['no_data_file', 'no_zip_file', 'extracting'] :
             return self._pygtfs
+        check_index = await self.hass.async_add_executor_job(
+                    check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
+                )            
         return None
 
     async def _check_config(self, data):

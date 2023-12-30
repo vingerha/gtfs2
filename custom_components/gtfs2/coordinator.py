@@ -14,6 +14,7 @@ import homeassistant.util.dt as dt_util
 from .const import (
     DEFAULT_PATH, 
     DEFAULT_REFRESH_INTERVAL, 
+    DEFAULT_LOCAL_STOP_REFRESH_INTERVAL,
     CONF_API_KEY, 
     CONF_X_API_KEY,
     ATTR_DUE_IN,
@@ -21,7 +22,7 @@ from .const import (
     ATTR_LONGITUDE,
     ATTR_RT_UPDATED_AT
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures
 from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services, get_rt_alerts
 
 _LOGGER = logging.getLogger(__name__)
@@ -148,3 +149,105 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         
         return self._data
 
+class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
+    """Data update coordinator for getting local stops."""
+
+    config_entry: ConfigEntry
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the coordinator."""
+        super().__init__(
+            hass=hass,
+            logger=_LOGGER,
+            name=entry.entry_id,
+            update_interval=timedelta(minutes=entry.data.get("refresh_local_stop_interval", DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)),
+        )
+        self.config_entry = entry
+        self.hass = hass
+        
+        self._pygtfs = ""
+        self._data: dict[str, str] = {}
+
+    async def _async_update_data(self) -> dict[str, str]:
+        """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
+        data = self.config_entry.data
+        options = self.config_entry.options
+        previous_data = None if self.data is None else self.data.copy()
+        _LOGGER.debug("Previous data: %s", previous_data)  
+
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )        
+        self._data = {
+            "schedule": self._pygtfs,
+            "include_tomorrow": True,
+            "gtfs_dir": DEFAULT_PATH,
+            "name": data["name"],
+            "file": data["file"],
+            "device_tracker_id": data["device_tracker_id"],
+            "extracting": False,
+        }           
+        self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat() 
+        
+        if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
+            _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data["extracting"] = True
+            return previous_data
+            
+        self._data["local_stops_next_departures"] = await self.hass.async_add_executor_job(
+                    get_local_stops_next_departures, self
+                )
+        _LOGGER.debug("Data from coordinator: %s", self._data)              
+        return self._data
+        
+class GTFSLocalStopUpdateCoordinator2(DataUpdateCoordinator):
+    """Data update coordinator for getting local stops."""
+
+    config_entry: ConfigEntry
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the coordinator."""
+        super().__init__(
+            hass=hass,
+            logger=_LOGGER,
+            name=entry.entry_id,
+            update_interval=timedelta(minutes=entry.data.get("refresh_local_stop_interval", DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)),
+        )
+        self.config_entry = entry
+        self.hass = hass
+        
+        self._pygtfs = ""
+        self._data: dict[str, str] = {}
+
+    async def _async_update_data(self) -> dict[str, str]:
+        """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
+        data = self.config_entry.data
+        options = self.config_entry.options
+        previous_data = None if self.data is None else self.data.copy()
+        _LOGGER.debug("Previous data: %s", previous_data)  
+
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )        
+        self._data = {
+            "schedule": self._pygtfs,
+            "include_tomorrow": True,
+            "gtfs_dir": DEFAULT_PATH,
+            "name": data["file"],
+            "file": data["file"],
+            "extracting": False,
+            "next_departure": {},
+            "next_departure_realtime_attr": {},
+        }           
+        self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat() 
+        
+        if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
+            _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data["extracting"] = True
+            return previous_data
+            
+        self._data["next_departure_local_stops"] = await self.hass.async_add_executor_job(
+                    get_next_departure_local_stops, self
+                )
+        _LOGGER.debug("Data from coordinator: %s", self._data)              
+        return self._data        
