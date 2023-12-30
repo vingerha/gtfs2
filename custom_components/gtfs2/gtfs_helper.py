@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import device_registry as dr
 
-from .const import DEFAULT_PATH_GEOJSON
+from .const import DEFAULT_PATH_GEOJSON, DEFAULT_LOCAL_STOP_TIMERANGE, DEFAULT_LOCAL_STOP_RADIUS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -628,7 +628,7 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
             )  
             
 def create_trip_geojson(self):
-    _LOGGER.debug("GTFS Helper, create geojson with data: %s", self._data)
+    _LOGGER.debug("Create geojson with data: %s", self._data)
     schedule = self._data["schedule"]
     self._trip_id = self._data["next_departure"]["trip_id"]
     sql_shape = f"""
@@ -659,15 +659,15 @@ def create_trip_geojson(self):
     return None
 
 def get_local_stops_next_departures(self):
-    # complex, via entity_registry
+    _LOGGER.debug("Get local stop departure with data: %s", self._data)
+    # complex, get device_id via entity_registry
     #entity_registry = er.async_get(self.hass)
     #entry = entity_registry.async_get(self._data['device_tracker_id'])
     #entry_attr = self.hass.states.get(entry.entity_id)
 
-    # aangezien device al in the entity is...shortcur
+    # as device_id aailable via entity , shorter path
     device_tracker = self.hass.states.get(self._data['device_tracker_id'])
-    _LOGGER.debug("Device tracker attributes: %s", device_tracker)   
-    _LOGGER.debug("Device tracker attributes FN: %s", str(device_tracker))    
+    _LOGGER.debug("Device tracker attributes: %s", device_tracker)
 
     
     if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
@@ -696,6 +696,12 @@ def get_local_stops_next_departures(self):
     #stop_lon = 4.834525
     latitude = device_tracker.attributes.get("latitude", None)
     longitude = device_tracker.attributes.get("longitude", None)
+    time_range = str('+' + str(self._data.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE)) + ' minute')
+    radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 130000
+    _LOGGER.debug("Time Range: %s", time_range)
+    if not latitude or not latitude:
+        _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
+        return []
     if include_tomorrow:
         _LOGGER.debug("Include Tomorrow")
         limit = int(limit / 2 * 3)
@@ -722,12 +728,12 @@ def get_local_stops_next_departures(self):
         INNER JOIN stop_times st
                    ON trip.trip_id = st.trip_id
         INNER JOIN stops stop
-                   on stop.stop_id = st.stop_id and abs(stop.stop_lat - :latitude) < 0.003 and abs(stop.stop_lon - :longitude) < 0.003
+                   on stop.stop_id = st.stop_id and abs(stop.stop_lat - :latitude) < :radius and abs(stop.stop_lon - :longitude) < :radius
         INNER JOIN routes route
                    ON route.route_id = trip.route_id 
 		WHERE 
         trip.service_id not in (select service_id from calendar_dates where date = :today and exception_type = 2)
-        and time(st.departure_time) between time('now','localtime')  and time('now','localtime','+30 minute') 
+        and time(st.departure_time) between time('now','localtime') and time('now','localtime',:timerange) 
         AND calendar.start_date <= :today 
         AND calendar.end_date >= :today 
         )
@@ -745,14 +751,14 @@ def get_local_stops_next_departures(self):
         INNER JOIN stop_times st
                    ON trip.trip_id = st.trip_id
         INNER JOIN stops stop
-                   on stop.stop_id = st.stop_id and abs(stop.stop_lat - :latitude) < 0.003 and abs(stop.stop_lon - :longitude) < 0.003
+                   on stop.stop_id = st.stop_id and abs(stop.stop_lat - :latitude) < :radius and abs(stop.stop_lon - :longitude) < :radius
         INNER JOIN routes route
                    ON route.route_id = trip.route_id 
         INNER JOIN calendar_dates calendar_date_today
 				   ON trip.service_id = calendar_date_today.service_id
 		WHERE 
         today_cd = 1
-        and time(st.departure_time) between time('now','localtime')  and time('now','localtime','+30 minute') 
+        and time(st.departure_time) between time('now','localtime')  and time('now','localtime',:timerange) 
 		{tomorrow_calendar_date_where}
         )
         order by stop_id, departure_time
@@ -764,6 +770,8 @@ def get_local_stops_next_departures(self):
             "longitude": longitude,
             "today": now_date,
             "tomorrow": tomorrow_date,
+            "timerange": time_range,
+            "radius": radius,
         },
     )        
     # Create lookup timetable for today and possibly tomorrow, taking into

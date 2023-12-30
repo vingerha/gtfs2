@@ -161,6 +161,4 @@ def setup(hass, config):
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     hass.data[DOMAIN][entry.entry_id]['coordinator'].update_interval = timedelta(minutes=1)
-    hass.data[DOMAIN][entry.entry_id]['coordinator_local_stops'].update_interval = timedelta(minutes=15)
-
     return True
