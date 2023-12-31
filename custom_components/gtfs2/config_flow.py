@@ -101,7 +101,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     {
                         vol.Required("file", default=""): vol.In(datasources),
                         vol.Required("device_tracker_id"): selector.EntitySelector(
-                            selector.EntitySelectorConfig(domain="person"),                          
+                            selector.EntitySelectorConfig(domain=["person","zone"]),                          
                         ),
                         vol.Required("name"): str, 
                     },
