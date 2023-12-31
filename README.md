@@ -10,6 +10,7 @@
 - Option to add local stops and next departures, based on your location as 'person' (e.g. via HA companion app)
 - A service to update the GTFS static datasource, e.g. for calling the service via automation
 - A service to update GTFS real time data locally, reducing internet traffic when using mulitple routes
+- A service to update GTFS local stops, e.g. when tied to a moving person
 - Allows to load/update/delete datasources in gtfs2 folder from the GUI
 - translations: English and French
 
