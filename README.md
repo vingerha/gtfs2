@@ -2,7 +2,7 @@
 
 # GTFS2 for Static and RealTime Public transport status collecting
 - configuration via the GUI
-- Static schedule on a *route* between start/end stops
+- Static schedule on a **route** between start/end stops
 - Shows next 10 departures on the same *route*, including alternative transport lines if applicable
 - allows to load/update/delete datasources in gtfs2 folder from the GUI
 - Option to add gtfs **realtime trip updates** source/url
