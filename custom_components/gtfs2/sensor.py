@@ -67,7 +67,7 @@ async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
-) -> None:
+    ) -> None:
     """Initialize the setup."""   
     if config_entry.data.get('device_tracker_id',None):
         sensors = []
@@ -89,7 +89,7 @@ async def async_setup_entry(
         sensors = [
             GTFSDepartureSensor(coordinator),
         ]
-       
+
     async_add_entities(sensors, False)
     
 class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
@@ -128,9 +128,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         """Icon to use in the frontend, if any."""
         return self._icon
 
-    #    @property
     def _update_attrs(self):  # noqa: C901 PLR0911
-        _LOGGER.debug(f"SENSOR update attr DATA: {self.coordinator.data}")
+        _LOGGER.debug("SENSOR update attr data: %s", self.coordinator.data)
         self._pygtfs = self.coordinator.data["schedule"]
         self.extracting = self.coordinator.data["extracting"]
         self.origin = self.coordinator.data["origin"].split(": ")[0]
@@ -498,7 +497,7 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
         super()._handle_coordinator_update()
 
     def _update_attrs(self):  # noqa: C901 PLR0911
-        _LOGGER.debug(f"SENSOR update stop attr DATA: {self.coordinator.data}")
+        _LOGGER.debug("SENSOR: %s, update attr data: %s", self._name, self.coordinator.data)
         self._departure = self.coordinator.data.get("local_stops_next_departures",None) 
         self._state: str | None = None
         # if no data or extracting, stop
@@ -508,18 +507,18 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
         else:
             self._state = self._stop["stop_name"]
 
-        self._attr_native_value = self._state
-
+        self._attr_native_value = self._state        
+        self._attributes["gtfs_updated_at"] = self.coordinator.data[
+            "gtfs_updated_at"]  
+        
         # Add next departures with their lines
         self._attributes["next_departures_lines"] = {}
         if self._departure:
-            self._attributes["latitude"] = self._stop["latitude"]  
-            self._attributes["longitude"] = self._stop["longitude"]            
-            
-            self._attributes["gtfs_updated_at"] = self.coordinator.data[
-                "gtfs_updated_at"]  
-
-            self._attributes["next_departures_lines"] = self._stop["departure"]
-               
+            for stop in self._departure:
+                if stop["stop_id"] == self._name:
+                    self._attributes["next_departures_lines"] = stop["departure"]
+                    self._attributes["latitude"] = stop["latitude"]  
+                    self._attributes["longitude"] = stop["longitude"]  
+          
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes

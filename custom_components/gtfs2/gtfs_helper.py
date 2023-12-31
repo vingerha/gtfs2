@@ -17,7 +17,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import device_registry as dr
 
-from .const import DEFAULT_PATH_GEOJSON, DEFAULT_LOCAL_STOP_TIMERANGE, DEFAULT_LOCAL_STOP_RADIUS
+from .const import (
+    DEFAULT_PATH_GEOJSON, 
+    DEFAULT_LOCAL_STOP_TIMERANGE, 
+    DEFAULT_LOCAL_STOP_RADIUS,
+    ICON,
+    ICONS
+    )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -715,7 +721,7 @@ def get_local_stops_next_departures(self):
     sql_query = f"""
         SELECT * FROM (
         SELECT stop.stop_id, stop.stop_name,stop.stop_lat as latitude, stop.stop_lon as longitude, trip.trip_id, trip.trip_headsign, time(st.departure_time) as departure_time,
-               route.route_long_name,route.route_short_name,
+               route.route_long_name,route.route_short_name,route.route_type,
                calendar.{now.strftime("%A").lower()} AS today,
                {tomorrow_select}
                calendar.start_date AS start_date,
@@ -740,7 +746,7 @@ def get_local_stops_next_departures(self):
 		UNION ALL
         SELECT * FROM (
 	    SELECT stop.stop_id, stop.stop_name,stop.stop_lat as latitude, stop.stop_lon as longitude, trip.trip_id, trip.trip_headsign, time(st.departure_time) as departure_time,
-               route.route_long_name,route.route_short_name,
+               route.route_long_name,route.route_short_name,route.route_type,
                '0' AS today,
                {tomorrow_select2}
                :today AS start_date,
@@ -786,11 +792,12 @@ def get_local_stops_next_departures(self):
     for row_cursor in result:
         row = row_cursor._asdict()
         if row["stop_id"] == prev_stop_id or prev_stop_id == "":
+            self._icon = ICONS.get(row['route_type'], ICON)
             if row["today"] == 1 or row["today_cd"] == 1:
                 idx_prefix = tomorrow_date
                 idx = f"{idx_prefix} {row['departure_time']}"
                 #timetable[idx] = {"route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"]}
-                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"]})
+                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
             if (
                 "tomorrow" in row
                 and row["tomorrow"] == 1
@@ -798,7 +805,7 @@ def get_local_stops_next_departures(self):
             ):
                 idx = f"{tomorrow_date} {row['departure_time']}"
                 #timetable[idx] = {"route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"]}
-                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"]})
+                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
         else:
             #timetable = {}
             timetable = []

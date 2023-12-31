@@ -162,7 +162,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=_LOGGER,
             name=entry.entry_id,
-            update_interval=timedelta(minutes=entry.data.get("refresh_local_stop_interval", DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)),
+            update_interval=timedelta(minutes=entry.options.get("local_stop_refresh_interval", DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)),
         )
         self.config_entry = entry
         self.hass = hass
