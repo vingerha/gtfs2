@@ -3,12 +3,14 @@
 # GTFS2 for Static and RealTime Public transport status collecting
 - configuration via the GUI
 - Static schedule on a **route** between start/end stops
-- Shows next 10 departures on the same *route*, including alternative transport lines if applicable
-- allows to load/update/delete datasources in gtfs2 folder from the GUI
+- Shows next 10 departures on the same **route**, including alternative transport lines if applicable
 - Option to add gtfs **realtime trip updates** source/url
 - Option to add gtfs **realtime vehicle location** source/url, generates geojson file which can be used for tracking vehicle on map card
 - Option to add gtfs **realtime alerts** source/url
+- Option to add local stops and next departures, based on your location as 'person' (e.g. via HA companion app)
 - A service to update the GTFS static datasource, e.g. for calling the service via automation
+- A service to update GTFS real time data locally, reducing internet traffic when using mulitple routes
+- Allows to load/update/delete datasources in gtfs2 folder from the GUI
 - translations: English and French
 
 **[Documentation](https://github.com/vingerha/gtfs2/wiki)**
