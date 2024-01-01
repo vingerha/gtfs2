@@ -7,11 +7,12 @@ from homeassistant.core import HomeAssistant, ServiceCall
 
 from datetime import timedelta
 
-from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_REFRESH_INTERVAL
+from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_PATH_RT, DEFAULT_REFRESH_INTERVAL
 from homeassistant.const import CONF_HOST
-from .coordinator import GTFSUpdateCoordinator
+from .coordinator import GTFSUpdateCoordinator, GTFSLocalStopUpdateCoordinator
 import voluptuous as vol
-from .gtfs_helper import get_gtfs
+from .gtfs_helper import get_gtfs, update_gtfs_local_stops
+from .gtfs_rt_helper import get_gtfs_rt
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,8 +34,9 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['offset'] = 0
         new_data.pop('offset')
         new_data['route_type'] = '99'
+        new_data['agency'] = '0: ALL'        
         
-        config_entry.version = 6
+        config_entry.version = 7
         hass.config_entries.async_update_entry(config_entry, data=new_data)
         hass.config_entries.async_update_entry(config_entry, options=new_options)
     
@@ -48,8 +50,9 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['offset'] = 0
         new_data.pop('offset')
         new_data['route_type'] = '99'
+        new_data['agency'] = '0: ALL'        
 
-        config_entry.version = 6
+        config_entry.version = 7
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
         hass.config_entries.async_update_entry(config_entry, data=new_data)        
 
@@ -62,8 +65,9 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_options['offset'] = 0
         new_data.pop('offset')
         new_data['route_type'] = '99'
+        new_data['agency'] = '0: ALL'        
 
-        config_entry.version = 6
+        config_entry.version = 7
         hass.config_entries.async_update_entry(config_entry, options=new_options)  
         hass.config_entries.async_update_entry(config_entry, data=new_data)
         
@@ -74,8 +78,9 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
         new_data['route_type'] = '99'
         new_options['offset'] = 0
         new_data.pop('offset')
+        new_data['agency'] = '0: ALL'        
 
-        config_entry.version = 6
+        config_entry.version = 7
         hass.config_entries.async_update_entry(config_entry, data=new_data)
         hass.config_entries.async_update_entry(config_entry, options=new_options)          
         
@@ -83,9 +88,18 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
 
         new_data = {**config_entry.data}
         new_data['route_type'] = '99'
+        new_data['agency'] = '0: ALL'
 
-        config_entry.version = 6
-        hass.config_entries.async_update_entry(config_entry, data=new_data)              
+        config_entry.version = 7
+        hass.config_entries.async_update_entry(config_entry, data=new_data)  
+        
+    if config_entry.version == 6:
+
+        new_data = {**config_entry.data}
+        new_data['agency'] = '0: ALL'
+
+        config_entry.version = 7
+        hass.config_entries.async_update_entry(config_entry, data=new_data)         
 
     _LOGGER.warning("Migration to version %s successful", config_entry.version)
 
@@ -93,20 +107,20 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up GTFS from a config entry."""
-
     hass.data.setdefault(DOMAIN, {})
+   
+    if entry.data.get('device_tracker_id',None):
+        coordinator = GTFSLocalStopUpdateCoordinator(hass, entry)
+    else:
+        coordinator = GTFSUpdateCoordinator(hass, entry)    
 
-    coordinator = GTFSUpdateCoordinator(hass, entry)
-
-    #await coordinator.async_config_entry_first_refresh()
-    
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
-    
+      
     hass.data[DOMAIN][entry.entry_id] = {
-        "coordinator": coordinator,
+        "coordinator": coordinator
     }
-    
+
     entry.async_on_unload(entry.add_update_listener(update_listener))
       
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -131,13 +145,28 @@ def setup(hass, config):
         get_gtfs(hass, DEFAULT_PATH, call.data, True)
         return True     
 
+    def update_gtfs_rt_local(call):
+        """My GTFS RT service."""
+        _LOGGER.debug("Updating GTFS RT with: %s", call.data)
+        get_gtfs_rt(hass, DEFAULT_PATH_RT, call.data)
+        return True  
+
+    async def update_local_stops(call):
+        """My GTFS RT service."""
+        _LOGGER.debug("Updating GTFS Local Stops with: %s", call.data)
+        await update_gtfs_local_stops(hass, call.data)
+        return True           
+
     hass.services.register(
         DOMAIN, "update_gtfs", update_gtfs)
+    hass.services.register(
+        DOMAIN, "update_gtfs_rt_local", update_gtfs_rt_local)     
+    hass.services.register(
+        DOMAIN, "update_gtfs_local_stops", update_local_stops)        
      
     return True
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     hass.data[DOMAIN][entry.entry_id]['coordinator'].update_interval = timedelta(minutes=1)
-
     return True

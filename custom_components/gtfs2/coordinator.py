@@ -14,6 +14,9 @@ import homeassistant.util.dt as dt_util
 from .const import (
     DEFAULT_PATH, 
     DEFAULT_REFRESH_INTERVAL, 
+    DEFAULT_LOCAL_STOP_REFRESH_INTERVAL,
+    DEFAULT_LOCAL_STOP_TIMERANGE,
+    DEFAULT_LOCAL_STOP_RADIUS,
     CONF_API_KEY, 
     CONF_X_API_KEY,
     ATTR_DUE_IN,
@@ -21,7 +24,7 @@ from .const import (
     ATTR_LONGITUDE,
     ATTR_RT_UPDATED_AT
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures
 from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services, get_rt_alerts
 
 _LOGGER = logging.getLogger(__name__)
@@ -72,7 +75,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "alert": {}
         }           
 
-        if check_extracting(self):    
+        if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
             _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
             previous_data["extracting"] = True
             return previous_data
@@ -93,7 +96,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             self._data = previous_data
         else:
             check_index = await self.hass.async_add_executor_job(
-                    check_datasource_index, self
+                    check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
                 )
 
             try:
@@ -107,7 +110,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("GTFS coordinator data from helper: %s", self._data["next_departure"]) 
         
         # collect and return rt attributes
-        # STILL REQUIRES A SOLUTION IF TIMING OUT
+        # STILL REQUIRES A SOLUTION IF CONNECTION TIMING OUT
         if "real_time" in options:
             if options["real_time"]:
                 self._get_next_service = {}
@@ -122,7 +125,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     self._headers = {"x-api-key": options[CONF_X_API_KEY]}
                 else:
                     self._headers = None
-                self._headers = None
                 self.info = {}
                 self._route_id = self._data["next_departure"].get("route_id", None)
                 if self._route_id == None:
@@ -134,7 +136,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._direction = data["direction"]
                 self._relative = False
                 try:
-                    self._get_rt_route_statuses = await self.hass.async_add_executor_job(get_rt_route_statuses, self)
+                    self._get_rt_trip_statuses = await self.hass.async_add_executor_job(get_rt_trip_statuses, self)
                     self._get_rt_alerts = await self.hass.async_add_executor_job(get_rt_alerts, self)
                     self._get_next_service = await self.hass.async_add_executor_job(get_next_services, self)
                     self._data["next_departure_realtime_attr"] = self._get_next_service
@@ -149,3 +151,55 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         
         return self._data
 
+class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
+    """Data update coordinator for getting local stops."""
+
+    config_entry: ConfigEntry
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+        """Initialize the coordinator."""
+        super().__init__(
+            hass=hass,
+            logger=_LOGGER,
+            name=entry.entry_id,
+            update_interval=timedelta(minutes=entry.options.get("local_stop_refresh_interval", DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)),
+        )
+        self.config_entry = entry
+        self.hass = hass
+        
+        self._pygtfs = ""
+        self._data: dict[str, str] = {}
+
+    async def _async_update_data(self) -> dict[str, str]:
+        """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
+        data = self.config_entry.data
+        options = self.config_entry.options
+        previous_data = None if self.data is None else self.data.copy()
+        _LOGGER.debug("Previous data: %s", previous_data)  
+
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )        
+        self._data = {
+            "schedule": self._pygtfs,
+            "include_tomorrow": True,
+            "gtfs_dir": DEFAULT_PATH,
+            "name": data["name"],
+            "file": data["file"],
+            "timerange": options.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE),
+            "radius": options.get("radius", DEFAULT_LOCAL_STOP_RADIUS),
+            "device_tracker_id": data["device_tracker_id"],
+            "extracting": False,
+        }           
+        self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat() 
+        
+        if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
+            _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data["extracting"] = True
+            return previous_data
+            
+        self._data["local_stops_next_departures"] = await self.hass.async_add_executor_job(
+                    get_local_stops_next_departures, self
+                )
+        _LOGGER.debug("Data from coordinator: %s", self._data)              
+        return self._data
