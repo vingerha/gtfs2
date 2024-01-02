@@ -689,7 +689,7 @@ def get_local_stops_next_departures(self):
         _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
         return []
     if include_tomorrow:
-        _LOGGER.debug("Include Tomorrow")
+        _LOGGER.debug("Includes Tomorrow")
         tomorrow_name = tomorrow.strftime("%A").lower()
         tomorrow_select = f"calendar.{tomorrow_name} AS tomorrow,"
         tomorrow_calendar_date_where = f"AND (calendar_date_today.date = :today or calendar_date_today.date = :tomorrow)"
@@ -760,29 +760,32 @@ def get_local_stops_next_departures(self):
     timetable = []
     local_stops_list = []
     prev_stop_id = ""
+       
     for row_cursor in result:
         row = row_cursor._asdict()
-        if row["stop_id"] == prev_stop_id or prev_stop_id == "":
-            self._icon = ICONS.get(row['route_type'], ICON)
-            if row["today"] == 1 or row["today_cd"] == 1:
-                idx_prefix = tomorrow_date
-                idx = f"{idx_prefix} {row['departure_time']}"
-                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
-            if (
-                "tomorrow" in row
-                and row["tomorrow"] == 1
-                and tomorrow_date <= row["end_date"]
-            ):
-                idx = f"{tomorrow_date} {row['departure_time']}"
-                timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
-        else:
-            timetable = []
+        entry = {"stop_id": row['stop_id'], "stop_name": row['stop_name'], "latitude": row['latitude'], "longitude": row['longitude'], "departure": timetable}
+
+        self._icon = ICONS.get(row['route_type'], ICON)
+        if row["today"] == 1 or row["today_cd"] == 1:
+            timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
+        if (
+            "tomorrow" in row
+            and row["tomorrow"] == 1
+            and row["today"] == 0
+            and tomorrow_date <= row["end_date"]
+        ):
+            timetable.append({"departure": row["departure_time"], "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "icon": self._icon})
+        entry["departure"] = timetable
+        prev_entry = entry
+
         if row["stop_id"] != prev_stop_id and prev_stop_id != "": 
-            local_stops_list.append({"stop_id": row['stop_id'], "stop_name": row['stop_name'], "latitude": row['latitude'], "longitude": row['longitude'], "departure": timetable})            
+            local_stops_list.append(prev_entry)
+            timetable = []
+
         prev_stop_id = str(row["stop_id"])
-   
-    data_returned = local_stops_list
-    
+            
+    local_stops_list.append(entry)
+    data_returned = local_stops_list   
     _LOGGER.debug("Stop data returned: %s", data_returned)
     return data_returned
     
