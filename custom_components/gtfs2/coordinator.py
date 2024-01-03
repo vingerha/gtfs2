@@ -182,7 +182,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         )        
         self._data = {
             "schedule": self._pygtfs,
-            "include_tomorrow": False,
+            "include_tomorrow": True,
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],
