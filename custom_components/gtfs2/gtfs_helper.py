@@ -46,7 +46,7 @@ def get_next_departure(self):
     
     # if type 2 (train) then filter on that and use name-like search 
     if route_type == "2":
-        route_type_where = f"route_type in (2,101,102,103,104,105,106,107,108,109)"
+        route_type_where = f"route_type in (2,101,102,103,104,105,106,107,108, 109)"
         start_station_id = str(self._data['origin'])+'%'
         end_station_id = str(self._data['destination'])+'%'
         start_station_where = f"AND start_station.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
@@ -591,7 +591,7 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     """    
     sql_add_index_5 = f"""
     create index gtfs2_routes_route_type on routes(route_type)
-    """        
+    """      
     result_1a = schedule.engine.connect().execute(
         text(sql_index_1),
         {"q": "q"},
@@ -653,7 +653,7 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
             result_5b = schedule.engine.connect().execute(
             text(sql_add_index_5),
             {"q": "q"},
-            )              
+            )                 
             
 def create_trip_geojson(self):
     # not in use, awaiting geojson in HA-core to cover this type of geometry
