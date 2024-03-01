@@ -412,7 +412,7 @@ def get_gtfs_rt(hass, path, data):
     if data.get("debug_output", False):
         data_out = ""
         feed_entities = get_gtfs_feed_entities(
-            url=data[ürl"],
+            url=data.get("url", None),
             headers=_headers,
             label="converting",
         )
