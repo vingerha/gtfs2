@@ -137,8 +137,8 @@
     },
     "route_type": {
       "options": {
-        "2": "üge, Intercity- oder Fernreisen (manuell im nächsten Bildschirm eingegeben)",
-        "99": "Alle, außer Züge (Auswahl aus Haltestellen im nächsten Bildschirm)"
+        "2": "Züge, zwischen manuell eingegebene Städte (nächsten Bildschirm)",
+        "99": "Alle, außer Züge, zwischen ausgewählte Haltestellen (nächsten Bildschirm)"
       }
     }
   },

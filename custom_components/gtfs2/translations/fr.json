@@ -135,8 +135,8 @@
     },
 	"route_type": {
       "options": {
-		"2": "Voyages ferroviaires, interurbains ou longue distance",
-		"99": "Tout, à part des ferroviaires"
+		"2": "Voyages ferroviaires, entre villes manuellement définiés (prochain écran)",
+		"99": "Tout à part des ferroviaires, entre stops sélectionnés (prochain écran)"
       }
     }
   },

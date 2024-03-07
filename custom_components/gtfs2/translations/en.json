@@ -137,8 +137,8 @@
     },
 	"route_type": {
       "options": {
-		"99": "All, excluding trains (selecting from stops in next screen)",
-		"2": "Trains, intercity or long-distance travel (manually entered in next screen)"
+		"99": "All but trains, between selected stops (next screen)",
+		"2": "Trains only, between manually entered cities (next screen)"
       }
     }
   },
