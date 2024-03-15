@@ -805,7 +805,7 @@ def get_local_stops_next_departures(self):
         entry = {"stop_id": row['stop_id'], "stop_name": row['stop_name'], "latitude": row['latitude'], "longitude": row['longitude'], "departure": timetable}
         self._icon = ICONS.get(row['route_type'], ICON)
         if row["today"] == 1 or row["today_cd"] == 1:
-            timetable.append({"departure": row["departure_time"], "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row.["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+            timetable.append({"departure": row["departure_time"], "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
         if (
             "tomorrow" in row
@@ -814,7 +814,7 @@ def get_local_stops_next_departures(self):
             and tomorrow_date <= row["end_date"]
             and now_time > row["departure_time"]            
         ):
-            timetable.append({"departure": row["departure_time"], "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row.["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+            timetable.append({"departure": row["departure_time"], "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         entry["departure"] = timetable
         
         prev_entry = entry.copy()
