@@ -83,7 +83,9 @@ def get_next_services(self):
     self.delay = "unknown"
     _LOGGER.debug("Configuration for RT route: %s, RT trip: %s, RT stop: %s, RT direction: %s", self._route, self._trip, self._stop, self._direction)
     next_services = self.data.get(self._trip, {}).get(self._direction, {}).get(self._stop, [])
-    next_services_all = get_rt_all_route_statuses(self).get(self._route, {}).get(self._direction, {}).get(self._stop, [])
+    # get next realtime departures based on route
+    self._rt_group = "route"
+    next_services_all = get_rt_route_trip_statuses(self).get(self._route, {}).get(self._direction, {}).get(self._stop, [])
     if not next_services:
         # GTFS RT feed may differ, try via route
         self._direction = '0'
@@ -321,7 +323,8 @@ def get_rt_trip_statuses(self):
     _LOGGER.debug("Departure times Trip: %s", departure_times)
     return departure_times 
 
-def get_rt_all_route_statuses(self):
+def get_rt_route_trip_statuses(self):
+    ''' Get next rt departure for route (multiple) or trip (single) '''
 
     departure_times = {}
 
@@ -347,8 +350,12 @@ def get_rt_all_route_statuses(self):
             if entity.trip_update.trip.direction_id is not None:
                     direction_id = str(entity.trip_update.trip.direction_id)
             else:
-                direction_id = DEFAULT_DIRECTION                
-            if route_id == self._route_id and direction_id == self._direction :
+                direction_id = DEFAULT_DIRECTION 
+
+            trip_id = entity.trip_update.trip.trip_id   
+                
+            if ((self._rt_group == "route" and route_id == self._route_id and direction_id == self._direction) or    
+                    (self._rt_group == "trip" and trip_id == self._trip_id)):
                 
                 if route_id not in departure_times:
                     departure_times[route_id] = {}
@@ -390,7 +397,7 @@ def get_rt_all_route_statuses(self):
                 departure_times[route][direction][stop].sort()
 
     self.info = departure_times
-    _LOGGER.debug("Departure times All Route: %s", departure_times)
+    _LOGGER.debug("Departure times Route Trip: %s", departure_times)
     return departure_times    
 
 def get_rt_vehicle_positions(self):
