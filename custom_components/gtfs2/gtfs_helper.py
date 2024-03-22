@@ -22,12 +22,13 @@ from .const import (
     DEFAULT_PATH_GEOJSON, 
     DEFAULT_LOCAL_STOP_TIMERANGE, 
     DEFAULT_LOCAL_STOP_RADIUS,
+    DEFAULT_PATH_RT,
     ICON,
     ICONS,
     DOMAIN,
     TIME_STR_FORMAT
     )
-from .gtfs_rt_helper import get_rt_route_statuses, get_rt_trip_statuses, get_next_services, get_rt_alerts, get_rt_route_trip_statuses
+from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -800,7 +801,22 @@ def get_local_stops_next_departures(self):
     prev_stop_id = ""
     prev_entry = entry = {}
     # params for getting rt data
-    self._rt_group = "trip"   
+    if self._realtime:
+        self._rt_group = "trip"
+        self._rt_data = {
+            "url": self._trip_update_url,
+            "headers": self._headers,
+            "file": self._data["name"] + "_localstop",
+            }
+        check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
+        # check if local file created
+        if not check:
+            _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
+            return False
+        else:
+            # use local file created as new url
+            self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
+        
     
     for row_cursor in result:
         row = row_cursor._asdict()
@@ -857,3 +873,4 @@ async def update_gtfs_local_stops(hass, data):
         _LOGGER.debug("Reloading local stops for config_entry_id: %s", cf_entry) 
         reload = await hass.config_entries.async_reload(cf_entry)    
     return
+
