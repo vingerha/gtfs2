@@ -66,14 +66,10 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
     if url.startswith('file'):
         requests_session = requests.session()
         requests_session.mount('file://', LocalFileAdapter())
-        response = requests_session.get(url)
-        _LOGGER.debug("Requests from file %s", response)
-    
+        response = requests_session.get(url)   
     else:
         response = requests.get(url, headers=headers, timeout=20)
-        _LOGGER.debug("Requests from url %s", response)
 
-    
     if response.status_code == 200:
         _LOGGER.debug("Successfully updated %s", label)
     else:
@@ -158,7 +154,7 @@ def get_rt_route_trip_statuses(self):
         url=self._trip_update_url, headers=self._headers, label="trip data"
     )
     self._feed_entities = feed_entities
-    _LOGGER.debug("Departure times searching for all route: %s, type: %s", self._route_id, self._rt_group)
+    _LOGGER.debug("Search departure times for route: %s, type: %s", self._route_id, self._rt_group)
     for entity in feed_entities:
         if entity.HasField("trip_update"):
             
@@ -186,16 +182,12 @@ def get_rt_route_trip_statuses(self):
             if ((self._rt_group == "route" and route_id == self._route_id and direction_id == self._direction) or    
                     (self._rt_group == "trip" and trip_id == self._trip_id )):
           
-                _LOGGER.debug("Entity found params, group: %s, route_id: %s, direction_id: %s, trip_id: %s", self._rt_group, route_id, direction_id, self._trip_id)
+                _LOGGER.debug("Entity found params - group: %s, route_id: %s, direction_id: %s, trip_id: %s", self._rt_group, route_id, direction_id, self._trip_id)
                 _LOGGER.debug("Entity found: %s", entity.trip_update.trip)
-                _LOGGER.debug("Departure times before stop sel.: %s", departure_times)
                 for stop in entity.trip_update.stop_time_update:
-                    _LOGGER.debug("Departure times, find self_stop_id: %s, in stop: %s", self._stop_id, stop.stop_id)
                     stop_id = stop.stop_id
-
-                    # Use stop arrival time;
-                    # fall back on departure time if not available
                     if stop_id == self._stop_id:
+                        _LOGGER.debug("Stop found: %s", stop)
                         if route_id not in departure_times:
                             departure_times[route_id] = {}
 
@@ -205,19 +197,23 @@ def get_rt_route_trip_statuses(self):
                         if not departure_times[route_id][direction_id].get(
                             stop_id
                         ):
-                            departure_times[route_id][direction_id][stop_id] = []                        
+                            departure_times[route_id][direction_id][stop_id] = []    
+                            
+                        # Use stop arrival time;
+                        # fall back on departure time if not available                            
                         if stop.arrival.time == 0:
                             stop_time = stop.departure.time
                         else:
                             stop_time = stop.arrival.time
                             
                         # Ignore arrival times in the past
-                        _LOGGER.debug("Due in minutes: %s", due_in_minutes(datetime.fromtimestamp(stop_time)))
+                        
                         if due_in_minutes(datetime.fromtimestamp(stop_time)) >= 0:
                             departure_times[route_id][direction_id][
                                 stop_id
                             ].append(dt_util.as_utc(datetime.fromtimestamp(stop_time)))
-                        _LOGGER.debug("Departure times: %s", departure_times)
+                        else:
+                            _LOGGER.debug("Not using realtime stop data for old due-in-minutes: %s", due_in_minutes(datetime.fromtimestamp(stop_time)))
                         
     # Sort by arrival time
     for route in departure_times:
@@ -339,6 +335,7 @@ def get_gtfs_rt(hass, path, data):
     return "ok"   
         
 class LocalFileAdapter(requests.adapters.HTTPAdapter):
+    """Used to allow requests.get for local file"""
     def build_response_from_file(self, request):
         file_path = request.url[7:]
         with open(file_path, 'rb') as file:
@@ -346,10 +343,8 @@ class LocalFileAdapter(requests.adapters.HTTPAdapter):
             file.readinto(buff)
             resp = Resp(buff)
             r = self.build_response(request, resp)
-
             return r
 
     def send(self, request, stream=False, timeout=None,
              verify=True, cert=None, proxies=None):
-
         return self.build_response_from_file(request)       
