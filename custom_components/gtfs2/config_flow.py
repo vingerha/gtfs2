@@ -437,18 +437,32 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             self._user_inputs.update(user_input)
             _LOGGER.debug(f"UserInput Realtime: {self._user_inputs}")
             return self.async_create_entry(title="", data=self._user_inputs)
-
-        return self.async_show_form(
-            step_id="real_time",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
-                    vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL,"")): str,
-                    vol.Optional(CONF_ALERTS_URL, default=self.config_entry.options.get(CONF_ALERTS_URL,"")): str,
-                    vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY,"")): str,
-                    vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY,"")): str,
-                    vol.Required(CONF_API_KEY_LOCATION, default=self.config_entry.options.get(CONF_API_KEY_LOCATION,DEFAULT_API_KEY_LOCATION)) : selector.SelectSelector(selector.SelectSelectorConfig(options=ATTR_API_KEY_LOCATIONS, translation_key="api_key_location")),
-                },
-            ),
-            errors=errors,
-        )  
+        
+        if self.config_entry.data.get(CONF_DEVICE_TRACKER_ID, None):
+            return self.async_show_form(
+                step_id="real_time",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
+                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY,"")): str,
+                        vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY,"")): str,
+                        vol.Required(CONF_API_KEY_LOCATION, default=self.config_entry.options.get(CONF_API_KEY_LOCATION,DEFAULT_API_KEY_LOCATION)) : selector.SelectSelector(selector.SelectSelectorConfig(options=ATTR_API_KEY_LOCATIONS, translation_key="api_key_location")),
+                    },
+                ),
+                errors=errors,
+            )  
+        else:
+            return self.async_show_form(
+                step_id="real_time",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
+                        vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL,"")): str,
+                        vol.Optional(CONF_ALERTS_URL, default=self.config_entry.options.get(CONF_ALERTS_URL,"")): str,
+                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY,"")): str,
+                        vol.Optional(CONF_X_API_KEY,default=self.config_entry.options.get(CONF_X_API_KEY,"")): str,
+                        vol.Required(CONF_API_KEY_LOCATION, default=self.config_entry.options.get(CONF_API_KEY_LOCATION,DEFAULT_API_KEY_LOCATION)) : selector.SelectSelector(selector.SelectSelectorConfig(options=ATTR_API_KEY_LOCATIONS, translation_key="api_key_location")),
+                    },
+                ),
+                errors=errors,
+            )       
