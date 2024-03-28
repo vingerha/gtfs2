@@ -124,7 +124,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input[CONF_URL] = "na"
         user_input[CONF_EXTRACT_FROM] = "zip"            
         self._user_inputs.update(user_input)
-        _LOGGER.debug(f"UserInputs Local Stops: {self._user_inputs}")
+        _LOGGER.debug(f"UserInputs Local Stops: {self._user_inputs}") 
+        check_data = await self._check_data(self._user_inputs)
+        if check_data :
+            errors["base"] = check_data
+            return self.async_abort(reason=check_data)          
         return self.async_create_entry(
             title=user_input[CONF_NAME], data=self._user_inputs
             )                
@@ -437,7 +441,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             self._user_inputs.update(user_input)
             _LOGGER.debug(f"UserInput Realtime: {self._user_inputs}")
             return self.async_create_entry(title="", data=self._user_inputs)
-        
+
         if self.config_entry.data.get(CONF_DEVICE_TRACKER_ID, None):
             return self.async_show_form(
                 step_id="real_time",
