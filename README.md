@@ -7,12 +7,12 @@
 - Option to add gtfs **realtime trip updates** source/url
 - Option to add gtfs **realtime vehicle location** source/url, generates geojson file which can be used for tracking vehicle on map card
 - Option to add gtfs **realtime alerts** source/url
-- Option to add local stops and next departures, based on your location as 'person' (e.g. via HA companion app)
+- Add local stops and next departures, based on your location as 'person' or 'zone', can be extended with realtime data 
 - A service to update the GTFS static datasource, e.g. for calling the service via automation
 - A service to update GTFS real time data locally, reducing internet traffic when using mulitple routes
 - A service to update GTFS local stops, e.g. when tied to a moving person
 - Allows to load/update/delete datasources in gtfs2 folder from the GUI
-- translations: English and French
+- translations: English, French and German
 
 **[Documentation](https://github.com/vingerha/gtfs2/wiki)**
 
