@@ -550,6 +550,8 @@ def remove_datasource(hass, path, filename):
         os.remove(os.path.join(gtfs_dir, filename + "_temp_out.zip"))
     if os.path.exists(os.path.join(gtfs_dir, filename + ".sqlite-journal")):        
         os.remove(os.path.join(gtfs_dir, filename + ".sqlite-journal"))
+    if os.path.exists(os.path.join(gtfs_dir, filename + ".zip")):        
+        os.remove(os.path.join(gtfs_dir, filename + ".zip"))        
     return "removed"
     
 def check_extracting(hass, gtfs_dir,file):
