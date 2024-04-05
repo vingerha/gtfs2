@@ -93,6 +93,7 @@
 	  "no_stops": "Problem bei der Datenerfassung: wahrscheinlich keine Stops für die gewählte Route",
       "no_data_file": "Problem bei der Datenerfassung: URL falsch oder Dateiname nicht im richtigen Ordner",
       "no_zip_file": "Problem bei der Datenerfassung: ZIP-Datei ist nicht im richtigen Ordner vorhanden. Beachten Sie, dass Groß- und Kleinschreibung berücksichtigt werden muss",
+	  "stop_limit_reached": "Für diesen Umkreis wurden mehr als 15 Haltestellen gefunden. \n Es besteht die Gefahr einer Beeinträchtigung der Systemleistung. \n Bitte wählen Sie einen kleineren Radius",
       "extracting": "Es werden (noch) Daten extrahiert, dies wird einige Zeit dauern [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
     }
   },
@@ -120,6 +121,9 @@
           "api_key_location": "der Ort, an dem der Schlüssel angewendet wird"
         }
       }
+    },
+	"abort": {
+	  "stop_limit_reached": "Für diesen Umkreis wurden mehr als 15 Haltestellen gefunden. \n Es besteht die Gefahr einer Beeinträchtigung der Systemleistung. \n Bitte wählen Sie einen kleineren Radius"
     }
   },
   "selector": {

@@ -93,6 +93,7 @@
 	  "no_data_file": "Problema de recopilación de datos: URL incorrecta o nombre de archivo que no está en la carpeta correcta",
 	  "no_stops": "Problema de recogida de datos: probablemente no hay paradas en la ruta seleccionada",
 	  "no_zip_file": "Problema con la recogida de datos: El archivo ZIP no existe en la carpeta correcta, tenga en cuenta que es sensible a las mayúsculas",
+	  "stop_limit_reached": "Más de 15 paradas encontradas para este radio. \n Arriesgando un impacto en el rendimiento del sistema. \n Por favor seleccione un radio más pequeño",
 	  "extracting": "(Todavía) extrayendo datos, esto llevará tiempo [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
     }
   },
@@ -117,10 +118,13 @@
 		  "alerts_url": "URL de las alertas",
 		  "api_key": "Clave API, si es necesaria",
 		  "x_api_key": "X_API key, si es necesaria",
-                  "api_key_location": "el lugar donde se aplica la clave"
+          "api_key_location": "el lugar donde se aplica la clave"
         }
       }
-    }
+    },
+	"abort": {
+	  "stop_limit_reached": "Más de 15 paradas encontradas para este radio. \n Arriesgando un impacto en el rendimiento del sistema. \n Por favor seleccione un radio más pequeño"
+    }	
   },
   "selector": {
     "extract_from": {
