@@ -118,7 +118,9 @@
 		  "alerts_url": "URL de las alertas",
 		  "api_key": "Clave API, si es necesaria",
 		  "x_api_key": "X_API key, si es necesaria",
-          "api_key_location": "el lugar donde se aplica la clave"
+		  "Ocp-Apim-Subscription-Key": "Ocp_Apim key, si es necesaria",		  
+          "api_key_location": "el lugar donde se aplica la clave",
+		  "Accept": "Agregue Accept:application/x-protobuf al encabezado"		  
         }
       }
     },

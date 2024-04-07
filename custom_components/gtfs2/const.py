@@ -287,6 +287,8 @@ CONF_REAL_TIME = "real_time"
 # gtfs_rt specific
 CONF_API_KEY = "api_key"
 CONF_X_API_KEY = "x_api_key"
+CONF_OCP_APIM_KEY = "Ocp-Apim-Subscription-Key"
+CONF_ACCEPT_HEADER_PB = "Accept"
 CONF_STOP_ID = "stopid"
 CONF_TRIP_UPDATE_URL = "trip_update_url"
 CONF_VEHICLE_POSITION_URL = "vehicle_position_url"
@@ -295,7 +297,7 @@ CONF_ROUTE_DELIMITER = "route_delimiter"
 CONF_ICON = "icon"
 CONF_SERVICE_TYPE = "service_type"
 
-
+DEFAULT_ACCEPT_HEADER_PB = False
 DEFAULT_SERVICE = "Service"
 DEFAULT_ICON = "mdi:bus"
 DEFAULT_DIRECTION = "0"

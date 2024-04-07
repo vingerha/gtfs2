@@ -118,7 +118,9 @@
           "alerts_url": "URL zu Warnungen",
           "api_key": "API-Schlüssel, falls erforderlich",
           "x_api_key": "X_API-Schlüssel, falls erforderlich",
-          "api_key_location": "der Ort, an dem der Schlüssel angewendet wird"
+		  "Ocp-Apim-Subscription-Key": "Ocp_Apim-Schlüssel, falls erforderlich",
+          "api_key_location": "der Ort, an dem der Schlüssel angewendet wird",
+		  "Accept": "Zufügung am Header von Accept:application/x-protobuf "
         }
       }
     },
