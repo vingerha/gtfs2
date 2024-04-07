@@ -80,13 +80,13 @@ update_gtfs_rt_local:
       name: Indicate location of the key
       description: Select location of the key
       required: true      
-      default: "n/a"
-      example: "n/a"
+      default: "not_applicable"
+      example: "not_applicable"
       selector:
         select:
           translation_key: "api_key_location"
           options:
-            - "n/a"
+            - "not_applicable"
             - "header"
             - "query_string"     
     accept:
