@@ -287,7 +287,7 @@ CONF_REAL_TIME = "real_time"
 # gtfs_rt specific
 CONF_API_KEY = "api_key"
 CONF_X_API_KEY = "x_api_key"
-CONF_OCP_APIM_KEY = "Ocp-Apim-Subscription-Key"
+CONF_OCP_APIM_KEY = "ocp_apim_subscription_key"
 CONF_ACCEPT_HEADER_PB = "Accept"
 CONF_STOP_ID = "stopid"
 CONF_TRIP_UPDATE_URL = "trip_update_url"
