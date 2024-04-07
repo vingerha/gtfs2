@@ -198,7 +198,7 @@
           "name": "x_api_key",
 		  "description": "provide x_api_key if required"
 		},
-		"Ocp-Apim-Subscription-Key": {
+		"ocp_apim_subscription_key": {
           "name": "Ocp-Apim-Subscription-Key",
 		  "description": "provide Ocp-Apim if required"
 		},

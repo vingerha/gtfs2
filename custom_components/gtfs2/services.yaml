@@ -70,7 +70,7 @@ update_gtfs_rt_local:
       required: false
       selector:
         text:  
-    Ocp-Apim-Subscription-Key:
+    ocp_apim_subscription_key:
       name: Ocp-Apim-Subscription-Key
       description: provide Ocp-Apim if required
       required: false
