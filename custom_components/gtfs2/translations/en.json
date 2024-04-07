@@ -182,7 +182,31 @@
 		"url": {
           "name": "URL",
 		  "description": "Provide the full path to the realtime data"
-		}
+		},
+		"api_key": {
+          "name": "api_key",
+		  "description": "provide api_key if required"
+		},
+		"x_api_key": {
+          "name": "x_api_key",
+		  "description": "provide x_api_key if required"
+		},
+		"Ocp-Apim-Subscription-Key": {
+          "name": "Ocp-Apim-Subscription-Key",
+		  "description": "provide Ocp-Apim if required"
+		},
+		"api_key_location": {
+          "name": "api_key_location",
+		  "description": "Select location of the key"
+		},	
+		"Accept": {
+          "name": "Accept",
+		  "description": "Add application/protobuf to the header"
+		},
+		"debug_output": {
+          "name": "debug_output",
+		  "description": "Save to local file in readable format"
+		}		
 	  }
 	},
 	"update_gtfs_local_stops": {
