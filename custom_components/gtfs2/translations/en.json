@@ -146,7 +146,14 @@
 		"99": "All but trains, between selected stops (next screen)",
 		"2": "Trains only, between manually entered cities (next screen)"
       }
-    }
+    },
+	"api_key_location": {
+      "options": {
+        "n/a": "no key used (default)",
+		"header": "header: build the call with header/key",
+        "query_string": "query-string: to build the call with query/key"
+      }
+	}
   },
   "services": {
     "update_gtfs": {
