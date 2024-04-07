@@ -89,7 +89,7 @@ update_gtfs_rt_local:
             - "n/a"
             - "header"
             - "query_string"     
-    Accept:
+    accept:
       name: Accept
       description: add application/protobuf to the header
       default: false

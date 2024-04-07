@@ -120,7 +120,7 @@
 		  "x_api_key": "X_API key, si es necesaria",
 		  "ocp_apim_subscription_key": "Ocp_Apim key, si es necesaria",		  
           "api_key_location": "el lugar donde se aplica la clave",
-		  "Accept": "Agregue Accept:application/x-protobuf al encabezado"		  
+		  "accept": "Agregue Accept:application/x-protobuf al encabezado"		  
         }
       }
     },

@@ -120,7 +120,7 @@
           "x_api_key": "X_API-Schlüssel, falls erforderlich",
 		  "ocp_apim_subscription_key": "Ocp_Apim-Schlüssel, falls erforderlich",
           "api_key_location": "der Ort, an dem der Schlüssel angewendet wird",
-		  "Accept": "Zufügung am Header von Accept:application/x-protobuf "
+		  "accept": "Zufügung am Header von Accept:application/x-protobuf "
         }
       }
     },
