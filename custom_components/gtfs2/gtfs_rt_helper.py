@@ -192,9 +192,9 @@ def get_rt_route_trip_statuses(self):
              
             if ((self._rt_group == "route" and (route_id == self._route_id and direction_id == self._direction) or (trip_id == self._trip_id and direction_id == "nn") ) or    
                     (self._rt_group == "trip" and trip_id == self._trip_id )):
-          
-                _LOGGER.debug("Entity found params - group: %s, route_id: %s, direction_id: %s, trip_id: %s", self._rt_group, route_id, direction_id, self._trip_id)
-                _LOGGER.debug("Entity found: %s", entity.trip_update.trip)
+                
+                _LOGGER.debug("Entity found params - group: %s, route_id: %s, direction_id: %s, self_trip_id: %s, with rt trip: %s", self._rt_group, route_id, direction_id, self._trip_id, entity.trip_update.trip)
+                
                 for stop in entity.trip_update.stop_time_update:
                     stop_id = stop.stop_id
                     if stop_id == self._stop_id:
