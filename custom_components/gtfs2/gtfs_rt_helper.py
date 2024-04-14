@@ -96,15 +96,9 @@ def get_next_services(self):
     self._direction = self._direction
     _LOGGER.debug("Configuration for RT route: %s, RT trip: %s, RT stop: %s, RT direction: %s", self._route, self._trip, self._stop, self._direction)
     self._rt_group = "route"
-    next_services = get_rt_route_trip_statuses(self).get(self._route, {}).get(self._direction, {}).get(self._stop, []).get("departures", [])
+    next_services = get_rt_route_trip_statuses(self).get(self._route, {}).get(self._direction, {}).get(self._stop, {}).get("departures", [])
     if next_services:
         _LOGGER.debug("Next services: %s", next_services)
-
-    if self.hass.config.time_zone is None:
-        _LOGGER.error("Timezone is not set in Home Assistant configuration, using UTC instead")
-        timezone = "UTC"
-    else:
-        timezone=dt_util.get_time_zone(self.hass.config.time_zone)
     
     if self._relative :
         due_in = (
