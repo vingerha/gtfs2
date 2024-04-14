@@ -375,7 +375,7 @@ def get_gtfs_rt(hass, path, data):
             label="converting",
         )
         file_all = data["file"] + "_converted.txt"
-        open(os.path.join(gtfs_dir, file_all), "w").write(str(feed_entities))     
+        open(os.path.join(gtfs_dir, file_all), "w").write(json.dumps(feed_entities, indent=4))     
     return "ok"   
         
 class LocalFileAdapter(requests.adapters.HTTPAdapter):
