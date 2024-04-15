@@ -164,7 +164,7 @@ def get_rt_route_trip_statuses(self):
         url=self._trip_update_url, headers=self._headers, label="trip data"
     )
     self._feed_entities = feed_entities
-    _LOGGER.debug("Search departure times for route: %s, type: %s, direction: %s", self._route_id, self._rt_group, self._direction)
+    _LOGGER.debug("Search departure times for route: %s, trip: %s, type: %s, direction: %s", self._route_id, self._trip_id, self._rt_group, self._direction)
     for entity in feed_entities:
 
         if entity.get('trip_update', False):
@@ -190,6 +190,7 @@ def get_rt_route_trip_statuses(self):
                 direction_id = self._direction                
 
             trip_id = entity["trip_update"]["trip"]["trip_id"]  
+                    
                         
             if ((self._rt_group == "route" and (route_id == self._route_id and direction_id == self._direction) or (trip_id == self._trip_id and direction_id == "nn") ) or    
                     (self._rt_group == "trip" and trip_id == self._trip_id )):
@@ -202,17 +203,17 @@ def get_rt_route_trip_statuses(self):
                         _LOGGER.debug("Stop found: %s", stop)
                         if route_id not in departure_times:
                             departure_times[route_id] = {}
-
+                                               
                         if direction_id == "nn": # i this case the trip_id serves as a basis so one can safely set direction to the requesting entity direction
                             direction_id = self._direction
 
                         if direction_id not in departure_times[route_id]:
                             departure_times[route_id][direction_id] = {}
-    
+                            
                         if not departure_times[route_id][direction_id].get(
                             stop_id
                         ):
-                            departure_times[route_id][direction_id][stop_id] = {}   
+                            departure_times[route_id][direction_id][stop_id] = {}
                         
                         if not departure_times[route_id][direction_id][stop_id].get(
                             "departures"
@@ -242,6 +243,7 @@ def get_rt_route_trip_statuses(self):
                             _LOGGER.debug("Not using realtime stop data for old due-in-minutes: %s", due_in_minutes(datetime.fromtimestamp(stop_time)))
                             
                         departure_times[route_id][direction_id][stop_id]["delays"].append(delay)
+
                         
     # Sort by time
     for route in departure_times:
