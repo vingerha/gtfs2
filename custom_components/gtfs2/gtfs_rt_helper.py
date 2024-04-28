@@ -454,10 +454,11 @@ def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
         "entity": []
     }
 
-    for entity in feed.entity:
+    for ent in feed.entity:
+        entity = ent.vehicle
         _LOGGER.debug("Position entity: %s", entity)
         entity_dict = {
-        "vehicles": {
+        "vehicle": {
             "trip": {
                 "trip_id" : entity.trip.trip_id,
                 "route_id": entity.trip.route_id,
