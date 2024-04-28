@@ -496,13 +496,14 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
                         "trip_id": informed_entity.trip.trip_id
                     }
                 informed_entities.append(informed_entity_json)
+                _LOGGER.debug("Alert Informed entities: %s", informed_entities)
             entity_dict = {
                 "alert": {
                     "id": entity.id,
-                    "active_period": {
-                        "start": entity.alert.active_period.start,
-                        "end": entity.alert.active_period.end
-                    },
+                    #"active_period": {
+                    #    "start": entity.alert.active_period.start,
+                    #    "end": entity.alert.active_period.end
+                    #},
                     "informed_entity": informed_entities,
                     "header_text": entity.alert.header_text,
                     "description_text": entity.alert.description_text
