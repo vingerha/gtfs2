@@ -505,11 +505,11 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
                         "start": entity.alert.active_period.start,
                         "end": entity.alert.active_period.end
                     },
-                    informed_entities,
+                    "informed_entity": informed_entities,
                     "header_text": entity.alert.header_text,
                     "description_text": entity.alert.description_text
-                    }   
-                }
+                }   
+            }
             json_data["entity"].append(entity_dict)
             _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
     return json_data      
