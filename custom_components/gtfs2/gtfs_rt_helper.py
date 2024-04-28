@@ -458,16 +458,27 @@ def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
         _LOGGER.debug("Position entity: %s", entity)
         entity_dict = {
         "vehicles": [
-            {
-                "id": entity.id,
-                "latitude": entity.latitude,
-                "longitude": entity.longitude,
-                # Add more fields as needed
-            }
+            "trip": {
+                "trip_id" : entity.trip.trip_id,
+                "route_id": entity.trip.route_id,
+                "direction_id": entity.trip.direction_id
+                },
+            "vehicle": {
+                "id": entity.vehicle.id,
+                "label": entity.vehicle.label
+                },
+            "position": {
+                "latitude": entity.position.latitude,
+                "longitude": entity.position.longitude,
+                "bearing": entity.postion.bearing,
+                "speed": entity.postion.speed
+            },
+            "stop_id": entity.stop_id,
+            "timestamp": entity.timestamp
         ]
         }
         json_data["entity"].append(entity_dict)
-
+        _LOGGER.debug("Position entity JSON: %s", json_data["entity"])
     return json_data    
 
 def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
