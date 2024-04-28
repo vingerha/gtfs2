@@ -276,8 +276,7 @@ def get_rt_vehicle_positions(self):
             # Vehicle is not in service
             continue
         if vehicle["trip"]["trip_id"] == self._trip_id: 
-            _LOGGER.debug("Adding position for TripId: %s", self._trip_id)
-            #_LOGGER.debug('Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s', vehicle["trip"]["trip_id"],vehicle["trip"]["route_id"],vehicle["trip"]["direction_id"],vehicle["position"]["latitude"],vehicle["position"]["longitude"])  
+            _LOGGER.debug('Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s', vehicle["trip"]["trip_id"],vehicle["trip"]["route_id"],vehicle["trip"]["direction_id"],vehicle["position"]["latitude"],vehicle["position"]["longitude"])  
             
         # add data if in the selected direction
         if (str(self._route_id) == str(vehicle["trip"]["route_id"]) or str(vehicle["trip"]["trip_id"]) == str(self._trip_id)) and str(self._direction) == str(vehicle["trip"]["direction_id"]):
@@ -312,26 +311,26 @@ def get_rt_alerts(self):
             label="alerts",
         )
         for entity in feed_entities:
-            if entity.HasField("alert"):
-                for x in entity.alert.informed_entity:
-                    if x.HasField("stop_id"):
-                        stop_id = x.stop_id 
+            if entity["alert"]:
+                for x in entity["alert"]["informed_entity"]:
+                    if x.["stop_id"]:
+                        stop_id = x.["stop_id"] 
                     else:
                         stop_id = "unknown"
-                    if x.HasField("stop_id"):
-                        route_id = x.route_id  
+                    if x.["route_id"]:
+                        route_id = x.["route_id"]  
                     else:
                         route_id = "unknown"
                 if stop_id == self._stop_id and (route_id == "unknown" or route_id == self._route_id): 
-                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
-                    rt_alerts["origin_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity["alert"]["header_text"])
+                    rt_alerts["origin_stop_alert"] = (str(entity["alert"]["header_text"]).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
                 if stop_id == self._destination_id and (route_id == "unknown" or route_id == self._route_id): 
-                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
-                    rt_alerts["destination_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity["alert"]["header_text"])
+                    rt_alerts["destination_stop_alert"] = (str(entity["alert"]["header_text"]).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
                 if stop_id == "unknown" and route_id == self._route_id: 
-                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity.alert.header_text)
-                    rt_alerts["origin_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
-                    rt_alerts["destination_stop_alert"] = (str(entity.alert.header_text).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')    
+                    _LOGGER.debug("RT Alert for route: %s, stop: %s, alert: %s", route_id, stop_id, entity["alert"]["header_text"])
+                    rt_alerts["origin_stop_alert"] = (str(entity["alert"]["header_text"]).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')
+                    rt_alerts["destination_stop_alert"] = (str(entity["alert"]["header_text"]).split('text: "')[1]).split('"',1)[0].replace(':','').replace('\n','')    
                         
     return rt_alerts
     
@@ -455,7 +454,6 @@ def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
     }
     for ent in feed.entity:
         entity = ent.vehicle
-        _LOGGER.debug("Position entity: %s", entity)
         entity_dict = {
         "vehicle": {
             "trip": {
@@ -478,7 +476,6 @@ def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
         }
         }
         json_data["entity"].append(entity_dict)
-        _LOGGER.debug("Position entity JSON: %s", json_data["entity"])
     return json_data    
 
 def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
@@ -488,18 +485,19 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
     json_data = {
         "entity": []
     }
-
     for entity in feed.entity:
+        _LOGGER.debug("Alert entity: %s", entity)
         entity_dict = {
-        "alerts": [
-            {
+            "alert": {
                 "id": entity.id,
-                "type": entity.type,
-                "description": entity.description,
-                # Add more fields as needed
+                "informed_entity":
+                {
+                    "stop_id": entity.alert.informed_entity.stop_id
+                    "route_id": entity.alert.informed_entity.route_id
+                },
+                "header_text": entity.alert.header_text
             }
-        ]
         }
         json_data["entity"].append(entity_dict)
-
+        _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
     return json_data      
