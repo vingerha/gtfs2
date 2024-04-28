@@ -488,8 +488,8 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
     for entity in feed.entity:
         _LOGGER.debug("Alert entity: %s", entity)
         if entity.HasField('alert'):
-             informed_entities = []
-             for informed_entity in entity.alert.informed_entity:
+            informed_entities = []
+            for informed_entity in entity.alert.informed_entity:
                 informed_entity_json = {
                     informed_entity: {
                         "agency_id": informed_entity.agency_id,
@@ -497,18 +497,18 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
                         "trip_id": informed_entity.trip.trip_id
                     }
                 }
-                informed_entities.append(informed_entity_jso)
+                informed_entities.append(informed_entity_json)
             entity_dict = {
-            "alert": {
-                "id": entity.id,
-                "active_period": {
-                    "start": entity.alert.active_period.start,
-                    "end": entity.alert.active_period.end
-                },
-                "informed_entity": informed_entities,
-                "header_text": entity.alert.header_text,
-                "description_text": entity.alert.description_text
-            }   
+                "alert": {
+                    "id": entity.id,
+                    "active_period": {
+                        "start": entity.alert.active_period.start,
+                        "end": entity.alert.active_period.end
+                    },
+                    "informed_entity": informed_entities,
+                    "header_text": entity.alert.header_text,
+                    "description_text": entity.alert.description_text
+                }   
             }
             json_data["entity"].append(entity_dict)
             _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
