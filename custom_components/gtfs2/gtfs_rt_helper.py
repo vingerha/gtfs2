@@ -491,12 +491,10 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
             informed_entities = []
             for informed_entity in entity.alert.informed_entity:
                 informed_entity_json = {
-                        "agency_id": informed_entity.agency_id,
                         "route_id": informed_entity.route_id,
                         "trip_id": informed_entity.trip.trip_id
                     }
                 informed_entities.append(informed_entity_json)
-                _LOGGER.debug("Alert Informed entities: %s", informed_entities)
             entity_dict = {
                 "alert": {
                     "id": entity.id,
@@ -510,5 +508,5 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
                 }   
             }
             json_data["entity"].append(entity_dict)
-            _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
+        _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
     return json_data      
