@@ -313,12 +313,12 @@ def get_rt_alerts(self):
         for entity in feed_entities:
             if entity["alert"]:
                 for x in entity["alert"]["informed_entity"]:
-                    if x.["stop_id"]:
-                        stop_id = x.["stop_id"] 
+                    if x["stop_id"]:
+                        stop_id = x["stop_id"] 
                     else:
                         stop_id = "unknown"
-                    if x.["route_id"]:
-                        route_id = x.["route_id"]  
+                    if x["route_id"]:
+                        route_id = x["route_id"]  
                     else:
                         route_id = "unknown"
                 if stop_id == self._stop_id and (route_id == "unknown" or route_id == self._route_id): 
