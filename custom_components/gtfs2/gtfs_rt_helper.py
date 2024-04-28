@@ -84,7 +84,12 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
         json_object = json.loads(response.content)
         feed = json_object       
     except ValueError as e:   
-        feed = convert_gtfs_realtime_to_json(response.content)
+        if label == "vehicle_positions":
+            feed = convert_gtfs_realtime_positions_to_json(response.content)
+        elif label == "alerts":
+            feed = convert_gtfs_realtime_alerts_to_json(response.content)
+        else:
+            feed = convert_gtfs_realtime_to_json(response.content)
     
     return feed.get('entity')
 
@@ -260,34 +265,34 @@ def get_rt_vehicle_positions(self):
     feed_entities = get_gtfs_feed_entities(
         url=self._vehicle_position_url,
         headers=self._headers,
-        label="vehicle positions",
+        label="vehicle_positions",
     )
     geojson_body = []
     geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
-        vehicle = entity.vehicle
+        vehicle = entity["vehicle"]
         
-        if not vehicle.trip.trip_id:
+        if not vehicle["trip"]["trip_id"]:
             # Vehicle is not in service
             continue
-        if vehicle.trip.trip_id == self._trip_id:  
-            _LOGGER.debug("Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s", vehicle.trip.trip_id, vehicle.trip.route_id, vehicle.trip.direction_id, vehicle.position.latitude, vehicle.position.longitude)  
+        if vehicle["trip"]["trip_id"] == self._trip_id:  
+            _LOGGER.debug("Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s", vehicle["trip"]["trip_id"], vehicle["trip"]["route_id"], vehicle["trip"]["direction_id"], vehicle["position"]["latitude"], vehicle["position"[]"longitude"])  
             
         # add data if in the selected direction
-        if (str(self._route_id) == str(vehicle.trip.route_id) or str(vehicle.trip.trip_id) == str(self._trip_id)) and str(self._direction) == str(vehicle.trip.direction_id):
+        if (str(self._route_id) == str(vehicle["trip"]["route_id"]) or str(vehicle["trip"]["trip_id"]) == str(self._trip_id)) and str(self._direction) == str(vehicle["trip"]["direction_id"]):
             _LOGGER.debug("Found vehicle on route with attributes: %s", vehicle)
             geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
             geojson_element["geometry"]["coordinates"] = []
-            geojson_element["geometry"]["coordinates"].append(vehicle.position.longitude)
-            geojson_element["geometry"]["coordinates"].append(vehicle.position.latitude)
-            geojson_element["properties"]["id"] = str(self._route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
-            geojson_element["properties"]["title"] = str(self._route_id) + "(" + str(vehicle.trip.direction_id) + ")" + str(vehicle.trip.trip_id)[-3:]
-            geojson_element["properties"]["trip_id"] = vehicle.trip.trip_id
+            geojson_element["geometry"]["coordinates"].append(vehicle["position"[]"longitude"])
+            geojson_element["geometry"]["coordinates"].append(vehicle["position"]["latitude"])
+            geojson_element["properties"]["id"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(vehicle["trip"]["trip_id"])[-3:]
+            geojson_element["properties"]["title"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(vehicle["trip"]["trip_id"])[-3:]
+            geojson_element["properties"]["trip_id"] = vehicle["trip"]["trip_id"]
             geojson_element["properties"]["route_id"] = str(self._route_id)
-            geojson_element["properties"]["direction_id"] = vehicle.trip.direction_id
-            geojson_element["properties"]["vehicle_id"] = vehicle.vehicle.id
-            geojson_element["properties"]["vehicle_label"] = vehicle.vehicle.label
-            geojson_element["properties"][vehicle.trip.trip_id] = geojson_element["geometry"]["coordinates"]
+            geojson_element["properties"]["direction_id"] = vehicle["trip"]["direction_id"]
+            geojson_element["properties"]["vehicle_id"] = vehicle["vehicle"]["id"]
+            geojson_element["properties"]["vehicle_label"] = vehicle["vehicle"]["label"]
+            geojson_element["properties"][vehicle["trip"]["trip_id"]] = geojson_element["geometry"]["coordinates"]
             geojson_body.append(geojson_element)
     
     self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
@@ -439,3 +444,49 @@ def convert_gtfs_realtime_to_json(gtfs_realtime_data):
         
         json_data["entity"].append(entity_dict)
     return json_data        
+
+def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
+    feed = gtfs_realtime_pb2.FeedMessage()
+    feed.ParseFromString(gtfs_realtime_data)
+
+    json_data = {
+        "entity": []
+    }
+
+    for entity in feed.entity:
+        entity_dict = {
+        "vehicles": [
+            {
+                "id": entity.id,
+                "latitude": entity.latitude,
+                "longitude": entity.longitude,
+                # Add more fields as needed
+            }
+        ]
+        }
+        json_data["entity"].append(entity_dict)
+
+    return json_data    
+
+def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
+    feed = gtfs_realtime_pb2.FeedMessage()
+    feed.ParseFromString(gtfs_realtime_data)
+
+    json_data = {
+        "entity": []
+    }
+
+    for entity in feed.entity:
+        entity_dict = {
+        "alerts": [
+            {
+                "id": entity.id,
+                "type": entity.type,
+                "description": entity.description,
+                # Add more fields as needed
+            }
+        ]
+        }
+        json_data["entity"].append(entity_dict)
+
+    return json_data      

@@ -163,7 +163,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                     self._data["alert"] = self._get_rt_alerts
                 except Exception as ex:  # pylint: disable=broad-except
                   _LOGGER.error("Error getting gtfs realtime data, for origin: %s with error: %s", data["origin"], ex)
-                  raise UpdateFailed(f"Error in getting start/end stop data: {err}")
+                  raise UpdateFailed(f"Error in getting start/end stop data: {ex}")
             else:
                 _LOGGER.debug("GTFS RT: RealTime = false, selected in entity options")            
         else:
@@ -246,7 +246,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
             self._data["local_stops_next_departures"] = await self.hass.async_add_executor_job(
                     get_local_stops_next_departures, self
                 )
-        except:
-            raise UpdateFailed(f"Error in getting local stops data: {err}")
+        except Exception as ex:
+            raise UpdateFailed(f"Error in getting local stops data: {ex}")
         _LOGGER.debug("Data from coordinator: %s", self._data)              
         return self._data
