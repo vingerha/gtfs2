@@ -471,8 +471,8 @@ def convert_gtfs_realtime_positions_to_json(gtfs_realtime_data):
             "position": {
                 "latitude": entity.position.latitude,
                 "longitude": entity.position.longitude,
-                "bearing": entity.postion.bearing,
-                "speed": entity.postion.speed
+                "bearing": entity.position.bearing,
+                "speed": entity.position.speed
             },
             "stop_id": entity.stop_id,
             "timestamp": entity.timestamp
