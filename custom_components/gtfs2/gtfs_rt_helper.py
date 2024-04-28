@@ -276,7 +276,7 @@ def get_rt_vehicle_positions(self):
             # Vehicle is not in service
             continue
         if vehicle["trip"]["trip_id"] == self._trip_id: 
-            _LOGGER.debug('Adding position for TripId: %s", self._trip_id)
+            _LOGGER.debug("Adding position for TripId: %s", self._trip_id)
             #_LOGGER.debug('Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s', vehicle["trip"]["trip_id"],vehicle["trip"]["route_id"],vehicle["trip"]["direction_id"],vehicle["position"]["latitude"],vehicle["position"[]"longitude"])  
             
         # add data if in the selected direction
