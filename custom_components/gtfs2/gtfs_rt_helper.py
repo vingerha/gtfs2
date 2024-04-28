@@ -490,13 +490,11 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
         if entity.HasField('alert'):
             informed_entities = []
             for informed_entity in entity.alert.informed_entity:
-                informed_entity_json = {
-                    "informed_entity": {
+                    informed_entity_json = {
                         "agency_id": informed_entity.agency_id,
                         "route_id": informed_entity.route_id,
                         "trip_id": informed_entity.trip.trip_id
                     }
-                }
                 informed_entities.append(informed_entity_json)
             entity_dict = {
                 "alert": {
