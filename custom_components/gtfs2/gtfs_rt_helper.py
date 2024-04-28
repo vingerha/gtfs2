@@ -492,7 +492,7 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
                 "id": entity.id,
                 "informed_entity":
                 {
-                    "stop_id": entity.alert.informed_entity.stop_id
+                    "stop_id": entity.alert.informed_entity.stop_id,
                     "route_id": entity.alert.informed_entity.route_id
                 },
                 "header_text": entity.alert.header_text
