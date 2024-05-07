@@ -4,7 +4,7 @@
   "codeowners": ["@vingerha"],
   "config_flow": true,
   "dependencies": [
-    "zone, person"
+    "zone", "person"
   ],
   "documentation": "https://github.com/vingerha/gtfs2/wiki",
   "iot_class": "local_polling",
