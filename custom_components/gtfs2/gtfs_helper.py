@@ -389,7 +389,7 @@ def get_gtfs(hass, path, data, update=False):
         _LOGGER.warning("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
-        remove_datasource(hass, path, filename)
+        remove_datasource(hass, path, filename, False)
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
         os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
@@ -404,10 +404,13 @@ def get_gtfs(hass, path, data, update=False):
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.error("The given URL or GTFS data file/folder was not found")
                 return "no_data_file"                
-    (gtfs_root, _) = os.path.splitext(file)
 
+    if not check_calendar_dates_from_zip(gtfs_dir, file):
+        _LOGGER.info('New file contains only dates in the future, extracting terminated')
+        return
+    (gtfs_root, _) = os.path.splitext(file)    
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
-    joined_path = os.path.join(gtfs_dir, sqlite_file) 
+    joined_path = os.path.join(gtfs_dir, sqlite_file)     
     gtfs = pygtfs.Schedule(joined_path)
     if not gtfs.feeds: 
         if data.get("clean_feed_info", False):
@@ -428,6 +431,51 @@ def extract_from_zip(hass, gtfs, gtfs_dir, file, remove_file):
         return
     pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     check_datasource_index(hass, gtfs, gtfs_dir, file[:-4])
+    
+def check_calendar_dates_from_zip(gtfs_dir,file):
+    _LOGGER.debug("Checking if file contains only future data: %s ", file)
+    filename = os.path.join(gtfs_dir, file)
+    # Rename existing sqlite if existing (i.e. in case of a fresh install)
+    if os.path.exists(os.path.join(gtfs_dir, file[:-4] + ".sqlite")):
+        os.rename (os.path.join(gtfs_dir, file[:-4] + '.sqlite'), os.path.join(gtfs_dir, file[:-4] + '.sqlite_current'))
+    #Load the ZIP archive
+    zin = zipfile.ZipFile (f"{os.path.join(gtfs_dir, filename)}", 'r')
+    check_list=[]
+    try:
+        for item in zin.infolist():
+            if item.filename[0:8] == 'calendar' :
+                if item.filename == 'calendar.txt':
+                    column = 'start_date'
+                else:
+                    column = 'date'
+                with open(zin.extract(item.filename)) as f:
+                    header = f.readline().strip('\n')   #
+                    data = f.readlines() 
+                    index =header.replace('"','').split(',').index(column)           
+                    list = []
+                    for line in data:
+                        list.append(line.split(',')[index])
+                    check_list.append(min(list))
+        min_date = datetime.datetime.strptime(min(check_list),"%Y%m%d")
+        _LOGGER.debug("Youngest calender date from new files: %s, is: %s", check_list, min_date)
+        if min_date > datetime.datetime.now()  :
+            _LOGGER.info("New file contains only dates in the future, keeping current")
+            if os.path.exists(os.path.join(gtfs_dir, file[:-4] + ".sqlite")):
+                os.remove(os.path.join(gtfs_dir, file[:-4] + ".sqlite"))
+            os.rename (os.path.join(gtfs_dir, file[:-4] + '.sqlite_current'), os.path.join(gtfs_dir, file[:-4] + '.sqlite'))
+            return False
+    except Exception as ex:
+        _LOGGER.error("Error getting earliest dates from zip, continuing with extract, error: %s", ex)
+        _LOGGER.debug(f"Removing/restoring sqlite after error")
+        if os.path.exists(os.path.join(gtfs_dir, file[:-4] + ".sqlite")):
+            os.remove(os.path.join(gtfs_dir, file[:-4] + ".sqlite"))
+        if os.path.exists(os.path.join(gtfs_dir, file[:-4] + ".sqlite")):
+            os.rename (os.path.join(gtfs_dir, file[:-4] + '.sqlite'), os.path.join(gtfs_dir, file[:-4] + '.sqlite_current'))
+        return False
+    _LOGGER.debug(f"New file is not containing only newer dates, removing current/copied sqlite")    
+    if os.path.exists(os.path.join(gtfs_dir, file[:-4] + ".sqlite_current")):
+        os.remove(os.path.join(gtfs_dir, file[:-4] + ".sqlite_current"))
+    return True
 
 def remove_from_zip(delmelist,gtfs_dir,file):
     _LOGGER.debug("Removing data: %s , from zipfile: %s", delmelist, file)
@@ -540,10 +588,10 @@ def get_datasources(hass, path) -> dict[str]:
     _LOGGER.debug(f"Datasources in folder: {datasources}")
     return datasources
 
-def remove_datasource(hass, path, filename):
+def remove_datasource(hass, path, filename, include_sqlite):
     gtfs_dir = hass.config.path(path)
     _LOGGER.info(f"Removing datasource: {os.path.join(gtfs_dir, filename)}.*")
-    if os.path.exists(os.path.join(gtfs_dir, filename + ".sqlite")):
+    if include_sqlite and os.path.exists(os.path.join(gtfs_dir, filename + ".sqlite")):
         os.remove(os.path.join(gtfs_dir, filename + ".sqlite"))
     if os.path.exists(os.path.join(gtfs_dir, filename + "_temp.zip")):     
         os.remove(os.path.join(gtfs_dir, filename + "_temp.zip"))
@@ -766,7 +814,7 @@ def get_local_stops_next_departures(self):
     time_range = str('+' + str(self._data.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE)) + ' minute')
     time_range_history = str('-' + str(self._data.get("timerange_history", DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY)) + ' minute')
     radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 130000
-    if not latitude or not latitude:
+    if not latitude or not longitude:
         _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
         return []
     if include_tomorrow:
