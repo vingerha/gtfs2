@@ -764,7 +764,7 @@ def get_local_stop_list(hass, schedule, data):
     device_tracker = hass.states.get(data['device_tracker_id'])
     latitude = device_tracker.attributes.get("latitude", None)
     longitude = device_tracker.attributes.get("longitude", None) 
-    radius = data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 130000
+    radius = data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 111111
     sql_query = f"""
         SELECT stop.stop_id, stop.stop_name
         FROM stops stop
@@ -813,7 +813,7 @@ def get_local_stops_next_departures(self):
     tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date(:now_offset))"
     time_range = str('+' + str(self._data.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE)) + ' minute')
     time_range_history = str('-' + str(self._data.get("timerange_history", DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY)) + ' minute')
-    radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 130000
+    radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 111111
     if not latitude or not longitude:
         _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
         return []
