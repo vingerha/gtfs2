@@ -76,7 +76,7 @@ async def async_setup_entry(
 
         # create a sensor with all stops
         sensors.append(
-            GTFSLocalStopSensorList( name=coordinator.data.get("name", "No Name"))
+            GTFSLocalStopSensorList( coordinator=coordinator)
         )
 
         for stop in coordinator.data["local_stops_next_departures"]:
@@ -548,16 +548,16 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
 class GTFSLocalStopSensorList(CoordinatorEntity, SensorEntity):
     """Implementation of a GTFS local stops departures sensor."""
 
-    def __init__( self, name) -> None:
+    def __init__( self, coordinator ) -> None:
         """Initialize the GTFSsensor."""
-#        super().__init__(coordinator)
-#        provided_name = coordinator.data.get("name", "No Name")
+        super().__init__(coordinator)
+        provided_name = coordinator.data.get("name", "No Name")
         self._previous_longitude = -1
         self._previous_latitude = -1
 
 
 
-        self._name =  name + " local_stoplist"
+        self._name =  provided_name + " local_stoplist"
         self._attributes: dict[str, Any] = {}
 
         self._attr_unique_id = "sensor.gtfs2_" + self._name
@@ -566,11 +566,11 @@ class GTFSLocalStopSensorList(CoordinatorEntity, SensorEntity):
         self.entity_id = self._attr_unique_id
 
         self._attr_device_info = DeviceInfo(
-            name=f"GTFS - {name}",
+            name=f"GTFS - {provided_name}",
             entry_type=DeviceEntryType.SERVICE,
-            identifiers={(DOMAIN, f"GTFS - {name}")},
+            identifiers={(DOMAIN, f"GTFS - {provided_name}")},
             manufacturer="GTFS",
-            model=name,
+            model=provided_name,
         )
         self._state: str | None = None
         self._state = "Initialized"
