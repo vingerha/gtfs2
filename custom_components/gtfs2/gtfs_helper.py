@@ -404,10 +404,12 @@ def get_gtfs(hass, path, data, update=False):
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.error("The given URL or GTFS data file/folder was not found")
                 return "no_data_file"                
-
-    if not check_calendar_dates_from_zip(gtfs_dir, file):
+    
+    # if update (servicecall) then check if new file does not only have future dates
+    if update and not check_calendar_dates_from_zip(gtfs_dir, file):
         _LOGGER.info('New file contains only dates in the future, extracting terminated')
         return
+    
     (gtfs_root, _) = os.path.splitext(file)    
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
     joined_path = os.path.join(gtfs_dir, sqlite_file)     
@@ -983,4 +985,3 @@ async def update_gtfs_local_stops(hass, data):
         _LOGGER.debug("Reloading local stops for config_entry_id: %s", cf_entry) 
         reload = await hass.config_entries.async_reload(cf_entry)    
     return
-
