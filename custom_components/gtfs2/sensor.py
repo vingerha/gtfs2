@@ -58,6 +58,8 @@ from .const import (
 )
 from .coordinator import GTFSUpdateCoordinator, GTFSLocalStopUpdateCoordinator
 
+from .sensor_stoplist import *
+
 _LOGGER = logging.getLogger(__name__)
 
 
