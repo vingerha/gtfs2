@@ -1,7 +1,11 @@
 """Support for GTFS."""
-from datetime import datetime
+from datetime import datetime, timezone
+
 import logging
 from typing import Any
+
+import os
+import geopy.distance
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -11,6 +15,18 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 import homeassistant.util.dt as dt_util
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_interval,
+)
+from homeassistant.const import (
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+    EVENT_HOMEASSISTANT_STARTED,    
+)
+
+from .sensor_stoplist import *
+
 
 from .const import (
     ATTR_ARRIVAL,
@@ -58,9 +74,16 @@ from .const import (
 )
 from .coordinator import GTFSUpdateCoordinator, GTFSLocalStopUpdateCoordinator
 
-from .sensor_stoplist import *
-
 _LOGGER = logging.getLogger(__name__)
+
+
+
+def get_now_utc_iso_to_str () -> str:
+    return dt_util.utcnow().isoformat()
+
+def get_now_utc_iso_from_str () -> str:
+    return dt_util.utcnow().isoformat()
+
 
 
 async def async_setup_entry(
@@ -78,7 +101,10 @@ async def async_setup_entry(
 
         # create a sensor with all stops
         sensors.append(
-            GTFSLocalStopSensorList( coordinator=coordinator)
+            GTFSLocalStopSensorList(
+                hass = hass,
+                config_entry = config_entry,  
+                coordinator = coordinator)
         )
 
         for stop in coordinator.data["local_stops_next_departures"]:
@@ -543,73 +569,4 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
 
 
 
-
-###########################
-###########################
-###########################
-class GTFSLocalStopSensorList(CoordinatorEntity, SensorEntity):
-    """Implementation of a GTFS local stops departures sensor."""
-
-    def __init__( self, coordinator ) -> None:
-        """Initialize the GTFSsensor."""
-        super().__init__(coordinator)
-        provided_name = coordinator.data.get("name", "No Name")
-        self._previous_longitude = -1
-        self._previous_latitude = -1
-
-
-
-        self._name =  provided_name + " local_stoplist"
-        self._attributes: dict[str, Any] = {}
-
-        self._attr_unique_id = "sensor.gtfs2_" + self._name
-        self._attr_unique_id = self._attr_unique_id.lower()
-        self._attr_unique_id = self._attr_unique_id.replace(" ", "_")
-        self.entity_id = self._attr_unique_id
-
-        self._attr_device_info = DeviceInfo(
-            name=f"GTFS - {provided_name}",
-            entry_type=DeviceEntryType.SERVICE,
-            identifiers={(DOMAIN, f"GTFS - {provided_name}")},
-            manufacturer="GTFS",
-            model=provided_name,
-        )
-        self._state: str | None = None
-        self._state = "Initialized"
-        self._attr_native_value = self._state
-
-        self._attributes["gtfs_updated_at"] = self.coordinator.data["gtfs_updated_at"]
-        self._attributes["device_tracker_id"] = self.coordinator.data["device_tracker_id"]
-        self._attributes["offset"] = self.coordinator.data["offset"]
-        self._attributes["stops"] = []
-        self._attr_extra_state_attributes = self._attributes
-
-
-    @property
-    def name(self) -> str:
-        """Return the name of the sensor."""
-        return self._name
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self._update_attrs()
-        self._attr_extra_state_attributes = self._attributes
-        self._state = "Updated"
-        self._attr_native_value = self._state        
-        super()._handle_coordinator_update()
-
-
-    def _update_attrs(self):  # noqa: C901 PLR0911
-        _LOGGER.debug("GTFSLocalStopSensorList: %s, update with attr data: %s", self._name, self.coordinator.data)
-
-# TO TO
-# if current GPS position is +/same as th last update and last update < 5 min ago
-# => no nothing
-# else update 
-
-        self._attributes["gtfs_updated_at"] = self.coordinator.data["gtfs_updated_at"]
-        self._departure = self.coordinator.data.get("local_stops_next_departures",None)
-        self._attributes["stops"] = self._departure
-        return self._attributes
 
