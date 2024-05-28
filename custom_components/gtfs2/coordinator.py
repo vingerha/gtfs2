@@ -70,7 +70,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "include_tomorrow": data["include_tomorrow"],
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
-            "check_source_dates": options[CONF_CHECK_SOURCE_DATES],
+            "check_source_dates": options.get(CONF_CHECK_SOURCE_DATES, False),
             "file": data["file"],
             "route_type": data["route_type"],
             "extracting": False,
