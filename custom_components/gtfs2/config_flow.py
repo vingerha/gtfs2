@@ -48,6 +48,7 @@ from .const import (
     CONF_REFRESH_INTERVAL,
     CONF_OFFSET,
     CONF_REAL_TIME,
+    CONF_CHECK_SOURCE_DATES,
     ATTR_API_KEY_LOCATIONS
 )    
 
@@ -432,6 +433,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Optional(CONF_RADIUS, default=self.config_entry.options.get(CONF_RADIUS, DEFAULT_LOCAL_STOP_RADIUS)): vol.All(vol.Coerce(int), vol.Range(min=50, max=5000)),
                     vol.Optional(CONF_TIMERANGE, default=self.config_entry.options.get(CONF_TIMERANGE, DEFAULT_LOCAL_STOP_TIMERANGE)): vol.All(vol.Coerce(int), vol.Range(min=15, max=120)),
                     vol.Optional(CONF_OFFSET, default=self.config_entry.options.get(CONF_OFFSET, DEFAULT_OFFSET)): int,
+                    vol.Optional(CONF_CHECK_SOURCE_DATES, default=self.config_entry.options.get(CONF_CHECK_SOURCE_DATES,False)): selector.BooleanSelector(),
                     vol.Optional(CONF_REAL_TIME, default=self.config_entry.options.get(CONF_REAL_TIME)): selector.BooleanSelector()
                 }
             return self.async_show_form(
@@ -444,6 +446,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             opt1_schema = {
                         vol.Optional(CONF_REFRESH_INTERVAL, default=self.config_entry.options.get(CONF_REFRESH_INTERVAL, DEFAULT_REFRESH_INTERVAL)): int,
                         vol.Optional(CONF_OFFSET, default=self.config_entry.options.get(CONF_OFFSET, DEFAULT_OFFSET)): int,
+                        vol.Optional(CONF_CHECK_SOURCE_DATES, default=self.config_entry.options.get(CONF_CHECK_SOURCE_DATES,False)): selector.BooleanSelector(),
                         vol.Optional(CONF_REAL_TIME, default=self.config_entry.options.get(CONF_REAL_TIME)): selector.BooleanSelector()
                     }
             return self.async_show_form(

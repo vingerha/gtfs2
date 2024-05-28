@@ -285,6 +285,7 @@ CONF_TIMERANGE = "timerange"
 CONF_REFRESH_INTERVAL = "refresh_interval"
 CONF_OFFSET = "offset"
 CONF_REAL_TIME = "real_time"
+CONF_CHECK_SOURCE_DATES = "check_source_dates"
 
 # gtfs_rt specific
 CONF_API_KEY = "api_key"
