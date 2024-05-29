@@ -38,7 +38,7 @@ update_gtfs:
       selector:
         boolean: 
     check_source_dates:
-      name: Experimental feature - Check source validity
+      name: (Experimental feature) Check source validity
       description: Verify if the new file has only future dates, then cancel
       required: true
       default: false
