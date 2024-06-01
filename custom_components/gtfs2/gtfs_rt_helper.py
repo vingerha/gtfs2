@@ -285,9 +285,9 @@ def get_rt_vehicle_positions(self):
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["longitude"])
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["latitude"])
-            geojson_element["properties"]["id"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(vehicle["trip"]["trip_id"])[-3:]
-            geojson_element["properties"]["title"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(vehicle["trip"]["trip_id"])[-3:]
-            geojson_element["properties"]["trip_id"] = vehicle["trip"]["trip_id"]
+            geojson_element["properties"]["id"] = str(self._route_id) + "_" + str(vehicle["vehicle"]["id"]) + "_" + str(vehicle["trip"]["direction_id"])
+            geojson_element["properties"]["title"] =  str(self._route_id) + "_" + str(vehicle["vehicle"]["id"]) + "_" + str(vehicle["trip"]["direction_id"])
+            geojson_element["properties"]["trip_id"] = str(self._route_id) + "_" + str(vehicle["vehicle"]["id"]) + "_" + str(vehicle["trip"]["direction_id"])
             geojson_element["properties"]["route_id"] = str(self._route_id)
             geojson_element["properties"]["direction_id"] = vehicle["trip"]["direction_id"]
             geojson_element["properties"]["vehicle_id"] = vehicle["vehicle"]["id"]
