@@ -390,7 +390,7 @@ def get_gtfs(hass, path, data, update=False):
         _LOGGER.warning("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
-        remove_datasource(hass, path, filename, False)
+        remove_datasource(hass, path, filename, True)
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
         os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
