@@ -959,7 +959,7 @@ def get_local_stops_next_departures(self):
                 _LOGGER.debug("Departure time corrected: %s, after now: %s", depart_time_corrected, now.replace(tzinfo=timezone))
                 timetable.append({"departure": row["departure_time"], "departure_realtime": departure_rt, "delay_realtime": delay_rt, "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
-        if row["tomorrow"] == 1 and row["today"] == 0 and datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S"):
+        if row["tomorrow"] == '1' and row["today"] == '0' and datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S"):
             _LOGGER.debug("Tomorrow: adding row")
             timetable.append({"departure": row["departure_time"], "departure_realtime": "tomorrow", "delay_realtime": "tomorrow", "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
