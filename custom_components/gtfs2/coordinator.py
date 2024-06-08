@@ -55,7 +55,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = None if self.data is None else self.data.copy()
+        previous_data = {} if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
 
         self._pygtfs = get_gtfs(
@@ -180,7 +180,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""      
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = None if self.data is None else self.data.copy()
+        previous_data = {} if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
         self._realtime = False
         if "real_time" in options: 
