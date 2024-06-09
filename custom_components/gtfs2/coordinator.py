@@ -55,7 +55,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = {} if self.data is None else self.data.copy()
+        previous_data = None if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
 
         self._pygtfs = get_gtfs(
@@ -79,6 +79,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
 
         if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
             _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data={}
             previous_data["extracting"] = True
             return previous_data
         
@@ -180,7 +181,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""      
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = {} if self.data is None else self.data.copy()
+        previous_data = None if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
         self._realtime = False
         if "real_time" in options: 
@@ -221,6 +222,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         
         if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):    
             _LOGGER.warning("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            previous_data={}
             previous_data["extracting"] = True
             return previous_data
         try:    
