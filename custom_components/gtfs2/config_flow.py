@@ -154,21 +154,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ),
                         vol.Required(CONF_FILE): str,
                         vol.Required(CONF_URL, default="na"): str,
-                        vol.Optional(
-                            CONF_API_KEY,
-                            default=self.config_entry.options.get(CONF_API_KEY),
-                        ): str,
+                        vol.Optional(CONF_API_KEY): str,
                         vol.Optional(
                             CONF_API_KEY_NAME,
-                            default=self.config_entry.options.get(
-                                CONF_API_KEY_NAME, DEFAULT_API_KEY_NAME
-                            ),
+                            default=DEFAULT_API_KEY_NAME,
                         ): str,
                         vol.Required(
                             CONF_API_KEY_LOCATION,
-                            default=self.config_entry.options.get(
-                                CONF_API_KEY_LOCATION, DEFAULT_API_KEY_LOCATION
-                            ),
+                            default=DEFAULT_API_KEY_LOCATION,
                         ): selector.SelectSelector(
                             selector.SelectSelectorConfig(
                                 options=ATTR_API_KEY_LOCATIONS,
