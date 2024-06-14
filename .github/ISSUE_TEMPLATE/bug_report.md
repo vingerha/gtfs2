@@ -10,7 +10,8 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 Steps/data to reproduce the behavior, e.g.
-- important: url to the zip file of the datasource
+- important: url to the zip file of the **static datasource**
+- important if realtime issue: url to the source too
 - route ID
 - stop ID
 - outward/return
