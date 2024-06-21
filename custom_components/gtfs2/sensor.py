@@ -323,7 +323,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
                     self._destination.wheelchair_boarding, WHEELCHAIR_BOARDING_DEFAULT
                 )
         else:
-            self._attributes["destination_station_stop_name"] = self._departure.get("destination_stop_name", None)        
+            self._attributes["destination_station_stop_name"] = self._departure.get("destination_stop_name", None)  
+            self._attributes["destination_station_stop_id"] = self._departure.get("destination_stop_id", None)            
 
         # Manage Route metadata
         key = "route_id"
