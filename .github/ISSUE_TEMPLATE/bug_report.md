@@ -7,18 +7,33 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+1. A clear and concise description of what the bug is.
+- has it worked before
+- what it does not do vs. expectation
+- have you verified if the source/provider is working correctly, usually they have their own website.
+  
+2. Datasource(s).
+- url to the zip file of the **static datasource**
+- have you updated the datasource to the latest version, some update weekly
+- if (!) realtime issue: url to its source
 
-Steps/data to reproduce the behavior, e.g.
-- important: url to the zip file of the **static datasource**
-- important if realtime issue: url to the source too
+2. In case of setup using start / stop station
 - route ID
 - stop ID
 - outward/return
+
+3. In case of location based setup
+- location
+- which transport types are missing or incorrect
 
 **Release used**
 - gtfs2 release 
 - HA type (HAOS/Container)
 
 **Additional**
-Please add logs if helpfull, switch to 'debug' logging to get more details
+Please add logs
+- remove the configuration
+- switch the Integration to 'debug' logging
+- reconfigure your failing setup
+- extract the logs and attach
+- switch logging back to normal
