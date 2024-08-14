@@ -7,6 +7,10 @@ assignees: ''
 ---
 
 **Describe the bug**
+**For each of the questions below add you data**
+
+Note that clairvoyancy does not exist ... no details = no response
+
 1. A clear and concise description of what the bug is.
 - has it worked before
 - what it does not do vs. expectation
