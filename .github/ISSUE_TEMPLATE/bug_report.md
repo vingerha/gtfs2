@@ -37,7 +37,13 @@ Note that clairvoyancy does not exist ... no details = no response
 **Additional**
 Please add logs
 - remove the configuration
-- switch the Integration to 'debug' logging
+- setup to 'debug' logging, either via the integration (needs at least 1 config to be OK) or in configuration.yaml (requires a restart
+```
+logger:
+  default: warning
+  logs:
+    custom_components.gtfs2: debug
+```
 - reconfigure your failing setup
 - extract the logs and attach
-- switch logging back to normal
+- switch logging back to normal when no longer needed
