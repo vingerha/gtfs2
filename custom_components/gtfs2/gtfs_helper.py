@@ -423,8 +423,10 @@ def get_gtfs(hass, path, data, update=False):
     
     (gtfs_root, _) = os.path.splitext(file)    
     sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
-    joined_path = os.path.join(gtfs_dir, sqlite_file)     
+    joined_path = os.path.join(gtfs_dir, sqlite_file)  
+
     gtfs = pygtfs.Schedule(joined_path)
+   
     if not gtfs.feeds: 
         if data.get("clean_feed_info", False):
             extract = Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','feed_info.txt']))

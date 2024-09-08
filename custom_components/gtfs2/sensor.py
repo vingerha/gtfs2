@@ -130,6 +130,10 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
 
     def _update_attrs(self):  # noqa: C901 PLR0911
         _LOGGER.debug("SENSOR update attr data: %s", self.coordinator.data)
+        if self.coordinator.data["extracting"]:  
+            _LOGGER.warning("Extracting datasource")
+            self._attr_native_value = None
+            return
         self._pygtfs = self.coordinator.data["schedule"]
         self.extracting = self.coordinator.data["extracting"]
         self.origin = self.coordinator.data["origin"].split(": ")[0]
