@@ -509,11 +509,12 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
         self._departure = self.coordinator.data.get("local_stops_next_departures",None) 
         self._state: str | None = None
         # if no data or extracting, stop
-        self._extracting = False
-        if self._extracting:  
-            self._state = None
-        else:
-            self._state = self._stop["stop_name"] + " (" +  str(dt_util.now().replace(tzinfo=None).strftime(TIME_STR_FORMAT)) + ")"
+        if self.coordinator.data["extracting"]:  
+            _LOGGER.warning("Extracting datasource")
+            self._attr_native_value = None
+            return
+        
+        self._state = self._stop["stop_name"] + " (" +  str(dt_util.now().replace(tzinfo=None).strftime(TIME_STR_FORMAT)) + ")"
 
         self._attr_native_value = self._state        
         self._attributes["gtfs_updated_at"] = self.coordinator.data[
