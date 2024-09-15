@@ -595,11 +595,12 @@ def get_agency_list(schedule, data):
     _LOGGER.debug(f"agencies: {agencies}")
     return agencies
 
-def get_datasources(hass, path) -> dict[str]:
+async def get_datasources(hass, path) -> dict[str]:
     _LOGGER.debug(f"Getting datasources for path: {path}")
     gtfs_dir = hass.config.path(path)
     os.makedirs(gtfs_dir, exist_ok=True)
-    files = os.listdir(gtfs_dir)
+    files = await hass.async_add_executor_job(
+            os.listdir, gtfs_dir)
     datasources = []
     for file in files:
         if file.endswith(".sqlite"):
