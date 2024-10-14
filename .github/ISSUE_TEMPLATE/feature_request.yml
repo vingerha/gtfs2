@@ -2,6 +2,7 @@ name: Feature Request
 description: File a idea on how to increase the value.
 title: "[FEATURE]: "
 labels: ["feature", "triage"]
+projects: ["octo-org/1", "octo-org/44"]
 assignees: ""
 body:
   - type: markdown
