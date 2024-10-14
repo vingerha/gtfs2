@@ -4,13 +4,12 @@ about: Please first check the [wiki-pages](https://github.com/vingerha/gtfs2/wik
 title: '[BUG]: '
 labels: ''
 assignees: ''
----
 body:
   - type: markdown
     attributes:
       value: |
         FOLLOW THE QUESTIONS BELOW, ISSUES WITHOUT DETAILS ON HOW TO REPRODUCE WILL BE IGNORED
-
+---
 
 Note that clairvoyancy does not exist ... no details = no response
 
