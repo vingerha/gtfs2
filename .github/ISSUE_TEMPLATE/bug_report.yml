@@ -18,6 +18,8 @@ body:
         - what it does not do vs. expectation
         - have you verified if the source/provider is working correctly, usually they have their own website.
       render: shell
+    validations:
+      required: true  
   - type: textarea
     id: sources
     attributes:
@@ -27,6 +29,8 @@ body:
         - have you updated the datasource to the latest version, some of them update on a weekly basis
         - if (!) realtime issue of if(!) position issue: url to its source
       render: shell
+    validations:
+      required: true        
   - type: textarea
     id: startstop_based
     attributes:
@@ -39,7 +43,7 @@ body:
   - type: textarea
     id: location_based
     attributes:
-      label: Config in case of setup using start / stop station
+      label: Config in case of setup using location based departures
       description: |
         - location lat/lon used
         - which transport types are missing or incorrect
@@ -51,7 +55,8 @@ body:
       description: |
         - gtfs2 release 
         - HA type (HAOS/Container)
-      render: shell    
+    validations:
+      required: true  
   - type: textarea
     id: logs
     attributes:
