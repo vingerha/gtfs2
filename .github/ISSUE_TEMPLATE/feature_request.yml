@@ -2,7 +2,7 @@ name: Feature Request
 description: File a idea on how to increase the value.
 title: "[FEATURE]: "
 labels: ["feature", "triage"]
-assignees: ""
+assignees: 
 body:
   - type: markdown
     attributes:
