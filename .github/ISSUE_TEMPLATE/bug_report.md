@@ -5,11 +5,12 @@ title: '[BUG]: '
 labels: ''
 assignees: ''
 ---
-<h2>Follow the requests for data below, issues without details to reproduce will be ignored</h2>
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FOLLOW THE QUESTIONS BELOW, ISSUES WITHOUT DETAILS ON HOW TO REPRODUCE WILL BE IGNORED
 
-
-**Describe the bug**
-**For each of the questions below add you data**
 
 Note that clairvoyancy does not exist ... no details = no response
 
