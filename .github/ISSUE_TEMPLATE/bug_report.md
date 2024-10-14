@@ -15,16 +15,16 @@ Note that clairvoyancy does not exist ... no details = no response
   
 2. Datasource(s).
 - url to the zip file of the **static datasource**
-- have you updated the datasource to the latest version, some update weekly
-- if (!) realtime issue: url to its source
+- have you updated the datasource to the latest version, some of them update on a weekly basis
+- if (!) realtime issue of if(!) position issue: url to its source
 
-2. In case of setup using start / stop station
+3. In case of setup using start / stop station
 - route ID
 - stop ID
 - outward/return
 
-3. In case of location based setup
-- location
+4. In case of location based setup
+- location lat/lon used
 - which transport types are missing or incorrect
 
 **Release used**
@@ -32,9 +32,9 @@ Note that clairvoyancy does not exist ... no details = no response
 - HA type (HAOS/Container)
 
 **Additional**
-Please add logs
+Please add debug logs
 - remove the configuration
-- setup to 'debug' logging, either via the integration (needs at least 1 config to be OK) or in configuration.yaml (requires a restart
+- setup to 'debug' logging, either via the integration (needs at least 1 config to be OK) or in configuration.yaml (requires a restart)
 ```
 logger:
   default: warning
@@ -42,5 +42,5 @@ logger:
     custom_components.gtfs2: debug
 ```
 - reconfigure your failing setup
-- extract the logs and attach
+- extract the logs that cover the time of the issue and attach
 - switch logging back to normal when no longer needed
