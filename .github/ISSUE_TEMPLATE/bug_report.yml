@@ -9,6 +9,14 @@ body:
     attributes:
       value: |
         Note that clairvoyancy does not exist ... no details = no response
+  - type: checkboxes
+    id: checked-docu
+    attributes:
+      label: Own Analysis
+      description: You have read the documentation which did not provide help [Documentation](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds). 
+      options:
+        - label: I cannot find my issue in the documentation
+          required: true
   - type: textarea
     id: what-happened
     attributes:
