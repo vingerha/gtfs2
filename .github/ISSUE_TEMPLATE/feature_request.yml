@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Is your request really a feature or aiming to fix a bug, then raise a BUG REPORT
+        Is your request really a feature or aiming to fix a bug, then raise a [BUG REPORT](https://github.com/vingerha/gtfs2/issues/new?assignees=&labels=bug%2Ctriage&projects=&template=bug_report.yml&title=%5BBug%5D%3A+)
   - type: textarea
     id: description
     attributes:
