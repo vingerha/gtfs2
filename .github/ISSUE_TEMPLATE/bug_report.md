@@ -2,7 +2,6 @@ name: Bug report
 about: Please first check the [wiki-pages](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds) before raising a ticket
 title: "[Bug]: "
 labels: ["bug", "triage"]
-projects: ["octo-org/1", "octo-org/44"]
 assignees:
   - []
 body:
