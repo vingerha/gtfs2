@@ -1,3 +1,4 @@
+---
 name: Bug Report
 description: File a bug report.
 title: "[Bug]: "
@@ -10,3 +11,4 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+---
