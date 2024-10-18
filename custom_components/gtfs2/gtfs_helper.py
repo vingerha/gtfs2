@@ -335,9 +335,11 @@ def get_next_departure(self):
     else:
         timezone = dt_util.get_time_zone(self.hass.config.time_zone)
         _LOGGER.debug("Timezone HA: %s",timezone)
-    if item["origin_stop_timezone"]:
+    _LOGGER.debug("Origin stop timezone: %s",item["origin_stop_timezone"])
+    _LOGGER.debug("Dest stop timezone: %s",item["dest_stop_timezone"])
+    if item["origin_stop_timezone"] is not None:
         timezone = dt_util.get_time_zone(item["origin_stop_timezone"])
-    if item["dest_stop_timezone"]:
+    if item["dest_stop_timezone"] is None:
         timezone_dest = dt_util.get_time_zone(item["origin_stop_timezone"])  
     else:
         timezone_dest = timezone
