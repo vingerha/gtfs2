@@ -335,15 +335,22 @@ def get_next_departure(self):
     else:
         timezone = dt_util.get_time_zone(self.hass.config.time_zone)
         _LOGGER.debug("Timezone HA: %s",timezone)
+    _LOGGER.debug("Default timezone: %s",timezone)
     _LOGGER.debug("Origin stop timezone: %s",item["origin_stop_timezone"])
     _LOGGER.debug("Dest stop timezone: %s",item["dest_stop_timezone"])
-    if item["origin_stop_timezone"] is not None:
+    if item["origin_stop_timezone"] is not None:    
+        _LOGGER.debug("Setting Orig TZ based on origin stop: %s",item["origin_stop_timezone"])
         timezone = dt_util.get_time_zone(item["origin_stop_timezone"])
-    if item["dest_stop_timezone"] is None:
-        timezone_dest = dt_util.get_time_zone(item["origin_stop_timezone"])  
+    if item["dest_stop_timezone"] is not None:
+        _LOGGER.debug("Setting Dest TZ based on dest stop: %s",item["dest_stop_timezone"])
+        timezone_dest = dt_util.get_time_zone(item["dest_stop_timezone"])  
     else:
         timezone_dest = timezone
-        
+    
+    _LOGGER.debug("Used orig timezone: %s",timezone)
+    _LOGGER.debug("Used dest timezone: %s",timezone_dest)    
+
+    
     depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)    
     arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone_dest)
     origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
