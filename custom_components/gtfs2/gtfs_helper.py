@@ -1040,6 +1040,7 @@ def get_local_stops_next_departures(self):
             _LOGGER.debug("Self._departure time in stop tz: %s", self._departure_time)
             departure_rt = "-"
             delay_rt = "-"
+            delay_rt_derived = '-'
             # Find RT if configured
             if self._realtime:
                 self._get_next_service = {}
@@ -1055,12 +1056,19 @@ def get_local_stops_next_departures(self):
             if departure_rt != '-':
                 depart_time_corrected_time = departures[0].astimezone(tz=timezone_stop)
                 departure_rt = depart_time_corrected_time.replace(tzinfo=None).strftime(TIME_STR_FORMAT)
+                td = abs(depart_time_corrected_time - self._departure_datetime.astimezone(tz=timezone_stop))
+                if td.seconds != 0 and depart_time_corrected_time < self._departure_datetime.astimezone(tz=timezone_stop) :
+                    delay_rt_derived = '-' + str(td)
+                elif td.seconds != 0: 
+                    delay_rt_derived = str(td)
+                _LOGGER.debug("Delay derived: %s", delay_rt_derived) 
             else: 
                 depart_time_corrected_time = (dt_util.parse_datetime(f"{now_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
             _LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)    
-            if delay_rt != '-':
+            if delay_rt != '-' and delay_rt != 0 :
                 depart_time_corrected_delay = (dt_util.parse_datetime(f"{now_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
             else:
+                delay_rt = '-'
                 depart_time_corrected_delay = dt_util.parse_datetime(f"{now_date} {self._departure_time}").replace(tzinfo=timezone_stop)                
             _LOGGER.debug("Departure time corrected based on realtime-delay: %s", depart_time_corrected_delay)   
 
@@ -1072,11 +1080,11 @@ def get_local_stops_next_departures(self):
 
             if depart_time_corrected > now_tz: 
                 _LOGGER.debug("Departure time corrected: %s, after now in tz with offset: %s", depart_time_corrected, now_tz)
-                timetable.append({"departure": self._departure_time, "departure_realtime": departure_rt, "delay_realtime": delay_rt, "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+                timetable.append({"departure": self._departure_time, "departure_realtime": departure_rt, "delay_realtime": delay_rt, "delay_realtime_derived": delay_rt_derived, "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
         if (row["tomorrow"] == '1' or row["tomorrow"] == 1) and (datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S")):
             _LOGGER.debug("Tomorrow: adding row")
-            timetable.append({"departure": row["departure_time"], "departure_realtime": "tomorrow", "delay_realtime": "tomorrow", "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+            timetable.append({"departure": row["departure_time"], "departure_realtime": "tomorrow", "delay_realtime": "tomorrow", "delay_realtime_derived": "tomorrow", "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
         prev_entry = entry.copy()
         prev_stop_id = str(row["stop_id"])
