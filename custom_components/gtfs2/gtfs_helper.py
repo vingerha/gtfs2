@@ -1034,9 +1034,9 @@ def get_local_stops_next_departures(self):
             self._stop_id = row['stop_id']
             _LOGGER.debug("Row departure_time: %s", row["departure_time"])              
             # collect departure time from row, using agency timezone as basis, then transforming it to the stop-specific timezone (based on Amtrak)
-            self._departure_datetime = datetime.datetime.strptime(now_date + " " + row["departure_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone_agency) 
+            self._departure_datetime = datetime.datetime.strptime(now_date + " " + row["departure_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone_agency).astimezone(tz=timezone_stop)
             _LOGGER.debug("Self._departure datetime in agency_tz: %s", self._departure_datetime)
-            self._departure_time = self._departure_datetime.astimezone(tz=timezone_stop).replace(tzinfo=None).strftime(TIME_STR_FORMAT)       
+            self._departure_time = self._departure_datetime.replace(tzinfo=None).strftime(TIME_STR_FORMAT)       
             _LOGGER.debug("Self._departure time in stop tz: %s", self._departure_time)
             departure_rt = "-"
             delay_rt = "-"
@@ -1051,13 +1051,13 @@ def get_local_stops_next_departures(self):
                     delays = next_service.get(self._route, {}).get(self._direction, {}).get(self._stop_id, []).get("delays", [])
                     departures = next_service.get(self._route, {}).get(self._direction, {}).get(self._stop_id, []).get("departures", [])
                     delay_rt = delays[0] if delays else "-"
-                    departure_rt = departures[0] if departures else "-"
+                    departure_rt = departure_rt_datetime = departures[0] if departures else "-"
                 _LOGGER.debug("Departure rt: %s, Delay rt: %s", departure_rt, delay_rt)   
             if departure_rt != '-':
                 depart_time_corrected_time = departures[0].astimezone(tz=timezone_stop)
                 departure_rt = depart_time_corrected_time.replace(tzinfo=None).strftime(TIME_STR_FORMAT)
-                td = abs(depart_time_corrected_time - self._departure_datetime.astimezone(tz=timezone_stop))
-                if td.seconds != 0 and depart_time_corrected_time < self._departure_datetime.astimezone(tz=timezone_stop) :
+                td = abs(depart_time_corrected_time - self._departure_datetime)
+                if td.seconds != 0 and depart_time_corrected_time < self._departure_datetime :
                     delay_rt_derived = '-' + str(td)
                 elif td.seconds != 0: 
                     delay_rt_derived = str(td)
@@ -1080,11 +1080,11 @@ def get_local_stops_next_departures(self):
 
             if depart_time_corrected > now_tz: 
                 _LOGGER.debug("Departure time corrected: %s, after now in tz with offset: %s", depart_time_corrected, now_tz)
-                timetable.append({"departure": self._departure_time, "departure_realtime": departure_rt, "delay_realtime": delay_rt, "delay_realtime_derived": delay_rt_derived, "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+                timetable.append({"departure": self._departure_time, "departure_datetime": dt_util.as_utc(self._departure_datetime), "departure_realtime": departure_rt, "departure_realtime_datetime": departure_rt_datetime, "delay_realtime_derived": delay_rt_derived, "delay_realtime": delay_rt,  "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
         if (row["tomorrow"] == '1' or row["tomorrow"] == 1) and (datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S")):
             _LOGGER.debug("Tomorrow: adding row")
-            timetable.append({"departure": row["departure_time"], "departure_realtime": "tomorrow", "delay_realtime": "tomorrow", "delay_realtime_derived": "tomorrow", "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
+            timetable.append({"departure": self._departure_time, "departure_datetime": dt_util.as_utc(self._departure_datetime), "departure_realtime": "tomorrow", "departure_realtime_datetime": "tomorrow", "delay_realtime_derived": "tomorrow", "delay_realtime": "tomorrow",  "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon})
         
         prev_entry = entry.copy()
         prev_stop_id = str(row["stop_id"])
