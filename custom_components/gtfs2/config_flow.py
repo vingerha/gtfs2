@@ -284,6 +284,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 errors=errors,
             )
+        user_input[CONF_ROUTE_TYPE] = user_input.get(CONF_ROUTE,99).split('#')[1]    
         self._user_inputs.update(user_input)
         _LOGGER.debug(f"UserInputs Route: {self._user_inputs}")
         return await self.async_step_stops()
@@ -295,7 +296,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 stops = get_stop_list(
                     self._pygtfs,
-                    self._user_inputs[CONF_ROUTE].split(": ")[0],
+                    self._user_inputs[CONF_ROUTE].split(":")[0],
                     self._user_inputs[CONF_DIRECTION],
                 )
                 last_stop = stops[-1:][0]
@@ -331,7 +332,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 stops = get_stop_list(
                     self._pygtfs,
-                    self._user_inputs[CONF_ROUTE].split(": ")[0],
+                    self._user_inputs[CONF_ROUTE].split(":")[0],
                     self._user_inputs[CONF_DIRECTION],
                 )
                 last_stop = stops[-1:][0]
