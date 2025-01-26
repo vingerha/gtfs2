@@ -18,7 +18,7 @@ body:
         - label: I cannot find my issue in the documentation
           required: true
   - type: checkboxes
-    id: checked-docu
+    id: checked-static-data-version
     attributes:
       label: Own Analysis
       description: Is you static data file up-to-date, this may change every month 
