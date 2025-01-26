@@ -21,7 +21,7 @@ body:
     id: checked-static-data-version
     attributes:
       label: Own Analysis
-      description: Is you static data file up-to-date, this may change every month 
+      description: Is your static data up-to-date, this may change every month 
       options:
         - label: My static data (zip) is up to date
           required: true          
