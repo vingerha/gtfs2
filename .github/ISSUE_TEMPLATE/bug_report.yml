@@ -17,6 +17,14 @@ body:
       options:
         - label: I cannot find my issue in the documentation
           required: true
+  - type: checkboxes
+    id: checked-docu
+    attributes:
+      label: Own Analysis
+      description: Is you static data file up-to-date, this may change every month 
+      options:
+        - label: My static data (zip) is up to date
+          required: true          
   - type: textarea
     id: what-happened
     attributes:
