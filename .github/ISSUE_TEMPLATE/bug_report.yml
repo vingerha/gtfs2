@@ -69,7 +69,7 @@ body:
     attributes:
       label: Info on your installed versions in X.Y.Z format
       description: |
-        - gtfs2 version, to be found in HACS top left alike 0.5.6b4
+        - gtfs2 version to be found in HACS top left alike 0.5.6b4
         - HA type (HAOS/Container) and release alike 2025.1.4
     validations:
       required: true  
