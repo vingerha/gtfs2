@@ -67,7 +67,7 @@ body:
   - type: textarea
     id: release
     attributes:
-      label: Info on your installed version
+      label: Info on your installed versions in X.Y.Z format for both gtfs2 release as well as the HA release
       description: |
         - gtfs2 release 
         - HA type (HAOS/Container)
