@@ -20,17 +20,11 @@ body:
   - type: checkboxes
     id: checked-beta
     attributes:
-      label: Own Analysis with beta
-      description: You have tried to install a newer (!) beta release. 
+      label: Own Analysis
+      description: I have tried to install a newer (!) beta release. 
       options:
         - label: The issue persists in the latest beta releasen
           required: true          
-  - type: checkboxes
-    id: checked-static-data-version
-    attributes:
-      label: Own Analysis
-      description: Is your static data up-to-date, this may change every month 
-      options:
         - label: My static data (zip) is up to date
           required: true          
   - type: textarea
