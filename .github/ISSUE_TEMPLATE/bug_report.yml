@@ -65,7 +65,7 @@ body:
         - which transport types are missing or incorrect
       render: shell  
   - type: textarea
-    id: version or sub-release
+    id: version
     attributes:
       label: Info on your installed versions in X.Y.Z format
       description: |
