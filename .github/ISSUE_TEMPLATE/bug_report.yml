@@ -18,6 +18,14 @@ body:
         - label: I cannot find my issue in the documentation
           required: true
   - type: checkboxes
+    id: checked-beta
+    attributes:
+      label: Own Analysis with beta
+      description: You have tried to install a newer (!) beta release. 
+      options:
+        - label: The issue persists in the latest beta releasen
+          required: true          
+  - type: checkboxes
     id: checked-static-data-version
     attributes:
       label: Own Analysis
