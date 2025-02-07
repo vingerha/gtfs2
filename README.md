@@ -1,4 +1,4 @@
-![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gtfs2) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs) **Latest Version incl. beta:** ![GitHub release](https://img.shields.io/github/v/release/vingerha/gtfs2.svg?include_prereleases&style=plastic)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/vingerha/gtfs2) [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs) **Latest beta:** ![GitHub release](https://img.shields.io/github/v/release/vingerha/gtfs2.svg?include_prereleases&style=plastic)
 
 
 # GTFS2 for Static and RealTime Public transport status collecting
