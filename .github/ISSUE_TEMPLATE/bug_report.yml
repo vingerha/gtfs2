@@ -13,13 +13,13 @@ body:
     id: checked-docu
     attributes:
       label: Own Analysis
-      description: You have read the documentation which did not provide help [Documentation](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds). I have tried to install a newer (beta) release. I verified that the static data (zip) provides the correct up-to-date data
+      description: You have read the documentation which did not provide help [Documentation](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds). I have tried to review and/or install a newer (beta) release. I verified that the static data (zip) provides the correct up-to-date data
       options:
         - label: I cannot find my issue in the documentation
           required: true
         - label: My static data (zip) is up to date
           required: true
-        - label: The issue persists in the latest (beta) release
+        - label: The issue is not resolved with the latest (beta) release
           required: true
   - type: textarea
     id: what-happened
