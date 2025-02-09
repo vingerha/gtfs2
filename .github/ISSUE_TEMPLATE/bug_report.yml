@@ -13,18 +13,14 @@ body:
     id: checked-docu
     attributes:
       label: Own Analysis
-      description: You have read the documentation which did not provide help [Documentation](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds). 
+      description: You have read the documentation which did not provide help [Documentation](https://github.com/vingerha/gtfs2/wiki/6.-Issues,-challenges-&-workarounds). I have tried to review and/or install a newer (beta) release. I verified that the static data (zip) provides the correct up-to-date data
       options:
         - label: I cannot find my issue in the documentation
           required: true
-  - type: checkboxes
-    id: checked-static-data-version
-    attributes:
-      label: Own Analysis
-      description: Is your static data up-to-date, this may change every month 
-      options:
         - label: My static data (zip) is up to date
-          required: true          
+          required: true
+        - label: The issue is not resolved with the latest (beta) release
+          required: true
   - type: textarea
     id: what-happened
     attributes:
@@ -65,12 +61,12 @@ body:
         - which transport types are missing or incorrect
       render: shell  
   - type: textarea
-    id: release
+    id: version
     attributes:
-      label: Info on your installed version
+      label: Info on your installed versions in X.Y.Z format
       description: |
-        - gtfs2 release 
-        - HA type (HAOS/Container)
+        - gtfs2 version to be found in HACS top left alike 0.5.6b4
+        - HA type (HAOS/Container) and release  alike 2025.1.4
     validations:
       required: true  
   - type: textarea
