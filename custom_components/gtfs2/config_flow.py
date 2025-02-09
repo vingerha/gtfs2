@@ -12,20 +12,23 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
 
 from .const import (
-    DEFAULT_PATH, 
+    ATTR_API_KEY_LOCATIONS,
     DOMAIN, 
+    DEFAULT_PATH, 
     DEFAULT_API_KEY_LOCATION,
     DEFAULT_REFRESH_INTERVAL, 
     DEFAULT_LOCAL_STOP_REFRESH_INTERVAL,
     DEFAULT_LOCAL_STOP_TIMERANGE,
     DEFAULT_LOCAL_STOP_RADIUS,
     DEFAULT_OFFSET,
+    DEFAULT_ACCEPT_HEADER_PB,
+    DEFAULT_API_KEY_NAME,
+    DEFAULT_MAX_LOCAL_STOPS,
+    DEFAULT_STOP_LIST,
     CONF_API_KEY_LOCATION, 
     CONF_API_KEY,
     CONF_API_KEY_NAME,
     CONF_ACCEPT_HEADER_PB,
-    DEFAULT_ACCEPT_HEADER_PB,
-    DEFAULT_API_KEY_NAME,
     CONF_VEHICLE_POSITION_URL, 
     CONF_TRIP_UPDATE_URL,
     CONF_ALERTS_URL,
@@ -48,9 +51,8 @@ from .const import (
     CONF_OFFSET,
     CONF_REAL_TIME,
     CONF_SOURCE_TIMEZONE_CORRECTION,
-    ATTR_API_KEY_LOCATIONS,
-    DEFAULT_MAX_LOCAL_STOPS,
-    CONF_MAX_LOCAL_STOPS
+    CONF_MAX_LOCAL_STOPS,
+    CONF_STOP_LIST
 )    
 
 from .gtfs_helper import (
@@ -62,7 +64,8 @@ from .gtfs_helper import (
     remove_datasource,
     check_datasource_index,
     get_agency_list,
-    get_local_stop_list
+    get_local_stop_list,
+    get_stop_range_list
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -467,6 +470,11 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         errors: dict[str, str] = {}
+        data = self.config_entry.data
+        options = self.config_entry.options
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )
         if user_input is not None:
             if self.config_entry.data.get(CONF_DEVICE_TRACKER_ID, None):
                 _data = user_input
@@ -478,6 +486,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 stop_limit = await _check_stop_list(self, _data)
                 if stop_limit :
                     return self.async_abort(reason=stop_limit) 
+
             if user_input.get(CONF_REAL_TIME,None):
                 self._user_inputs.update(user_input)
                 _LOGGER.debug(f"UserInputs Options Init with realtime: {self._user_inputs}")
@@ -488,19 +497,24 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title="", data=self._user_inputs)
         
         if self.config_entry.data.get(CONF_DEVICE_TRACKER_ID, None):
+            stop_list1 = [ selector.SelectOptionDict(value=r, label=r.split(':')[1]) for r in get_stop_range_list(self.hass, self._pygtfs, data, options) ]
+            _LOGGER.debug("Stop_list 1: %s", stop_list1)
+            stop_list = get_stop_range_list(self.hass, self._pygtfs, data, options)
+            _LOGGER.debug("Stop_list: %s", stop_list)
             opt1_schema = {
                     vol.Optional(CONF_LOCAL_STOP_REFRESH_INTERVAL, default=self.config_entry.options.get(CONF_LOCAL_STOP_REFRESH_INTERVAL, DEFAULT_LOCAL_STOP_REFRESH_INTERVAL)): int,
                     vol.Optional(CONF_RADIUS, default=self.config_entry.options.get(CONF_RADIUS, DEFAULT_LOCAL_STOP_RADIUS)): vol.All(vol.Coerce(int), vol.Range(min=50, max=5000)),
                     vol.Optional(CONF_TIMERANGE, default=self.config_entry.options.get(CONF_TIMERANGE, DEFAULT_LOCAL_STOP_TIMERANGE)): vol.All(vol.Coerce(int), vol.Range(min=15, max=120)),
                     vol.Optional(CONF_OFFSET, default=self.config_entry.options.get(CONF_OFFSET, DEFAULT_OFFSET)): int,
                     vol.Required(CONF_MAX_LOCAL_STOPS, default=self.config_entry.options.get(CONF_MAX_LOCAL_STOPS, DEFAULT_MAX_LOCAL_STOPS)): int,
-                    vol.Optional(CONF_REAL_TIME, default=self.config_entry.options.get(CONF_REAL_TIME)): selector.BooleanSelector()
-                }
+                    vol.Optional(CONF_REAL_TIME, default=self.config_entry.options.get(CONF_REAL_TIME)): selector.BooleanSelector(),
+                    vol.Optional(CONF_STOP_LIST, default = self.config_entry.options.get(CONF_STOP_LIST,DEFAULT_STOP_LIST )): selector.SelectSelector(selector.SelectSelectorConfig(options=stop_list1, translation_key="stop_range_list",custom_value=True, multiple=True, mode=selector.SelectSelectorMode.LIST,)),                 
+                }                    
             return self.async_show_form(
                 step_id="init",
                 data_schema=vol.Schema(opt1_schema),
                 errors = errors
-            )                
+            )              
         
         else:
             opt1_schema = {

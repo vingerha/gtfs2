@@ -26,6 +26,7 @@ from .const import (
     CONF_API_KEY_LOCATION,
     CONF_API_KEY_NAME,
     CONF_ACCEPT_HEADER_PB,
+    CONF_RADIUS,
     DEFAULT_LOCAL_STOP_TIMERANGE, 
     DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY,
     DEFAULT_LOCAL_STOP_RADIUS,
@@ -640,6 +641,37 @@ def get_stop_list(schedule, route_id, direction):
         stops.append(val)
     _LOGGER.debug(f"stops: {stops}")
     return stops 
+    
+def get_stop_range_list(hass, schedule, data, options):
+    _LOGGER.debug("Getting local stop list with data: %s", data)
+    device_tracker = hass.states.get(data['device_tracker_id']) 
+    latitude = device_tracker.attributes.get("latitude", None)
+    longitude = device_tracker.attributes.get("longitude", None) 
+    radius = options.get(CONF_RADIUS, DEFAULT_LOCAL_STOP_RADIUS) / 111111    
+    
+    sql_stops = f"""
+        SELECT stop.stop_id, stop.stop_name
+        FROM stops stop
+            where abs(stop.stop_lat - :latitude) < :radius and abs(stop.stop_lon - :longitude) < :radius
+        """  # noqa: S608
+    result = schedule.engine.connect().execute(
+        text(sql_stops),
+        {
+            "latitude": latitude,
+            "longitude": longitude,
+            "radius": radius
+        },
+    )    
+    stops_range_list = []
+    stops = []
+    for row_cursor in result:
+        row = row_cursor._asdict()
+        stops_range_list.append(list(row_cursor))
+    for x in stops_range_list:
+        val = x[0] + ": " + x[1]
+        stops.append(val)
+    _LOGGER.debug(f"stops in range: {stops}")
+    return stops     
 
 def get_agency_list(schedule, data):
     _LOGGER.debug("Getting agencies with data: %s", data)
@@ -874,7 +906,12 @@ def get_local_stop_list(hass, schedule, data):
         
 
 def get_local_stops_next_departures(self):
-    _LOGGER.debug("Get local stop departure with data: %s", self._data)
+    _LOGGER.debug("Get local stop departure with _data: %s", self._data)
+    _LOGGER.debug("Get local stop departure with options: %s", self.config_entry.options)
+    _LOGGER.debug("Stopslist 1:: %s", self.config_entry.options.get('stop_list', None))
+
+        
+
     if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
         _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
         return {}
@@ -905,8 +942,18 @@ def get_local_stops_next_departures(self):
         tomorrow_name = tomorrow.strftime("%A").lower()
         tomorrow_select = f"calendar.{tomorrow_name} AS tomorrow,"
         tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date(:now_offset) or calendar_date_today.date = date(:now_offset,'+1 day'))"
-        tomorrow_select2 = f"CASE WHEN date(:now_offset) < calendar_date_today.date THEN '1' else '0' END as tomorrow,"    
-    _LOGGER.debug("Query params: Latitude %s - Longitude %s - Timerange %s - Timerange_history %s - Radius %s - Now: %s", latitude, longitude, time_range, time_range_history, radius, now)
+        tomorrow_select2 = f"CASE WHEN date(:now_offset) < calendar_date_today.date THEN '1' else '0' END as tomorrow," 
+    stop_list_where = 'AND 1=1'
+    my_stop_list = self.config_entry.options.get('stop_list',[])
+    _LOGGER.debug("Local stops list: %s", my_stop_list)
+    if my_stop_list and my_stop_list != 'All': 
+        # get the stop_id, in a mysql acceptable list with ()
+        my_stops = ', '.join(["'" + str(i.split(':')[0]) + "'" for i in my_stop_list])
+        my_stops = '(' + my_stops + ')'            
+        stop_list_where = f"AND stop.stop_id in {my_stops}"
+    
+    _LOGGER.debug("Query values, Latitude %s - Longitude %s - Timerange %s - Timerange_history %s - Radius %s - Now: %s", latitude, longitude, time_range, time_range_history, radius, now)
+    _LOGGER.debug("Query where statements,  tomorrow_calendar_date_where: %s - stop_list_where: %s",tomorrow_calendar_date_where,stop_list_where)
     sql_query = f"""
         SELECT * FROM (
         SELECT stop.stop_id, stop.stop_name,stop.stop_lat as latitude, stop.stop_lon as longitude, stop.stop_timezone as stop_timezone, agency.agency_timezone as agency_timezone, trip.trip_id, trip.trip_headsign, trip.direction_id, time(st.departure_time) as departure_time,st.stop_sequence as stop_sequence,
@@ -938,7 +985,8 @@ def get_local_stops_next_departures(self):
         and ((datetime(date(:now_offset) || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange))
         or (datetime(date(:now_offset,'+1 day') || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange)))
         AND calendar.start_date <= date(:now_offset) 
-        AND calendar.end_date >= date(:now_offset) 
+        AND calendar.end_date >= date(:now_offset)
+        {stop_list_where}     
         )
 		UNION ALL
         SELECT * FROM (
@@ -971,7 +1019,9 @@ def get_local_stops_next_departures(self):
         and ((datetime(date(:now_offset) || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange))
         or (datetime(date(:now_offset,'+1 day') || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange)))
         {tomorrow_calendar_date_where}
+        {stop_list_where}
         )
+        
         order by stop_id, tomorrow, departure_time
         """  # noqa: S608
     result = schedule.engine.connect().execute(
