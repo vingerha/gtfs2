@@ -127,14 +127,22 @@ def setup(hass, config):
         """My GTFS RT service."""
         _LOGGER.debug("Updating GTFS Local Stops with: %s", call.data)
         await update_gtfs_local_stops(hass, call.data)
-        return True           
+        return True   
+
+    def update_gtfs_rt_siri_local(call):
+        """My GTFS RT service."""
+        _LOGGER.debug("Updating GTFS RT from SIRI with: %s", call.data)
+        get_gtfs_rt(hass, DEFAULT_PATH_RT, call.data)
+        return True  
 
     hass.services.register(
         DOMAIN, "update_gtfs", update_gtfs)
     hass.services.register(
         DOMAIN, "update_gtfs_rt_local", update_gtfs_rt_local)     
     hass.services.register(
-        DOMAIN, "update_gtfs_local_stops", update_local_stops)        
+        DOMAIN, "update_gtfs_local_stops", update_local_stops) 
+    hass.services.register(
+        DOMAIN, "update_gtfs_rt_siri_local", update_gtfs_rt_siri_local) 
      
     return True
 

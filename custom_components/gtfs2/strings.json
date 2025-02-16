@@ -225,6 +225,32 @@
 		}		
 	  }
 	},
+	"update_gtfs_rt_siri_local": {
+      "name": "Collects GTFS Realtime data",
+      "description": "Can be used for Trip, Vehicle Location or Alerts",
+      "fields": {
+        "name": {
+          "name": "Name of the provider",
+		  "description": "Strongly recommend to use the same as for static data"
+		},
+		"url": {
+          "name": "URL",
+		  "description": "Provide the full path to the realtime data"
+		},
+		"headers": {
+          "name": "headers",
+		  "description": "provide headers if required"
+		},
+		"stop_id": {
+          "name": "stop_id",
+		  "description": "stop id, look at your entity"
+		},
+		"source_format": {
+          "name": "source_format",
+		  "description": "Format of the source"
+		}	
+	  }
+	},	
 	"update_gtfs_local_stops": {
       "name": "Update GTFS local stops",
       "description": "e.g. for moving 'person', to be defined for each person / zone",

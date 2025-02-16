@@ -146,6 +146,50 @@ update_gtfs_rt_local:
       default: false
       selector:
         boolean:         
+
+update_gtfs_rt_siri_local:
+  name: Update GTFS Realtime Data locally from Siri format
+  description: Downloads realtime data locally
+  fields:
+    file:
+      name: Name of the transport service with realtime data
+      description: Preferably use the same name as for static data
+      required: true
+      example: "mytransportservice"
+      selector:
+        text:            
+    url:
+      name: URL
+      description: provide the full path to SIRI ur, with &key if needed
+      required: true
+      default: "na"
+      example: "https://path-to-my-realttime-data&key=abcdefg"
+      selector:
+        text:
+    headers:
+      name: headers
+      description: provide headers, if required
+      required: true
+      default: ""
+      selector:
+        text:           
+    stop_id:
+      name: Stop ID
+      description: provide stop_id, see your local entity
+      required: true
+      selector:
+        text:   
+    source_format:
+      name: Indicate format of realtime data 
+      description: Select type
+      required: true
+      default: "siri"
+      selector:
+        select:
+          translation_key: "source_format"
+          options:
+            - "protobuf"
+            - "siri"
         
 update_gtfs_local_stops: 
   name: Update Local Stops
