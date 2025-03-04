@@ -986,7 +986,6 @@ def get_local_stops_next_departures(self):
         )
         order by stop_id, tomorrow, departure_time
         """  # noqa: S608
-    _LOGGER.debug("sql: %s", sql_query)
     result = schedule.engine.connect().execute(
         text(sql_query),
         {
@@ -1026,14 +1025,22 @@ def get_local_stops_next_departures(self):
             "file": self._data["name"] + "_localstop",
             }
         _LOGGER.debug("self rt_data: %s, self headers: %s, self data: %s", self._rt_data, self._headers, self._data)
-        check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
-        # check if local file created
-        if check != "ok":
-            _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
-            return {}
-        else:
-            # use local file created as new url
-            self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
+        # check if url refers to already created json (via service/action)
+        requests_session = requests.session()
+        response = requests_session.get(self._trip_update_url)
+        try:
+            json_object = json.loads(response.text)    
+            feed = json.loads(response.text)
+        except ValueError as e:   
+            _LOGGER.debug("GTFS RT url is not providing format json")
+            check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
+            # check if local file created
+            if check != "ok":
+                _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
+                return {}
+            else:
+                # use local file created as new url
+                self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
 
     for row_cursor in result:
         row = row_cursor._asdict()
@@ -1048,10 +1055,11 @@ def get_local_stops_next_departures(self):
             timezone_agency = dt_util.get_time_zone(row['stop_timezone'])
         else:
             timezone_agency = timezone_local
+        
         if row['stop_timezone'] is not None:
             timezone_stop = dt_util.get_time_zone(row['stop_timezone'])
         else:
-            timezone_stop = timezone_local
+            timezone_stop = timezone_agency
         _LOGGER.debug("Using Agency timezone: %s", timezone_agency)            
         _LOGGER.debug("Using Stop timezone: %s", timezone_stop) 
                 
@@ -1109,7 +1117,7 @@ def get_local_stops_next_departures(self):
             else: 
                 depart_time_corrected_time = (dt_util.parse_datetime(f"{now_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
             _LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)    
-            if delay_rt != '-' and delay_rt != 0 :
+            if delay_rt != '-' and delay_rt != 0 and delay_rt != '':
                 depart_time_corrected_delay = (dt_util.parse_datetime(f"{now_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
             else:
                 delay_rt = '-'

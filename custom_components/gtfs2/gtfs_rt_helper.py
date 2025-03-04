@@ -55,7 +55,8 @@ from .const import (
     DEFAULT_PATH,
     DEFAULT_PATH_GEOJSON,
 
-    TIME_STR_FORMAT
+    TIME_STR_FORMAT,
+    DATETIME_STR_FORMAT
 )
 
 def due_in_minutes(timestamp):
@@ -81,8 +82,9 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
         return None
 
     if label == "alerts":
-        _LOGGER.debug("Feed : %s", feed)
-        
+        _LOGGER.debug("Feed alerts: %s", feed)
+    if label == "vehicle_positions":
+        _LOGGER.debug("Feed verhicles: %s", feed)    
     try:
         json_object = json.loads(response.text)    
         feed = json.loads(response.text)
@@ -300,6 +302,7 @@ def get_rt_vehicle_positions(self):
         headers=self._headers,
         label="vehicle_positions",
     )
+    _LOGGER.debug("VH Feed entities: %s", feed_entities)
     geojson_body = []
     geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
     for entity in feed_entities:
@@ -308,11 +311,11 @@ def get_rt_vehicle_positions(self):
         if not vehicle["trip"]["trip_id"]:
             # Vehicle is not in service
             continue
-        if vehicle["trip"]["trip_id"] == self._trip_id: 
+        if self._trip_id == vehicle["trip"]["trip_id"] or self._trip_id in vehicle["trip"]["trip_id"]: 
             _LOGGER.debug('Adding position for TripId: %s, RouteId: %s, DirectionId: %s, Lat: %s, Lon: %s, crc_trip_id: %s', vehicle["trip"]["trip_id"],vehicle["trip"]["route_id"],vehicle["trip"]["direction_id"],vehicle["position"]["latitude"],vehicle["position"]["longitude"], binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))  
             
         # add data if in the selected direction
-        if (str(self._route_id) == str(vehicle["trip"]["route_id"]) or str(vehicle["trip"]["trip_id"]) == str(self._trip_id)) and str(self._direction) == str(vehicle["trip"]["direction_id"]):
+        if (str(self._route_id) == str(vehicle["trip"]["route_id"]) or str(self._route_id) in str(vehicle["trip"]["route_id"]) or str(self._trip_id) == str(vehicle["trip"]["trip_id"]) or str(self._trip_id) in str(vehicle["trip"]["trip_id"])  ) and str(self._direction) == str(vehicle["trip"]["direction_id"]):
             _LOGGER.debug("Found vehicle on route with attributes: %s", vehicle)
             _LOGGER.debug("crc : %s", binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))
             geojson_element = {"geometry": {"coordinates":[],"type": "Point"}, "properties": {"id": "", "title": "", "trip_id": "", "route_id": "", "direction_id": "", "vehicle_id": "", "vehicle_label": ""}, "type": "Feature"}
@@ -428,6 +431,7 @@ def get_gtfs_rt(hass, path, data):
     _LOGGER.debug("Getting gtfs rt locally with headers: %s", _headers)
     
     if data.get('entity_for_siri',None):
+        _stop_list=[]
         _LOGGER.debug("Getting siri RT departures with data: %s", data)
         entity_registry = er.async_get(hass)
         entity = er.async_get(hass).async_get(data["entity_for_siri"])
@@ -436,13 +440,30 @@ def get_gtfs_rt(hass, path, data):
         config_entry = hass.config_entries.async_get_entry(entity.config_entry_id)
         cf_data = config_entry.data
         cf_options = config_entry.options
-        _stop_id = cf_data["origin"].split(':')[0]
-        _LOGGER.debug("_stop_id: %s", _stop_id)
         _LOGGER.debug("config entry data: %s, options: %s", cf_data, cf_options)
-        file = data["file"] + "_rt.json"
+        # get stop from config entry (fixed route situation)
+        _stop = cf_data.get("origin",None)
+        if _stop:
+            _stop_id = _stop.split(':')[0]
+            _stop_list.append(_stop_id)
+        _LOGGER.debug("stop_list: %s", _stop_list)
+        # get stops from entities (local stop situation)
+        if not _stop:
+            entries = er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
+            for entry in entries:
+                _stop_list.append(entry.entity_id.split('sensor.')[1].split('_local_stop')[0])
+                _LOGGER.debug("_stop list entities: %s",_stop_list)
+        _LOGGER.debug("stop_list full: %s", _stop_list)
+        
+        
+        file_trips = data["file"] + "_trips_rt.json"
+        file_vehicles = data["file"] + "_vehicles_rt.json"
         #try:
-        r = convert_realtime_siri_trips_to_json(url,_headers,_stop_id)
-        open(os.path.join(gtfs_dir, file), "w").write(json.dumps(r))
+        trips = convert_siri_realtime_trips_to_json(url,_headers,_stop_list)
+        open(os.path.join(gtfs_dir, file_trips), "w").write(json.dumps(trips))
+        if _stop:
+            vehicles = convert_siri_realtime_vehicles_to_json(url,_headers,_stop_id)
+            open(os.path.join(gtfs_dir, file_vehicles), "w").write(json.dumps(vehicles))
         return "ok"
         #except Exception as ex:  # pylint: disable=broad-except
         #    _LOGGER.error("Ìssues with downloading GTFS RT SIRI data to: %s with error: 5s", os.path.join(gtfs_dir, file), ex)
@@ -604,18 +625,73 @@ def convert_gtfs_realtime_alerts_to_json(gtfs_realtime_data):
         _LOGGER.debug("Alert entity JSON: %s", json_data["entity"])
     return json_data      
     
-def convert_realtime_siri_trips_to_json(url,headers,stop_id):
-    
-    #Used for Strasbourg, but they differ on output too
-    ##the Basic token is a base64 conversion of: d6452e5d-4894-4ee1-8d5b-11ce235eeef6	
-    ## ZDY0NTJlNWQtNDg5NC00ZWUxLThkNWItMTFjZTIzNWVlZWY2
-    ## ZDY0NTJlNWQtNDg5NC00ZWUxLThkNWItMTFjZTIzNWVlZWY2Og==    
-    #_encoded = base64.b64encode(b'd6452e5d-4894-4ee1-8d5b-11ce235eeef6:').decode("utf-8") 
-    #_headers = { "Authorization": f"Basic {_encoded}" }
-    #url = "https://api.cts-strasbourg.eu/v1/siri/2.0/stop-monitoring?MonitoringRef=GACEN_20"
+def convert_siri_realtime_trips_to_json(url,headers,stop_list):
 
-    #url = "https://bustime.mta.info/api/siri/stop-monitoring.json?key=f4f9c18e-0550-4cc7-bc36-275715015673&OperatorRef=MTA"
+    json_data = {
+        "header": {
+            "gtfs_realtime_version": "n/a",
+            "timestamp": dt_util.now().strftime(DATETIME_STR_FORMAT),
+            "incrementality": "n/a"
+        },
+        "entity": []
+    }    
     
+    for stop_id in stop_list:
+        url = url + f"&MonitoringRef={stop_id}"
+        response = requests.get(url, headers=headers, timeout=20)
+
+        json_object = json.loads(response.content)
+        feed = json_object
+
+        if feed.get('Siri'):
+            try:
+                feed_entities = feed['Siri']['ServiceDelivery']['StopMonitoringDelivery'][0]['MonitoredStopVisit']
+                feed = feed['Siri']
+            except Exception as ex:  # pylint: disable=broad-except
+                _LOGGER.error("Ìssues getting GTFS RT SIRI data: %s", ex)
+                return 'issues with getting siri data'        
+        else:  
+            try:
+                feed_entities = feed['ServiceDelivery']['StopMonitoringDelivery'][0]['MonitoredStopVisit']
+            except Exception as ex:  # pylint: disable=broad-except
+                _LOGGER.error("Ìssues getting GTFS RT SIRI data: %s", ex)
+                return 'issues with getting siri data'
+            
+        _LOGGER.debug("Feed entities: %s", feed_entities)
+
+        for entity in feed_entities:
+            entity_dict = {
+                "id": entity['MonitoredVehicleJourney']['FramedVehicleJourneyRef']['DatedVehicleJourneyRef'],
+                "trip_update": {
+                    "trip": {
+                        "trip_id": entity['MonitoredVehicleJourney']['FramedVehicleJourneyRef']['DatedVehicleJourneyRef'],
+                        "start_time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp(),
+                        "start_date": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp(),
+                        "route_id": entity['MonitoredVehicleJourney']['LineRef'],
+                        "direction_id": str(entity['MonitoredVehicleJourney']['DirectionRef'])
+                    },
+                    "stop_time_update": [{
+                        "stop_sequence": "n.a",
+                        "stop_id": stop_id,
+                        "arrival": {
+                            "delay": '',
+                            "time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivlTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedArrivalTime',None))).timestamp()
+                        },
+                        "departure": {
+                            "delay": '',
+                            "time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp()
+                        }
+                    }]
+                }
+            }
+            
+            json_data["entity"].append(entity_dict)
+        
+    _LOGGER.debug("json data: %s", json.dumps(json_data))
+    return json_data
+    
+def convert_siri_realtime_vehicles_to_json(url,headers,stop_id):
+       
     url = url + f"&MonitoringRef={stop_id}"
     response = requests.get(url, headers=headers, timeout=20)
 
@@ -651,31 +727,27 @@ def convert_realtime_siri_trips_to_json(url,headers,stop_id):
 
     for entity in feed_entities:
         entity_dict = {
-            "id": entity['MonitoredVehicleJourney']['FramedVehicleJourneyRef']['DatedVehicleJourneyRef'],
-            "trip_update": {
-                "trip": {
-                    "trip_id": entity['MonitoredVehicleJourney']['FramedVehicleJourneyRef']['DatedVehicleJourneyRef'],
-                    "start_time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp(),
-                    "start_date": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp(),
-                    "route_id": entity['MonitoredVehicleJourney']['LineRef'],
-                    "direction_id": str(entity['MonitoredVehicleJourney']['DirectionRef'])
+        "vehicle": {
+            "trip": {
+                "trip_id" : entity['MonitoredVehicleJourney']['FramedVehicleJourneyRef']['DatedVehicleJourneyRef'],
+                "route_id": entity['MonitoredVehicleJourney']['LineRef'],
+                "direction_id": str(entity['MonitoredVehicleJourney']['DirectionRef'])
                 },
-                "stop_time_update": [{
-                    "stop_sequence": "n.a",
-                    "stop_id": stop_id,
-                    "arrival": {
-                        "delay": '',
-                        "time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedArrivlTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedArrivalTime',None))).timestamp()
-                    },
-                    "departure": {
-                        "delay": '',
-                        "time": datetime.fromisoformat(entity['MonitoredVehicleJourney']['MonitoredCall'].get('ExpectedDepartureTime',entity['MonitoredVehicleJourney']['MonitoredCall'].get('AimedDepartureTime',None))).timestamp()
-                    }
-                }]
-            }
+            "vehicle": {
+                "id": entity['MonitoredVehicleJourney']['VehicleRef'],
+                "label": entity['MonitoredVehicleJourney']['PublishedLineName']
+                },
+            "position": {
+                "latitude": entity['MonitoredVehicleJourney']['VehicleLocation']['Latitude'],
+                "longitude": entity['MonitoredVehicleJourney']['VehicleLocation']['Longitude'],
+                "bearing": entity['MonitoredVehicleJourney']['Bearing'],
+                "speed": entity['MonitoredVehicleJourney']['ProgressRate']
+            },
+            "stop_id": stop_id,
+            "timestamp": feed['ServiceDelivery']['ResponseTimestamp']
         }
-        
+        }       
         json_data["entity"].append(entity_dict)
         
     _LOGGER.debug("json data: %s", json.dumps(json_data))
-    return json_data
+    return json_data    
