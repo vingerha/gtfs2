@@ -458,7 +458,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
         self._data: dict[str, str] = {}
         self._user_inputs: dict = {}
 
@@ -530,8 +529,8 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 data_schema=vol.Schema(
                     {
                         vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
-                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY)) : str,
-                        vol.Optional(CONF_API_KEY_NAME, default=self.config_entry.options.get(CONF_API_KEY_NAME,DEFAULT_API_KEY_NAME)) : str,
+                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY, '')) : cv.string,
+                        vol.Optional(CONF_API_KEY_NAME, default=self.config_entry.options.get(CONF_API_KEY_NAME,DEFAULT_API_KEY_NAME)) : cv.string,
                         vol.Required(CONF_API_KEY_LOCATION, default=self.config_entry.options.get(CONF_API_KEY_LOCATION,DEFAULT_API_KEY_LOCATION)) : selector.SelectSelector(selector.SelectSelectorConfig(options=ATTR_API_KEY_LOCATIONS, translation_key="api_key_location")),
                         vol.Optional(CONF_ACCEPT_HEADER_PB, default = self.config_entry.options.get(CONF_ACCEPT_HEADER_PB,False)): selector.BooleanSelector(),
                     },
@@ -545,9 +544,9 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                     {
                         vol.Required(CONF_TRIP_UPDATE_URL, default=self.config_entry.options.get(CONF_TRIP_UPDATE_URL)): str,
                         vol.Optional(CONF_VEHICLE_POSITION_URL, default=self.config_entry.options.get(CONF_VEHICLE_POSITION_URL,"")): str,
-                        vol.Optional(CONF_ALERTS_URL, default=self.config_entry.options.get(CONF_ALERTS_URL,"")): str,
-                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY)) : str,
-                        vol.Optional(CONF_API_KEY_NAME, default=self.config_entry.options.get(CONF_API_KEY_NAME,DEFAULT_API_KEY_NAME)) : str,
+                        vol.Optional(CONF_ALERTS_URL, default=self.config_entry.options.get(CONF_ALERTS_URL,"")): cv.string,
+                        vol.Optional(CONF_API_KEY, default=self.config_entry.options.get(CONF_API_KEY, '')) : cv.string,
+                        vol.Optional(CONF_API_KEY_NAME, default=self.config_entry.options.get(CONF_API_KEY_NAME,DEFAULT_API_KEY_NAME)) : cv.string,
                         vol.Required(CONF_API_KEY_LOCATION, default=self.config_entry.options.get(CONF_API_KEY_LOCATION,DEFAULT_API_KEY_LOCATION)) : selector.SelectSelector(selector.SelectSelectorConfig(options=ATTR_API_KEY_LOCATIONS, translation_key="api_key_location")),
                         vol.Optional(CONF_ACCEPT_HEADER_PB, default = self.config_entry.options.get(CONF_ACCEPT_HEADER_PB,False)): selector.BooleanSelector(),
                     },
