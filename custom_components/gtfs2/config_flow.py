@@ -274,7 +274,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         if user_input is None:
             route_list = [
-                selector.SelectOptionDict(value=r, label=r.split('#')[1])
+                selector.SelectOptionDict(value=r, label=r.split('##')[1])
                 for r in get_route_list(self._pygtfs, self._user_inputs)
                 ]
             return self.async_show_form(
@@ -287,8 +287,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
                 errors=errors,
             )
-        user_input[CONF_ROUTE_TYPE] = user_input.get(CONF_ROUTE).split('#')[0] 
-        user_input[CONF_ROUTE] = user_input.get(CONF_ROUTE).split('#')[1].split(":")[0]   
+        user_input[CONF_ROUTE_TYPE] = user_input.get(CONF_ROUTE).split('##')[0] 
+        user_input[CONF_ROUTE] = user_input.get(CONF_ROUTE).split('##')[1].split(": (")[0]   
                
         self._user_inputs.update(user_input)
         _LOGGER.debug(f"UserInputs Route: {self._user_inputs}")

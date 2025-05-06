@@ -20,6 +20,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.core import HomeAssistant
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
+from homeassistant.helpers import entity_registry as er
 
 from .const import (
     CONF_API_KEY,
@@ -243,8 +244,7 @@ def get_next_departure(hass, _data):
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
             timetable[idx] = {**row, **extras}
-            today_last = idx
-            _LOGGER.debug("idx prefix today: %s", idx_prefix)        
+            today_last = idx      
         if (
             "tomorrow" in row
             and row["tomorrow"] == 1
@@ -258,7 +258,6 @@ def get_next_departure(hass, _data):
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
             timetable[idx] = {**row, **extras}
-            _LOGGER.debug("idx prefix tomorrow: %s", idx_prefix)
     # Flag last departures.
     for idx in filter(None, [yesterday_last, today_last]):
         timetable[idx]["last"] = True
@@ -270,7 +269,7 @@ def get_next_departure(hass, _data):
                 "Departure(s) found for station %s @ %s -> %s", start_station_id, key, item
             )
             break
-    _LOGGER.debug("item: %s", item)
+    _LOGGER.debug("Item(s) from SQL: %s", item)
     
     if item == {}:
         data_returned = {        
@@ -319,8 +318,7 @@ def get_next_departure(hass, _data):
                 item = timetable[key]
                 ix = ix + 1
             _LOGGER.debug("Adding departure: %s", upcoming)
-            timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())
-    _LOGGER.debug("item reset: %s", item)        
+            timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())   
     _LOGGER.debug("Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining)
     if item == {}:
         data_returned = {        
@@ -349,6 +347,15 @@ def get_next_departure(hass, _data):
         "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
         timetable_remaining_headsign,
     )
+
+    # create upcoming trips
+    timetable_upcoming_trips = []
+    for key, value in sorted(timetable.items()):
+        upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
+        if upcoming > now_local_tz:
+            timetable_upcoming_trips.append(
+                str(value["trip_id"])
+            )
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
@@ -435,6 +442,7 @@ def get_next_departure(hass, _data):
         "next_departures": timetable_remaining,
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,
+        "next_departures_trip_id": timetable_upcoming_trips,
     }
     
     return data_returned
@@ -603,7 +611,7 @@ def get_route_list(schedule, data):
         row = row_cursor._asdict()
         routes_list.append(list(row_cursor))
     for x in routes_list:
-        val = str(x[0]) + "#" + str(x[1]) + ": (" + str(x[2]) + " - " + str(x[3]) + ") " + str(x[4])
+        val = str(x[0]) + "##" + str(x[1]) + ": (" + str(x[2]) + " - " + str(x[3]) + ") " + str(x[4])
         routes.append(val)
     _LOGGER.debug(f"routes: {routes}")
     return routes
@@ -631,9 +639,9 @@ def get_stop_list(schedule, route_id, direction):
     for x in stops_list:
         val = x[0] + ": " + x[1] + ' (' + str(x[2]) + ')'
         stops.append(val)
-    _LOGGER.debug(f"stops: {stops}")
+    _LOGGER.debug(f"Route stops: {stops}")
     return stops 
-
+    
 def get_agency_list(schedule, data):
     _LOGGER.debug("Getting agencies with data: %s", data)
     sql_agencies = f"""
@@ -1025,22 +1033,14 @@ def get_local_stops_next_departures(self):
             "file": self._data["name"] + "_localstop",
             }
         _LOGGER.debug("self rt_data: %s, self headers: %s, self data: %s", self._rt_data, self._headers, self._data)
-        # check if url refers to already created json (via service/action)
-        requests_session = requests.session()
-        response = requests_session.get(self._trip_update_url)
-        try:
-            json_object = json.loads(response.text)    
-            feed = json.loads(response.text)
-        except ValueError as e:   
-            _LOGGER.debug("GTFS RT url is not providing format json")
-            check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
-            # check if local file created
-            if check != "ok":
-                _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
-                return {}
-            else:
-                # use local file created as new url
-                self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
+        check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
+        # check if local file created
+        if check != "ok":
+            _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
+            return {}
+        else:
+            # use local file created as new url
+            self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
 
     for row_cursor in result:
         row = row_cursor._asdict()
@@ -1055,11 +1055,10 @@ def get_local_stops_next_departures(self):
             timezone_agency = dt_util.get_time_zone(row['stop_timezone'])
         else:
             timezone_agency = timezone_local
-        
         if row['stop_timezone'] is not None:
             timezone_stop = dt_util.get_time_zone(row['stop_timezone'])
         else:
-            timezone_stop = timezone_agency
+            timezone_stop = timezone_local
         _LOGGER.debug("Using Agency timezone: %s", timezone_agency)            
         _LOGGER.debug("Using Stop timezone: %s", timezone_stop) 
                 
@@ -1117,7 +1116,7 @@ def get_local_stops_next_departures(self):
             else: 
                 depart_time_corrected_time = (dt_util.parse_datetime(f"{now_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
             _LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)    
-            if delay_rt != '-' and delay_rt != 0 and delay_rt != '':
+            if delay_rt != '-' and delay_rt != 0 :
                 depart_time_corrected_delay = (dt_util.parse_datetime(f"{now_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
             else:
                 delay_rt = '-'
@@ -1231,3 +1230,64 @@ async def get_route_departures(hass, data):
     _LOGGER.debug("Departures returned: %s", _departures)   
     
     return _departures
+    
+async def get_trip_stops(hass, data):
+    _LOGGER.debug("Getting stoptimes for trip with: %s", data)
+    state = hass.states.get(data.get("entity_id",""))
+
+    _LOGGER.debug("Entity data: %s, attributes: %s", state.state, state.attributes)
+    entity_registry = er.async_get(hass)
+    entry = entity_registry.async_get(data.get("entity_id",""))
+    config_entry = hass.config_entries.async_get_entry(entry.config_entry_id)
+    cf_data = config_entry.data
+    trip_list = str(state.attributes.get("next_departures_trips", "()")).replace("[","(").replace("]",")")
+    origin_station_id = state.attributes.get("origin_station_stop_id", "")
+    _LOGGER.debug("Trip list: %s", trip_list)
+
+    schedule = get_gtfs(
+            hass, DEFAULT_PATH, cf_data, False
+        ) 
+       
+    sql_stops = f"""
+    SELECT st.trip_id, s.stop_name, time(st.departure_time), s.stop_id
+    from stop_times st 
+    inner join stops s on s.stop_id = st.stop_id
+    where  st.trip_id in {trip_list}
+    order by st.trip_id, st.departure_time
+    """  # noqa: S608
+    result = schedule.engine.connect().execute(
+        text(sql_stops),
+        {"q": "q"},
+    )
+    stops_list = []
+    stops = []
+    for row_cursor in result:
+        row = row_cursor._asdict()
+        stops_list.append(list(row_cursor))
+    for x in stops_list:
+        val = x[0] + ": " + x[1] + ' - ' + str(x[2]) + ' (' + str(x[3]) + ')'
+        stops.append(val)
+    _LOGGER.debug(f"Trip stops: {stops}")
+    stopslist = {}
+    for trip in state.attributes.get("next_departures_trips",[]):
+        _LOGGER.debug("trip: %s", trip)
+        s = []
+        stop_hit = 0
+        for tripstop in stops:
+            _LOGGER.debug("tripstop: %s", tripstop )
+            if origin_station_id in tripstop and trip in tripstop:
+                stop_hit = 1
+                _LOGGER.debug("stophit: %s", tripstop )
+            if trip in tripstop and stop_hit == 1:
+                _LOGGER.debug("append stop: %s", tripstop )
+                s.append(tripstop.split(": ")[1])
+            stopslist[trip] = s
+        stop_hit = 0
+    
+    _tripstops = {
+        "entity": data.get("entity_id","entity-not-found"),
+        "origin_station_id": state.attributes.get("origin_station_stop_id","id-not-found"),
+        "origin_station_name": state.attributes.get("origin_station_stop_name","name-not-found"),
+        "trip_stops": stopslist,
+    }
+    return _tripstops       
