@@ -1131,14 +1131,14 @@ def get_local_stops_next_departures(self):
 
             if depart_time_corrected > now_tz: 
                 _LOGGER.debug("Departure time corrected: %s, after now in tz with offset: %s", depart_time_corrected, now_tz)
-                element = {"departure": self._departure_time, "departure_datetime": self._departure_datetime_utc, "departure_realtime": departure_rt, "departure_realtime_datetime": departure_rt_datetime, "delay_realtime_derived": delay_rt_derived, "delay_realtime": delay_rt, "date": now_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon}
+                element = {"departure": self._departure_time, "departure_datetime": self._departure_datetime_utc, "departure_realtime": departure_rt, "departure_realtime_datetime": departure_rt_datetime, "delay_realtime_derived": delay_rt_derived, "delay_realtime": delay_rt, "date": now_date, "stop_name": row['stop_name'], "stop_id": row['stop_id'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon}
                 if element not in timetable: 
                     timetable.append(element)
                 _LOGGER.debug("Timetable: %s", timetable)
         
         if (row["tomorrow"] == '1' or row["tomorrow"] == 1) and (datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S")):
             _LOGGER.debug("Tomorrow: adding row")
-            element = {"departure": self._departure_time, "departure_datetime": self._departure_datetime_utc, "departure_realtime": "tomorrow", "departure_realtime_datetime": "tomorrow", "delay_realtime_derived": "tomorrow", "delay_realtime": "tomorrow",  "date": tomorrow_date, "stop_name": row['stop_name'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon}
+            element = {"departure": self._departure_time, "departure_datetime": self._departure_datetime_utc, "departure_realtime": "tomorrow", "departure_realtime_datetime": "tomorrow", "delay_realtime_derived": "tomorrow", "delay_realtime": "tomorrow",  "date": tomorrow_date, "stop_name": row['stop_name'], "stop_id": row['stop_id'], "route": row["route_short_name"], "route_long": row["route_long_name"], "headsign": row["trip_headsign"], "trip_id": row["trip_id"], "direction_id": row["direction_id"], "icon": self._icon}
             if element not in timetable: 
                 timetable.append(element)
             _LOGGER.debug("Timetable: %s", timetable)
@@ -1240,9 +1240,20 @@ async def get_trip_stops(hass, data):
     entry = entity_registry.async_get(data.get("entity_id",""))
     config_entry = hass.config_entries.async_get_entry(entry.config_entry_id)
     cf_data = config_entry.data
-    trip_list = str(state.attributes.get("next_departures_trips", "()")).replace("[","(").replace("]",")")
-    origin_station_id = state.attributes.get("origin_station_stop_id", "")
-    _LOGGER.debug("Trip list: %s", trip_list)
+    origin_station_ids=[]
+    trips=[]
+    if 'device_tracker_id' in state.attributes:
+        _LOGGER.debug("Attribs ndl: %s", state.attributes.get("next_departures_lines",{}))
+        for trip in state.attributes.get("next_departures_lines",{}):
+            _LOGGER.debug("Trip: %s", trip)
+            trips.append(trip.get("trip_id",""))
+            origin_station_ids.append(trip.get("stop_id",""))
+    else:
+        trips = state.attributes.get("next_departures_trips", "[]")
+        origin_station_ids.append(state.attributes.get("origin_station_stop_id", ""))
+    
+    trip_list = str(trips).replace("[","(").replace("]",")")
+    _LOGGER.debug("Trip list: %s, origin_station_ids: %s", trip_list, origin_station_ids)
 
     schedule = get_gtfs(
             hass, DEFAULT_PATH, cf_data, False
@@ -1269,20 +1280,17 @@ async def get_trip_stops(hass, data):
         stops.append(val)
     _LOGGER.debug(f"Trip stops: {stops}")
     stopslist = {}
-    for trip in state.attributes.get("next_departures_trips",[]):
-        _LOGGER.debug("trip: %s", trip)
+    for trip in trips:
         s = []
         stop_hit = 0
         for tripstop in stops:
-            _LOGGER.debug("tripstop: %s", tripstop )
-            if origin_station_id in tripstop and trip in tripstop:
-                stop_hit = 1
-                _LOGGER.debug("stophit: %s", tripstop )
-            if trip in tripstop and stop_hit == 1:
-                _LOGGER.debug("append stop: %s", tripstop )
-                s.append(tripstop.split(": ")[1])
-            stopslist[trip] = s
-        stop_hit = 0
+            for origin_station_id in origin_station_ids:
+                if origin_station_id in tripstop and trip in tripstop:
+                    stop_hit = 1
+                if trip in tripstop and stop_hit == 1:
+                    if tripstop.split(": ")[1] not in s:
+                        s.append(tripstop.split(": ")[1])
+                stopslist[trip] = s
     
     _tripstops = {
         "entity": data.get("entity_id","entity-not-found"),
