@@ -288,6 +288,7 @@ CONF_TIMERANGE = "timerange"
 CONF_REFRESH_INTERVAL = "refresh_interval"
 CONF_OFFSET = "offset"
 CONF_REAL_TIME = "real_time"
+CONF_SOURCE_TIMEZONE_CORRECTION = "source_timezone_correction"
 CONF_MAX_LOCAL_STOPS = "max_local_stops"
 
 # gtfs_rt specific
@@ -309,6 +310,5 @@ DEFAULT_DIRECTION = "0"
 DEFAULT_API_KEY_NAME = "api_key"
 
 TIME_STR_FORMAT = "%H:%M"
-DATETIME_STR_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
