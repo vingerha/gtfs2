@@ -124,7 +124,7 @@ def get_next_departure(hass, _data):
                destination_stop_time.stop_sequence AS dest_stop_sequence,
                destination_stop_time.timepoint AS dest_stop_timepoint,
                calendar.{yesterday.strftime("%A").lower()} AS yesterday,
-               ( select calendar.{now.strftime("%A").lower()} - ( select '1' from calendar_dates where service_id=trip.service_id and date = date('now') and exception_type = 2 )) AS today,
+               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select '1' from calendar_dates where service_id=trip.service_id and date = date('now') and exception_type = 2 ) == '1' then '1' else '0' end  ) ) as today,
                {tomorrow_select}
                calendar.start_date AS start_date,
                calendar.end_date AS end_date,
