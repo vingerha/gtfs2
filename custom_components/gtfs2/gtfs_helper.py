@@ -497,9 +497,9 @@ def get_gtfs(hass, path, data, update=False):
    
     if not gtfs.feeds: 
         if data.get("clean_feed_info", False):
-            extract = Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','feed_info.txt']))
+            extract = Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt','feed_info.txt']))
         else: 
-            extract = Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt']))
+            extract = Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt']))
         extract.start()
         extract.join()
         _LOGGER.info("Exiting main after start subprocess for unpacking: %s", file)
