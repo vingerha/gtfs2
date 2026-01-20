@@ -98,7 +98,7 @@ def get_next_departure(hass, _data):
         tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('now') or calendar_date_today.date = date('now','+1 day') )"
         tomorrow_select2 = f"CASE WHEN date('now') < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
     sql_query = f"""
-        SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,
+        SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
         	   start_station.stop_id as origin_stop_id,
                start_station.stop_name as origin_stop_name,
@@ -153,7 +153,7 @@ def get_next_departure(hass, _data):
         AND calendar.start_date <= date('now')
         AND calendar.end_date >= date('now')
 		UNION ALL
-	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,
+	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
                start_station.stop_id as origin_stop_id,
                start_station.stop_name as origin_stop_name,
@@ -427,6 +427,7 @@ def get_next_departure(hass, _data):
         "trip_id": item["trip_id"],
         "route_id": item["route_id"],
         "trip_direction_id": item["direction_id"],
+        "trip_short_name": item["trip_short_name"],
         "day": item["day"],
         "first": item["first"],
         "last": item["last"],

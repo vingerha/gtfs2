@@ -145,6 +145,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._stop_sequence = self._data["next_departure"]["origin_stop_sequence"]
                 self._destination_id = data["destination"].split(": ")[0]
                 self._trip_id = self._data.get('next_departure', {}).get('trip_id', None) 
+                self._trip_short_name = self._data.get('next_departure', {}).get('trip_short_name', None) 
                 self._direction = str(self._data.get('next_departure', {}).get('trip_direction_id', data["direction"]))
                 self._relative = False
                 try:
