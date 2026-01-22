@@ -21,7 +21,7 @@
 
 ## 🌍 Support Environmental Protection
 
-If you would like to show your appreciation and support environmental protection efforts (public transport being one itself), consider donating to one of the following established organizations or any of your own choice:
+If you would like to show your appreciation for the work then please think about supporting environmental protection efforts,, consider donating to one below or any of your own choice:
 
 - 🌱 **Greenpeace**  
   https://www.greenpeace.org/international/donate/
