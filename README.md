@@ -15,10 +15,13 @@
 - Allows to load/update/delete datasources in gtfs2 folder from the GUI
 - translations: English, French, German, Spanish, Portuguese
 
+**[Documentation](https://github.com/vingerha/gtfs2/wiki)**
+
+![image](https://github.com/vingerha/gtfs2/assets/44190435/401d3f5b-c3c3-405f-ab9a-1ecf949d5428)
+
 ## 🌍 Support Environmental Protection
 
-This project does not accept donations directly.  
-If you would like to support environmental protection efforts, consider donating to one of the following established organizations:
+This project does not accept donations directly.  If you would like to support environmental protection efforts (public transport being one itself), consider donating to one of the following established organizations or any of your own choice:
 
 - 🌱 **Greenpeace**  
   https://www.greenpeace.org/international/donate/
@@ -28,12 +31,6 @@ If you would like to support environmental protection efforts, consider donating
 
 - 🌳 **Rainforest Alliance**  
   https://www.rainforest-alliance.org/donate/
-
-**[Documentation](https://github.com/vingerha/gtfs2/wiki)**
-
-![image](https://github.com/vingerha/gtfs2/assets/44190435/401d3f5b-c3c3-405f-ab9a-1ecf949d5428)
-
-
 
 
 
