@@ -19,6 +19,18 @@
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/401d3f5b-c3c3-405f-ab9a-1ecf949d5428)
 
+## 🌍 Support Environmental Protection
+
+If you would like to show your appreciation for the effort put into this project then please think about supporting environmental protection efforts (as does using public transport) consider donating to one below or any of your own choice:
+
+- 🌱 **Greenpeace**  
+  https://www.greenpeace.org/international/donate/
+
+- 🐼 **World Wide Fund for Nature (WWF)**  
+  https://donate.worldwildlife.org/
+
+- 🌳 **Rainforest Alliance**  
+  https://www.rainforest-alliance.org/donate/
 
 
 
