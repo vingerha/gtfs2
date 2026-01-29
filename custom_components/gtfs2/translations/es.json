@@ -106,7 +106,7 @@
 	  "no_stops": "Problema de recogida de datos: probablemente no hay paradas en la ruta seleccionada",
 	  "no_zip_file": "Problema con la recogida de datos: El archivo ZIP no existe en la carpeta correcta, tenga en cuenta que es sensible a las mayúsculas",
 	  "stop_limit_reached": "Se detectó una gran cantidad de paradas para este radio, \nlo que posiblemente afecte el rendimiento del sistema. \nPuedes cambiar el límite bajo tu propia responsabilidad antes de cambiar el radio",
-	  "extracting": "(Todavía) extrayendo datos, esto llevará tiempo [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
+	  "extracting": "(Todavía) extrayendo datos, esto llevará tiempo [(docu)]({docu_extracting})"
     }
   },
   "options": {

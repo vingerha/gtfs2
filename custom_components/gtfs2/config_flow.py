@@ -216,7 +216,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         check_data = await self._check_data(self._user_inputs)
         if check_data :
             errors["base"] = check_data
-            return self.async_abort(reason=check_data)
+            return self.async_abort(
+                reason=check_data,
+                description_placeholders={
+                    "docu_extracting": "https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance"
+                },
+            )
+            
         agencies = get_agency_list(self._pygtfs, self._user_inputs)
         if len(agencies) > 1:
             agencies[:0] = ["0: ALL"]

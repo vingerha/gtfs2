@@ -107,7 +107,7 @@
       "no_data_file": "Problem bei der Datenerfassung: URL falsch oder Dateiname nicht im richtigen Ordner",
       "no_zip_file": "Problem bei der Datenerfassung: ZIP-Datei ist nicht im richtigen Ordner vorhanden. Beachten Sie, dass Groß- und Kleinschreibung berücksichtigt werden muss",
 	  "stop_limit_reached": "Es wurde eine hohe Anzahl von Stopps für diesen Umkreis festgestellt. \n Es besteht die Gefahr einer Beeinträchtigung der Systemleistung. \n Sie können die Limite auf eigenes Risiko ändern, bevor Sie den Umkreis ändern",
-      "extracting": "Es werden (noch) Daten extrahiert, dies wird einige Zeit dauern [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
+      "extracting": "Es werden (noch) Daten extrahiert, dies wird einige Zeit dauern [(docu)]({docu_extracting})"
     }
   },
   "options": {

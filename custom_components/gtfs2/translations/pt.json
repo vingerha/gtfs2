@@ -107,7 +107,7 @@
 	  "no_stops": "Problema de recolha de dados: provavelmente sem paragens para a rota selecionada",
 	  "no_zip_file": "Problema de recolha de dados: Ficheiro ZIP não existe na pasta correta, note que é sensível a maiúsculas",
 	  "stop_limit_reached": "Foi detectado um grande número de paragens neste raio, \nrisco de impacto no desempenho do sistema. \n Pode alterar o limite por sua conta e risco antes de alterar o raio",
-	  "extracting": "(Ainda) a extrair dados, isso vai demorar [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
+	  "extracting": "(Ainda) a extrair dados, isso vai demorar [(docu)]({docu_extracting})"
     }
   },
   "options": {

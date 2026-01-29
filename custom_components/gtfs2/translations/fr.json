@@ -105,7 +105,7 @@
 	  "no_stops": "Problème de collecte de données : probablement pas des stops pour la route sélectionné",
 	  "no_zip_file": "Problème de collecte de données : fichier ZIP ne se trouve pas dans le bon dossier, note: sensible à la casse",
 	  "stop_limit_reached": "Un nombre élevé d'arrêts a été détecté pour ce rayon, \nrisque d'impact sur les performances du système. \n Vous pouvez modifier la limite à votre propre risque avant de modifier le rayon",
-	  "extracting": "Extraction des données en cours, cela prend du temps [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
+	  "extracting": "Extraction des données en cours, cela prend du temps [(docu)]({docu_extracting})"
     }
   },
    "options": {
