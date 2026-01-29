@@ -8,13 +8,13 @@
 		  "source": "Configurar uma nova fonte de dados",
 		  "remove": "Remover uma fonte de dados existente, por exemplo, para liberar espaço"
         },
-        "description": "Selecione a sua escolha [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Selecione a sua escolha [(docu)]({docu_menu_options})"
       },
 	  "start_end": {
         "data": {
           "file": "Selecionar fonte"
         },
-        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)]({docu_select_source})"
       },
 	  "local_stops": {
         "data": {
@@ -22,7 +22,7 @@
 		  "device_tracker_id": "Objeto/Pessoa a usar para lat/lon",
 		  "name": "Nome do sensor"
         },
-        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)](https://github.com/vingerha/gtfs2/wiki/2c.-Acquire-local-stops-&-departures)"
+        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)]({docu_local_stops})"
       },	  
       "source": {
         "data": {
@@ -33,26 +33,26 @@
           "api_key_location": "A localização onde a chave é aplicada",
 		  "extract_from": "Extrair dados de:"
         },
-        "description": "NOTA: com um novo url/zip, isso pode demorar um pouco, \n dependendo do tamanho do ficheiro e do desempenho do sistema [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "NOTA: com um novo url/zip, isso pode demorar um pouco, \n dependendo do tamanho do ficheiro e do desempenho do sistema [(docu)]({docu_extracting})"
       },
       "agency": {
         "data": {
           "agency": "Selecione o prestador de serviços (ou TODOS)"
         },
-		"description": "Selecione uma das opções abaixo [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
       },		  
       "route_type": {
         "data": {
           "route_type": "Tipo de transporte"
         },
-		"description": "Selecione uma das opções abaixo [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
       },	  
       "route": {
         "data": {
           "route": "Nome da rota",
           "direction": "Direção principal/inicial do veículo"
         },
-		"description": "Selecione uma das opções abaixo [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
       },
       "stops": {
         "data": {
@@ -61,7 +61,7 @@
           "name": "Nome da rota",
           "include_tomorrow": "Incluir amanhã"
         },
-		"description": "Selecione uma das opções abaixo [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
       },
       "stops_retry": {
         "data": {
@@ -70,7 +70,7 @@
           "name": "Nome da rota",
           "include_tomorrow": "Incluir amanhã"
         },
-		"description": "Viagem não encontrada, tente novamente com outra paragem(s) [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Viagem não encontrada, tente novamente com outra paragem(s) [(docu)]({docu_new_route})"
       },	  
 	  "stops_train": {
         "data": {
@@ -80,13 +80,13 @@
           "refresh_interval": "Intervalo de atualização em minutos",
           "include_tomorrow": "Incluir amanhã"
         },
-		"description": "Selecione uma das opções abaixo [(docu)](https://github.com/vingerha/gtfs2/wiki/2b.-Setup-route-for-trains)"
+		"description": "Selecione uma das opções abaixo [(docu)]({docu_setup_train})"
       },
 	  "remove": {
         "data": {
           "file": "Selecione a fonte a remover"
         },
-        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Selecione das fontes existentes na sua pasta gtfs2 [(docu)]({docu_menu_options})"
       }	
     },
     "error": {
@@ -113,7 +113,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "Personalize a forma como a integração funciona [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "Personalize a forma como a integração funciona [(docu)]({docu_configuring_options})",
         "data": {
           "refresh_interval": "Intervalo de atualização de dados (em minutos)",
 		  "offset": "Desvio em minutos",
@@ -126,7 +126,7 @@
         }
       },
 	  "real_time": {
-        "description": "Forneça a URL para a API em tempo real [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "Forneça a URL para a API em tempo real [(docu)]({docu_configuring_options})",
         "data": {
           "trip_update_url": "URL para os dados da viagem",
 		  "vehicle_position_url": "URL para a posição do veículo",

@@ -66,6 +66,17 @@ from .gtfs_helper import (
 
 _LOGGER = logging.getLogger(__name__)
 
+TRANSLATION_DESCRIPTION_PLACEHOLDERS = {
+    "docu_extracting": "https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance",
+    "docu_menu_options": "https://github.com/vingerha/gtfs2/wiki/0.-Installation-and-Main-menu",
+    "docu_select_source": "https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source",
+    "docu_local_stops": "https://github.com/vingerha/gtfs2/wiki/2c.-Acquire-local-stops-&-departures",
+    "docu_new_route": "https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route",
+    "docu_setup_train": "https://github.com/vingerha/gtfs2/wiki/2b.-Setup-route-for-trains",
+    "docu_configuring_options": "https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options",
+    "model": "Example model",
+}
+
 @config_entries.HANDLERS.register(DOMAIN)
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for GTFS."""
@@ -85,9 +96,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_menu(
             step_id="user",
             menu_options=["start_end", "local_stops", "source","remove"],
-            description_placeholders={
-                "model": "Example model",
-            }
+            description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
         )
                    
     async def async_step_start_end(self, user_input: dict | None = None) -> FlowResult:
@@ -102,6 +111,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_FILE, default=""): vol.In(datasources),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,                
             )
 
         user_input[CONF_URL] = "na"
@@ -126,6 +136,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_NAME): str, 
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
             ) 
         user_input[CONF_URL] = "na"
         user_input[CONF_EXTRACT_FROM] = "zip"    
@@ -171,6 +182,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )
         check_data = await self._check_data(user_input)
@@ -194,6 +206,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_FILE, default=""): vol.In(datasources),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )
         try:
@@ -218,9 +231,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = check_data
             return self.async_abort(
                 reason=check_data,
-                description_placeholders={
-                    "docu_extracting": "https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance"
-                },
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
             )
             
         agencies = get_agency_list(self._pygtfs, self._user_inputs)
@@ -235,6 +246,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             vol.Required(CONF_AGENCY): vol.In(agencies),
                         },
                     ),
+                    description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                     errors=errors,
                 ) 
         else:
@@ -255,6 +267,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_ROUTE_TYPE): selector.SelectSelector(selector.SelectSelectorConfig(options=["99", "2"], translation_key="route_type")),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )                
         self._user_inputs.update(user_input)
@@ -291,6 +304,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required(CONF_DIRECTION): selector.SelectSelector(selector.SelectSelectorConfig(options=["0", "1"], translation_key="direction")),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )
         user_input[CONF_ROUTE_TYPE] = user_input.get(CONF_ROUTE).split('##')[0] 
@@ -321,6 +335,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             vol.Optional(CONF_INCLUDE_TOMORROW, default = False): selector.BooleanSelector(),
                         },
                     ),
+                    description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                     errors=errors,
                 )
             except:
@@ -363,6 +378,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             vol.Optional(CONF_INCLUDE_TOMORROW, default = False): selector.BooleanSelector(),
                         },
                     ),
+                    description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                     errors=errors,
                 )
             except:
@@ -392,6 +408,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Optional(CONF_INCLUDE_TOMORROW, default = False): selector.BooleanSelector(),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )
         self._user_inputs.update(user_input)
@@ -509,6 +526,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_show_form(
                 step_id="init",
                 data_schema=vol.Schema(opt1_schema),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors = errors
             )                
         
@@ -520,7 +538,8 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                     }
             return self.async_show_form(
                 step_id="init",
-                data_schema=vol.Schema(opt1_schema)
+                data_schema=vol.Schema(opt1_schema),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
             )
         
     async def async_step_real_time(
@@ -545,6 +564,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                         vol.Optional(CONF_ACCEPT_HEADER_PB, default = self.config_entry.options.get(CONF_ACCEPT_HEADER_PB,False)): selector.BooleanSelector(),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )  
         else:
@@ -561,6 +581,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                         vol.Optional(CONF_ACCEPT_HEADER_PB, default = self.config_entry.options.get(CONF_ACCEPT_HEADER_PB,False)): selector.BooleanSelector(),
                     },
                 ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                 errors=errors,
             )      
     

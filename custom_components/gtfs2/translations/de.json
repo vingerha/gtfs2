@@ -8,13 +8,13 @@
           "source": "Eine neue Datenquelle einrichten",
           "remove": "Eine vorhandene Datenquelle entfernen, z. B. um Speicherplatz freizugeben"
         },
-        "description": "Wählen Sie Ihre Option [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Wählen Sie Ihre Option [(docu)]({docu_menu_options})"
       },
       "start_end": {
         "data": {
           "file": "Quelle auswählen"
         },
-        "description": "Aus vorhandenen Quellen in Ihrem GTFS2-Ordner auswählen [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Aus vorhandenen Quellen in Ihrem GTFS2-Ordner auswählen [(docu)]({docu_select_source})"
       },
       "local_stops": {
         "data": {
@@ -22,7 +22,7 @@
           "device_tracker_id": "Objekt/Person zur Verwendung für Lat/Lon",
           "name": "Name des Sensors"
         },
-        "description": "Wählen Sie aus vorhandenen Quellen in Ihrem GTFS2-Ordner [(docu)](https://github.com/vingerha/gtfs2/wiki/2c.-Acquire-local-stops-&-departures)"
+        "description": "Wählen Sie aus vorhandenen Quellen in Ihrem GTFS2-Ordner [(docu)]({docu_local_stops})"
       },
       "source": {
         "data": {
@@ -33,26 +33,26 @@
           "api_key_location": "der Ort, an dem der Schlüssel angewendet wird",
           "extract_from": "Daten extrahieren von:"
         },
-        "description": "HINWEIS: Bei einer neuen URL/ZIP-Datei kann dies je \n nach Dateigröße und Systemleistung einige Zeit in Anspruch nehmen [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "HINWEIS: Bei einer neuen URL/ZIP-Datei kann dies je \n nach Dateigröße und Systemleistung einige Zeit in Anspruch nehmen [(docu)]({docu_extracting})"
       },
       "agency": {
         "data": {
           "agency": "Wählen Sie den Dienstanbieter (oder ALLE)"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_new_route})"
       },
       "route_type": {
         "data": {
           "route_type": "Transportart"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_new_route})"
       },
       "route": {
         "data": {
           "route": "Name der Route",
           "direction": "Haupt-/Anfangsrichtung des Fahrzeugs"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_new_route})"
       },
       "stops": {
         "data": {
@@ -61,7 +61,7 @@
           "name": "Name der Route",
           "include_tomorrow": "Inklusive morgen"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_new_route})"
       },
       "stops_retry": {
         "data": {
@@ -70,7 +70,7 @@
           "name": "Name der Route",
           "include_tomorrow": "Inklusive morgen"
         },
-        "description": "Kein Trip gefunden, bitte Haltestelle(n) ändern [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+        "description": "Kein Trip gefunden, bitte Haltestelle(n) ändern [(docu)]({docu_new_route})"
       },	  
       "stops_train": {
         "data": {
@@ -80,13 +80,13 @@
           "refresh_interval": "Aktualisierungsintervall in Minuten",
           "include_tomorrow": "Inklusive morgen"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)](https://github.com/vingerha/gtfs2/wiki/2b.-Setup-route-for-trains)"
+        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_setup_train})"
       },
       "remove": {
         "data": {
           "file": "Quelle zum Entfernen auswählen"
         },
-        "description": "Wählen Sie aus vorhandenen Quellen in Ihrem GTFS2-Ordner [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Wählen Sie aus vorhandenen Quellen in Ihrem GTFS2-Ordner [(docu)]({docu_menu_options})"
       }
     },
     "error": {
@@ -113,7 +113,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "Passen Sie die Funktionsweise der Integration an [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "Passen Sie die Funktionsweise der Integration an [(docu)]({docu_configuring_options})",
         "data": {
           "refresh_interval": "Datenaktualisierungsintervall (in Minuten)",
           "offset": "Offset in Minuten",
@@ -125,7 +125,7 @@
         }
       },
       "real_time": {
-        "description": "URL zur Echtzeit-API bereitstellen [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "URL zur Echtzeit-API bereitstellen [(docu)]({docu_configuring_options})",
         "data": {
           "trip_update_url": "URL zu Reisedaten",
           "vehicle_position_url": "URL zur Fahrzeugposition",
