@@ -8,13 +8,13 @@
 		  "source": "Setup a new data source",
 		  "remove": "Remove an existing data source, e.g. to free up space"
         },
-        "description": "Select your choice [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Select your choice [(docu)]({docu_menu_options})"
       },
 	  "start_end": {
         "data": {
           "file": "Select source"
         },
-        "description": "Select from existing sources in your gtfs2 folder [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Select from existing sources in your gtfs2 folder [(docu)]({docu_select_source})"
       },
 	  "local_stops": {
         "data": {
@@ -22,7 +22,7 @@
 		  "device_tracker_id": "Object/Person to use for lat/lon",
 		  "name": "Name of the sensor"
         },
-        "description": "Select from existing sources in your gtfs2 folder [(docu)](https://github.com/vingerha/gtfs2/wiki/2c.-Acquire-local-stops-&-departures)"
+        "description": "Select from existing sources in your gtfs2 folder [(docu)]({docu_local_stops})"
       },	  
       "source": {
         "data": {
@@ -33,26 +33,26 @@
           "api_key_location": "the location where the key is applied",
 		  "extract_from": "Extract data from:"
         },
-        "description": "NOTE: with a new url/zip, this may take quite a bit of time, \n depending on file-size and system performance [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "NOTE: with a new url/zip, this may take quite a bit of time, \n depending on file-size and system performance [(docu)]({docu_extracting})"
       },
       "agency": {
         "data": {
           "agency": "Select the service provider (or ALL)"
         },
-		"description": "Select from the options below [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Select from the options below [(docu)]({docu_new_route})"
       },		  
       "route_type": {
         "data": {
           "route_type": "Type of transport"
         },
-		"description": "Select from the options below [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Select from the options below [(docu)]({docu_new_route})"
       },	  
       "route": {
         "data": {
           "route": "Name of the route",
           "direction": "Principal/initial direction of the vehicle"
         },
-		"description": "Select from the options below [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Select from the options below [(docu)]({docu_new_route})"
       },
       "stops": {
         "data": {
@@ -61,7 +61,7 @@
           "name": "Name of the route",
           "include_tomorrow": "Include tomorrow"
         },
-		"description": "Select from the options below [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "Select from the options below [(docu)]({docu_new_route})"
       },
       "stops_retry": {
         "data": {
@@ -70,7 +70,7 @@
           "name": "Name of the route",
           "include_tomorrow": "Include tomorrow"
         },
-		"description": "No trip found between selected stops, try again [(docu)](https://github.com/vingerha/gtfs2/wiki/2.-Setup-a-new-route)"
+		"description": "No trip found between selected stops, try again [(docu)]({docu_new_route})"
       },	  
 	  "stops_train": {
         "data": {
@@ -80,13 +80,13 @@
           "refresh_interval": "Refresh interval in minutes",
           "include_tomorrow": "Include tomorrow"
         },
-		"description": "Select from the options below [(docu)](https://github.com/vingerha/gtfs2/wiki/2b.-Setup-route-for-trains)"
+		"description": "Select from the options below [(docu)]({docu_setup_train})"
       },
 	  "remove": {
         "data": {
           "file": "Select source to remove"
         },
-        "description": "Select from existing sources in your gtfs2 folder [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source)"
+        "description": "Select from existing sources in your gtfs2 folder [(docu)]({docu_menu_options})"
       }	
     },
     "error": {
@@ -96,7 +96,6 @@
       "stop_incorrect": "Start and/or End destination incorrect, possibly no transport 'today' or not in same direction, check logs",
       "generic_failure": "Overall failure, check logs",
       "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder",
-	  "stop_limit_reached": "More than 15 stops found for this radius. \n Risking an impact on system performance. \n Please select a smaller radius",
 	  "no_zip_file": "Data collection issue: ZIP file not in the correct folder"
     },
     "abort": {
@@ -106,17 +105,19 @@
 	  "no_data_file": "Data collection issue: URL incorrect or filename not in the correct folder",
 	  "no_stops": "Data collection issue: probably no stops for the selected route",
 	  "no_zip_file": "Data collection issue: ZIP file not existing in the correct folder, note that it is capital-sensitive",
-	  "stop_limit_reached": "More than 15 stops found for this radius. \n Risking an impact on system performance. \n Please select a smaller radius",
-	  "extracting": "(Still) extracting data, this will take time [(docu)](https://github.com/vingerha/gtfs2/wiki/1.-Initial-setup:-the-static-data-source#performance)"
+	  "stop_limit_reached": "Detected a high number of stops for this radius, \npossibly impacting system performance. \n You can change the limit at your own risk before changing the radius.",
+	  "extracting": "(Still) extracting data, this will take time [(docu)]({docu_extracting})"
     }
   },
   "options": {
     "step": {
       "init": {
-        "description": "Customize the way the integration works [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "Customize the way the integration works [(docu)]({docu_configuring_options})",
         "data": {
           "refresh_interval": "Data refresh interval (in minutes)",
 		  "offset": "Offset in minutes",
+		  "max_local_stops": "Limit #stops to avoid possible performance impact. \nIncrease at your own risk",
+		  "source_timezone_correction": "Correct source gtfs timezone (in hours)",
 		  "real_time": "Setup Realtime integration? \n (needs data from the same source)",
 		  "local_stop_refresh_interval": "Data refresh interval (in minutes)",
           "timerange": "Checking for departures in future from 'now' (in minutes: between 15 and 120)",
@@ -125,7 +126,7 @@
         }
       },
 	  "real_time": {
-        "description": "Provide url to real time API [(docu)](https://github.com/vingerha/gtfs2/wiki/3.-Configuring-options)",
+        "description": "Provide url to real time API [(docu)]({docu_configuring_options})",
         "data": {
           "trip_update_url": "URL to trip data",
 		  "vehicle_position_url": "URL to vehicle position",
@@ -138,7 +139,7 @@
       }
     },
 	"abort": {
-	  "stop_limit_reached": "More than 15 stops found for this radius. \n Risking an impact on system performance. \n Please select a smaller radius"
+	  "stop_limit_reached": "Detected a high number of stops for this radius, \npossibly impacting system performance. \n You can change the limit at your own risk before changing the radius"
     }
   },
   "selector": {
@@ -219,6 +220,14 @@
           "name": "Accept",
 		  "description": "Add application/protobuf to the header"
 		},
+		"rt_type": {
+          "name": "Indicate type of realtime data",
+		  "description": "Select type of realtime data from source"
+		},			
+		"entity_for_siri": {
+          "name": "SIRI RT Route",
+		  "description": "Experimental: SIRI format realtime only (!) select your configuration. see documentation > service"
+		},
 		"debug_output": {
           "name": "debug_output",
 		  "description": "Save to local file in readable format"
@@ -232,6 +241,20 @@
         "entity_id": {
           "name": "Entity that is connected to local stops",
 		  "description": "The entity for which you setup local stops"
+		}
+	  }
+	},
+	"extract_departures": {
+      "name": "Extract departures",
+      "description": "Extracts all next departures from your entity up-until tomorrow day end",
+      "fields": {
+        "config_entry": {
+          "name": "Route from which to extract",
+		  "description": "Select your start/stop configuration"
+		},
+		"from_time": {
+          "name": "The time after which departures are collected",
+		  "description": "The time after which you would like to receive the slots. \n If left empty then all future slots will be extracted for today/tomorrow. \n In yaml this has to be 24H format"
 		}
 	  }
 	}
