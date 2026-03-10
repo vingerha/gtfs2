@@ -60,6 +60,11 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         previous_data = None if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
 
+        if self._pygtfs and hasattr(self._pygtfs, 'engine'):
+            try:
+                self._pygtfs.engine.dispose()
+            except Exception:
+                pass
         self._pygtfs = get_gtfs(
             self.hass, DEFAULT_PATH, data, False
         )        
@@ -210,6 +215,11 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                     self._headers[CONF_API_KEY] = options.get(CONF_API_KEY, None)
                     self._headers[CONF_ACCEPT_HEADER_PB] = options.get(CONF_ACCEPT_HEADER_PB, False)
                 _LOGGER.debug("RT header: %s", self._headers)
+        if self._pygtfs and hasattr(self._pygtfs, 'engine'):
+            try:
+                self._pygtfs.engine.dispose()
+            except Exception:
+                pass
         self._pygtfs = get_gtfs(
             self.hass, DEFAULT_PATH, data, False
         )        
