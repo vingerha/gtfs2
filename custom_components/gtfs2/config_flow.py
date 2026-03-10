@@ -433,7 +433,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self._pygtfs in ['no_data_file', 'no_zip_file', 'extracting'] :
             return self._pygtfs
         check_index = await self.hass.async_add_executor_job(
-                    check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
+                    check_datasource_index, self._pygtfs, self.hass.config.path(DEFAULT_PATH), data["file"]
                 )            
         return None
         
@@ -457,7 +457,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         }
         # check and/or add indexes
         check_index = await self.hass.async_add_executor_job(
-                    check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
+                    check_datasource_index, self._pygtfs, self.hass.config.path(DEFAULT_PATH), data["file"]
                 )
         try:
             self._data["next_departure"] = await self.hass.async_add_executor_job(

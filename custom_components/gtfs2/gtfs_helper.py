@@ -10,7 +10,6 @@ import json
 import requests
 import pygtfs
 from sqlalchemy.sql import text
-import multiprocessing
 from multiprocessing import Process
 from . import zip_file as zipfile
 from pathlib import Path
@@ -44,7 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_next_departure(hass, _data):
     _LOGGER.debug("Get next departure with data: %s", _data)
-    if check_extracting(hass, _data['gtfs_dir'],_data['file']):
+    if check_extracting(hass.config.path(_data['gtfs_dir']), _data['file']):
         _LOGGER.debug("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
         return {}
 
@@ -467,7 +466,7 @@ def get_gtfs(hass, path, data, update=False):
     sqlite = data["file"] + ".sqlite"
     check_source_dates = data.get("check_source_dates", False)
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
-    if check_extracting(hass, gtfs_dir,filename) and not update :
+    if check_extracting(gtfs_dir, filename) and not update :
         _LOGGER.debug("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
     if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
@@ -501,25 +500,24 @@ def get_gtfs(hass, path, data, update=False):
    
     if not gtfs.feeds: 
         if data.get("clean_feed_info", False):
-            _fork_ctx = multiprocessing.get_context("fork")
-            extract = _fork_ctx.Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt','feed_info.txt']))
+            extract = Process(target=extract_from_zip, args=(joined_path, gtfs_dir, file, ['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt','feed_info.txt']))
         else: 
-            _fork_ctx = multiprocessing.get_context("fork")
-            extract = _fork_ctx.Process(target=extract_from_zip, args = (hass, gtfs,gtfs_dir,file,['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt']))
+            extract = Process(target=extract_from_zip, args=(joined_path, gtfs_dir, file, ['shapes.txt','transfers.txt','fare_attributes.txt','levels.txt','pathways.txt','translations.txt']))
         extract.start()
         extract.join()
         _LOGGER.info("Exiting main after start subprocess for unpacking: %s", file)
         return "extracting"
     return gtfs
 
-def extract_from_zip(hass, gtfs, gtfs_dir, file, remove_file):
+def extract_from_zip(joined_path, gtfs_dir, file, remove_file):
     _LOGGER.debug("Extracting gtfs file: %s", file)
     # first remove shapes from zip to avoid possibly very large db 
-    clean = remove_from_zip(remove_file,gtfs_dir, file[:-4])
+    clean = remove_from_zip(remove_file, gtfs_dir, file[:-4])
     if os.fork() != 0:
         return
+    gtfs = pygtfs.Schedule(joined_path)
     pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
-    check_datasource_index(hass, gtfs, gtfs_dir, file[:-4])
+    check_datasource_index(gtfs, gtfs_dir, file[:-4])
     
 def check_calendar_dates_from_zip(gtfs_dir,file):
     _LOGGER.debug("Checking if file contains only future data: %s ", file)
@@ -697,9 +695,8 @@ def remove_datasource(hass, path, filename, include_sqlite):
         os.remove(os.path.join(gtfs_dir, filename + ".zip"))        
     return "removed"
     
-def check_extracting(hass, gtfs_dir,file):
+def check_extracting(gtfs_dir, file):
     _LOGGER.debug(f"Checking if extracting: %s", file)
-    gtfs_dir = hass.config.path(gtfs_dir)
     filename = file
     journal = os.path.join(gtfs_dir, filename + ".sqlite-journal")
     tempzip = os.path.join(gtfs_dir, filename + "_temp.zip")
@@ -709,9 +706,9 @@ def check_extracting(hass, gtfs_dir,file):
     return False    
 
 
-def check_datasource_index(hass, schedule, gtfs_dir, file):
+def check_datasource_index(schedule, gtfs_dir, file):
     _LOGGER.debug("Check datasource index for file: %s", file)
-    if check_extracting(hass, gtfs_dir,file):
+    if check_extracting(gtfs_dir, file):
         _LOGGER.warning("Cannot check indexes on this datasource as still unpacking: %s", file)
         return
     sql_index_1 = f"""
@@ -907,7 +904,7 @@ def get_local_stop_list(hass, schedule, data):
 
 def get_local_stops_next_departures(self):
     _LOGGER.debug("Get local stop departure with data: %s", self._data)
-    if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
+    if check_extracting(self.hass.config.path(self._data['gtfs_dir']), self._data['file']):
         _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
         return {}
     """Get next departures from data."""
