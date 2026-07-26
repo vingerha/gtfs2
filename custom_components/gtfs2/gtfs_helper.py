@@ -42,6 +42,36 @@ from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt
 _LOGGER = logging.getLogger(__name__)
 
 
+def _service_departure_date(calendar_date, origin_depart_date):
+    """Return the date a departure actually falls on, as a YYYY-MM-DD string.
+
+    calendar_date is the service date taken from calendar_dates.txt, so it is
+    known rather than inferred. departure_time carries no date component, so
+    date() of it returns 1970-01-01, or 1970-01-02 for GTFS times at or past
+    24:00:00 which pygtfs normalises onto the following day. The distance from
+    the epoch is therefore the number of days to add to the service date, which
+    is what puts a trip scheduled as 24:06 on the day after its service date.
+
+    Returns None if either value cannot be parsed, so callers can fall back.
+    """
+    try:
+        service_date = datetime.datetime.strptime(str(calendar_date), "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
+    try:
+        day_offset = (
+            datetime.datetime.strptime(str(origin_depart_date), "%Y-%m-%d")
+            - datetime.datetime(1970, 1, 1)
+        ).days
+    except (TypeError, ValueError):
+        day_offset = 0
+    if day_offset < 0:
+        day_offset = 0
+    return (service_date + datetime.timedelta(days=day_offset)).strftime(
+        dt_util.DATE_STR_FORMAT
+    )
+
+
 def get_next_departure(hass, _data):
     _LOGGER.debug("Get next departure with data: %s", _data)
     if check_extracting(hass, _data['gtfs_dir'],_data['file']):
@@ -229,6 +259,38 @@ def get_next_departure(hass, _data):
         
     for row_cursor in rows:
         row = row_cursor._asdict()
+        # Rows from the calendar_dates part of the query know their own service
+        # date, so place them directly instead of inferring the day from
+        # origin_depart_date. That value is date() of a time-only departure_time
+        # and is always the epoch, so it cannot tell one service day from another:
+        # without this, tomorrow's trips are filed under today, and because the
+        # query orders by calendar_date they overwrite today's at the same time.
+        departure_date = None
+        if row["calendar_date"]:
+            departure_date = _service_departure_date(
+                row["calendar_date"], row["origin_depart_date"]
+            )
+        if departure_date is not None:
+            is_today = departure_date == now_date_local_tz
+            # first and last keep the sentinels the day specific blocks below use:
+            # sensor.py drops the attribute when the value is None, so last stays
+            # None for anything that is not today, matching the tomorrow block.
+            extras = {
+                "day": "today" if is_today else "tomorrow",
+                "first": False,
+                "last": False if is_today else None,
+            }
+            idx = f"{departure_date} {row['origin_depart_time']}"
+            timetable[idx] = {**row, **extras}
+            if is_today:
+                if today_start is None:
+                    today_start = departure_date
+                    timetable[idx]["first"] = True
+                today_last = idx
+            elif tomorrow_start is None:
+                tomorrow_start = departure_date
+                timetable[idx]["first"] = True
+            continue
         if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
             extras = {"day": "yesterday", "first": None, "last": False}
             if yesterday_start is None:
@@ -370,11 +432,25 @@ def get_next_departure(hass, _data):
     origin_arrival = now
     dest_arrival = now
     origin_depart_time = f"{now_date_local_tz} {item['origin_depart_time']}"
-    if _tomorrow and now_time > item['origin_depart_time']:
+    # When the item came from calendar_dates its date is known, so use it rather
+    # than deciding on tomorrow from whether the clock time has already passed.
+    # That test reports today for anything still due later in the day, even when
+    # the trip belongs to another service date.
+    item_departure_date = None
+    if item.get("calendar_date"):
+        item_departure_date = _service_departure_date(
+            item["calendar_date"], item.get("origin_depart_date")
+        )
+    if item_departure_date is not None:
+        origin_arrival = dest_arrival = datetime.datetime.strptime(
+            item_departure_date, dt_util.DATE_STR_FORMAT
+        )
+        origin_depart_time = f"{item_departure_date} {item['origin_depart_time']}"
+    elif _tomorrow and now_time > item['origin_depart_time']:
         origin_arrival = tomorrow
         dest_arrival = tomorrow
         origin_depart_time = f"{tomorrow_date} {item['origin_depart_time']}"
-    
+
     if item["origin_arrival_time"] > item["origin_depart_time"]:
         origin_arrival -= datetime.timedelta(days=1)
     origin_arrival_time = (
