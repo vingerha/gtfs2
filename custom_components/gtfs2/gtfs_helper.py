@@ -27,7 +27,8 @@ from .const import (
     CONF_API_KEY_LOCATION,
     CONF_API_KEY_NAME,
     CONF_ACCEPT_HEADER_PB,
-    DEFAULT_LOCAL_STOP_TIMERANGE, 
+    DEFAULT_DOWNLOAD_TIMEOUT,
+    DEFAULT_LOCAL_STOP_TIMERANGE,
     DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY,
     DEFAULT_LOCAL_STOP_RADIUS,
     DEFAULT_PATH_RT,
@@ -473,23 +474,53 @@ def get_gtfs(hass, path, data, update=False):
     if check_extracting(hass, gtfs_dir,filename) and not update :
         _LOGGER.debug("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
-    if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
-        remove_datasource(hass, path, filename, True)
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
-        os.remove(os.path.join(gtfs_dir, sqlite))      
+        os.remove(os.path.join(gtfs_dir, sqlite))
     if data["extract_from"] == "zip":
         if not os.path.exists(os.path.join(gtfs_dir, file)):
             _LOGGER.error("The given GTFS zipfile was not found")
             return "no_zip_file"
     if data["extract_from"] == "url":
-        if not os.path.exists(os.path.join(gtfs_dir, file)):
+        target = os.path.join(gtfs_dir, file)
+        # Fetch when there is nothing yet, or when a service call asks for a
+        # refresh. Download to a staging file and only replace the datasource once
+        # the new archive has arrived complete and is really a zip. Removing the
+        # old zip and sqlite up front, as this used to, means a failed, truncated
+        # or non-zip response leaves the datasource with nothing at all until the
+        # next successful run.
+        if update or not os.path.exists(target):
+            staged = os.path.join(gtfs_dir, filename + "_download.zip")
             try:
-                r = requests.get(url,headers=_headers, allow_redirects=True)
-                open(os.path.join(gtfs_dir, file), "wb").write(r.content)
+                with requests.get(
+                    url,
+                    headers=_headers,
+                    allow_redirects=True,
+                    timeout=DEFAULT_DOWNLOAD_TIMEOUT,
+                    stream=True,
+                ) as r:
+                    r.raise_for_status()
+                    with open(staged, "wb") as staged_file:
+                        for chunk in r.iter_content(chunk_size=65536):
+                            staged_file.write(chunk)
             except Exception as ex:  # pylint: disable=broad-except
-                _LOGGER.error("The given URL or GTFS data file/folder was not found")
-                return "no_data_file"                
-    
+                _LOGGER.error(
+                    "Could not download GTFS data from: %s, keeping the current data, error: %s",
+                    url,
+                    ex,
+                )
+                if os.path.exists(staged):
+                    os.remove(staged)
+                return "no_data_file"
+            if not zipfile.is_zipfile(staged):
+                _LOGGER.error(
+                    "Data downloaded from: %s is not a zip archive, keeping the current data",
+                    url,
+                )
+                os.remove(staged)
+                return "no_data_file"
+            remove_datasource(hass, path, filename, True)
+            os.replace(staged, target)
+
     # if update (servicecall) then check if new file does not only have future dates
     if check_source_dates:
         if update and not check_calendar_dates_from_zip(gtfs_dir, file):

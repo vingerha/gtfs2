@@ -13,6 +13,10 @@ DEFAULT_LOCAL_STOP_RADIUS = 200
 DEFAULT_MAX_LOCAL_STOPS = 15
 
 DEFAULT_NAME = "GTFS Sensor2"
+# (connect, read) timeout for fetching a static datasource. The read timeout
+# applies between chunks rather than to the whole transfer, so a slow but
+# progressing download is not cut off.
+DEFAULT_DOWNLOAD_TIMEOUT = (10, 60)
 DEFAULT_PATH = "gtfs2"
 DEFAULT_PATH_GEOJSON = "www/gtfs2"
 DEFAULT_PATH_RT = "www/gtfs2"
