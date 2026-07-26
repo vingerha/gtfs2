@@ -87,16 +87,16 @@ def get_next_departure(hass, _data):
     # days.
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
-    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('now'))"
+    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date(:now_offset))"
     if include_tomorrow:
         _LOGGER.debug("Includes Tomorrow")
         limit = int(limit / 2 * 3)
         tomorrow_name = tomorrow.strftime("%A").lower()
-        tomorrow_select = f"( select calendar.{tomorrow_name} - ( select case when (select '1' from calendar_dates where service_id=trip.service_id and date = {tomorrow_date} and exception_type = 2 ) == '1' then '1' else '0' end) ) as tomorrow,"
+        tomorrow_select = f"( select calendar.{tomorrow_name} - ( select case when (select '1' from calendar_dates where service_id=trip.service_id and date = date(:now_offset,'+1 day') and exception_type = 2 ) == '1' then '1' else '0' end) ) as tomorrow,"
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
-        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('now') or calendar_date_today.date = date('now','+1 day') )"
-        tomorrow_select2 = f"CASE WHEN date('now') < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
+        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date(:now_offset) or calendar_date_today.date = date(:now_offset,'+1 day') )"
+        tomorrow_select2 = f"CASE WHEN date(:now_offset) < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
@@ -125,7 +125,7 @@ def get_next_departure(hass, _data):
                destination_stop_time.stop_sequence AS dest_stop_sequence,
                destination_stop_time.timepoint AS dest_stop_timepoint,
                calendar.{yesterday.strftime("%A").lower()} AS yesterday,
-               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select '1' from calendar_dates where service_id=trip.service_id and date = date('now') and exception_type = 2 ) == '1' then '1' else '0' end  ) ) as today,
+               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select '1' from calendar_dates where service_id=trip.service_id and date = date(:now_offset) and exception_type = 2 ) == '1' then '1' else '0' end  ) ) as today,
                {tomorrow_select}
                calendar.start_date AS start_date,
                calendar.end_date AS end_date,
@@ -150,8 +150,8 @@ def get_next_departure(hass, _data):
         {start_station_where}
         {end_station_where}
         AND origin_stop_sequence < dest_stop_sequence
-        AND calendar.start_date <= date('now')
-        AND calendar.end_date >= date('now')
+        AND calendar.start_date <= date(:now_offset)
+        AND calendar.end_date >= date(:now_offset)
 		UNION ALL
 	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
@@ -182,8 +182,8 @@ def get_next_departure(hass, _data):
                '0' AS yesterday,
                '0' AS today,
                {tomorrow_select2}
-               date('now') AS start_date,
-               date('now') AS end_date,
+               date(:now_offset) AS start_date,
+               date(:now_offset) AS end_date,
                calendar_date_today.date as calendar_date,
                calendar_date_today.exception_type as today_cd
         FROM trips trip
@@ -223,6 +223,10 @@ def get_next_departure(hass, _data):
                 "end_station_id": end_station_id,
                 "limit": limit,
                 "route_type": route_type,
+                # Bound as a date string rather than a datetime: every use is
+                # wrapped in date(), and passing a datetime through to sqlite3
+                # relies on its default adapter, deprecated since Python 3.12.
+                "now_offset": now_date,
             },
         )
         rows = result.fetchall()
