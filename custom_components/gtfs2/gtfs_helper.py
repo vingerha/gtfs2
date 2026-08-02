@@ -96,7 +96,7 @@ def get_next_departure(hass, _data):
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
         tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}') or calendar_date_today.date = date('{now_date}','+1 day') )"
-        tomorrow_select2 = f"CASE WHEN date('{now_date}') < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
+        tomorrow_select2 = f"CASE WHEN date('{now_date}') < calendar_date_today.date or date(origin_stop_time.departure_time) = '1970-01-02' THEN 1 else 0 END as tomorrow,"
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
@@ -251,14 +251,19 @@ def get_next_departure(hass, _data):
         row = row_cursor._asdict()
         _LOGGER.debug("Row in cursor: %s", row)
         if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
+            _LOGGER.debug("Row in cursor added to yesterday")
             extras = {"day": "yesterday", "first": None, "last": False}
             if yesterday_start is None:
                 yesterday_start = row["origin_depart_date"]
             if yesterday_start != row["origin_depart_date"]:
                 idx = f"{now_date_local_tz} {row['origin_depart_time']}"
-                timetable[idx] = {**row, **extras}
-                yesterday_last = idx
+                if idx in timetable:
+                    _LOGGER.warning("Duplicate timetable key: %s", idx)
+                else:
+                    timetable[idx] = {**row, **extras}
+                    yesterday_last = idx
         if (row["today"] == 1 or row["today_cd"] == 1) and ("tomorrow" not in row or row["tomorrow"] == 0):
+            _LOGGER.debug("Row in cursor added to today")
             extras = {"day": "today", "first": False, "last": False}
             if today_start is None:
                 today_start = row["origin_depart_date"]
@@ -268,13 +273,17 @@ def get_next_departure(hass, _data):
             else:
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
-            timetable[idx] = {**row, **extras}
-            today_last = idx      
+            if idx in timetable:
+                _LOGGER.warning("Duplicate timetable key: %s", idx)
+            else:
+                timetable[idx] = {**row, **extras}
+                today_last = idx      
         if (
             "tomorrow" in row
             and row["tomorrow"] == 1
-            and ( tomorrow_date <= row["end_date"] or tomorrow_date == row["calendar_date"])
+            and ( tomorrow_date <= row["end_date"] or tomorrow_date == row["calendar_date"] or row["origin_depart_date"]=="1970-01-02")
         ):
+            _LOGGER.debug("Row in cursor added to tomorrow")
             extras = {"day": "tomorrow", "first": False, "last": None}
             if tomorrow_start is None:
                 tomorrow_start = row["origin_depart_date"]
@@ -282,7 +291,10 @@ def get_next_departure(hass, _data):
             if tomorrow_start == row["origin_depart_date"]:
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
-            timetable[idx] = {**row, **extras}
+            if idx in timetable:
+                _LOGGER.warning("Duplicate timetable key: %s", idx)
+            else:
+                timetable[idx] = {**row, **extras}
     # Flag last departures.
     for idx in filter(None, [yesterday_last, today_last]):
         timetable[idx]["last"] = True
@@ -352,27 +364,22 @@ def get_next_departure(hass, _data):
         _LOGGER.info("No items found in gtfs")
         return {}
     
-    # create upcoming timetable with line info and headsign
+    # create upcoming timetable with line info, headsign and trips
     timetable_remaining_line = []
     timetable_remaining_headsign = []
-                                 
-    for key, value in sorted(timetable.items()):
+    timetable_upcoming_trips = []
+    #for key, value in sorted(timetable.items()):
+    for key, value in timetable.items():
         upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-                                                                                                                                                                              
+        _LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
-                                                                                                     
+            _LOGGER.debug("Adding departure/Key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
             timetable_remaining_line.append(
-                str(dt_util.as_utc(upcoming).isoformat()) + " (" + str(value["route_short_name"]) +  str( ("/" + value["route_long_name"])  if value["route_long_name"] else "") + ")"
+                str(dt_util.as_utc(upcoming).isoformat())  + " (" + str(value["route_short_name"]) +  str( ("/" + value["route_long_name"])  if value["route_long_name"] else "") + ")"
             )
             timetable_remaining_headsign.append(
                 str(dt_util.as_utc(upcoming).isoformat()) + " (" + str(value["trip_headsign"]) + ")"
             )
-    # create upcoming trips
-    timetable_upcoming_trips = []
-    for key, value in sorted(timetable.items()):
-        _LOGGER.debug("Key: %s, Value: %s", key,value )
-        upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        if upcoming > now_local_tz:
             timetable_upcoming_trips.append(
                 str(value["trip_id"])
             )
