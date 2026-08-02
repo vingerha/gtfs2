@@ -87,16 +87,16 @@ def get_next_departure(hass, _data):
     # days.
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
-    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('now'))"
+    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}'))"
     if include_tomorrow:
         _LOGGER.debug("Includes Tomorrow")
         limit = int(limit / 2 * 3)
         tomorrow_name = tomorrow.strftime("%A").lower()
-        tomorrow_select = f"( select calendar.{tomorrow_name} - ( select case when (select '1' from calendar_dates where service_id=trip.service_id and date = {tomorrow_date} and exception_type = 2 ) == '1' then '1' else '0' end) ) as tomorrow,"
+        tomorrow_select = f"( select calendar.{tomorrow_name} - ( select case when (select 1 from calendar_dates where service_id=trip.service_id and date = {tomorrow_date} and exception_type = 2 ) == 1 then 1 else 0 end) ) as tomorrow,"
         tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
         tomorrow_order = f"calendar.{tomorrow_name} DESC,"
-        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('now') or calendar_date_today.date = date('now','+1 day') )"
-        tomorrow_select2 = f"CASE WHEN date('now') < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
+        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}') or calendar_date_today.date = date('{now_date}','+1 day') )"
+        tomorrow_select2 = f"CASE WHEN date('{now_date}') < calendar_date_today.date THEN 1 else 0 END as tomorrow,"
     sql_query = f"""
         SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
@@ -125,7 +125,7 @@ def get_next_departure(hass, _data):
                destination_stop_time.stop_sequence AS dest_stop_sequence,
                destination_stop_time.timepoint AS dest_stop_timepoint,
                calendar.{yesterday.strftime("%A").lower()} AS yesterday,
-               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select '1' from calendar_dates where service_id=trip.service_id and date = date('now') and exception_type = 2 ) == '1' then '1' else '0' end  ) ) as today,
+               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select 1 from calendar_dates where service_id=trip.service_id and date = date('{now_date}') and exception_type = 2 ) == 1 then 1 else 0 end  ) ) as today,
                {tomorrow_select}
                calendar.start_date AS start_date,
                calendar.end_date AS end_date,
@@ -150,8 +150,8 @@ def get_next_departure(hass, _data):
         {start_station_where}
         {end_station_where}
         AND origin_stop_sequence < dest_stop_sequence
-        AND calendar.start_date <= date('now')
-        AND calendar.end_date >= date('now')
+        AND calendar.start_date <= date('{now_date}')
+        AND calendar.end_date >= date('{now_date}')
 		UNION ALL
 	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
@@ -179,11 +179,11 @@ def get_next_departure(hass, _data):
                destination_stop_time.stop_headsign AS dest_stop_headsign,
                destination_stop_time.stop_sequence AS dest_stop_sequence,
                destination_stop_time.timepoint AS dest_stop_timepoint,
-               '0' AS yesterday,
-               '0' AS today,
+               0 AS yesterday,
+               0 AS today,
                {tomorrow_select2}
-               date('now') AS start_date,
-               date('now') AS end_date,
+               date('{now_date}') AS start_date,
+               date('{now_date}') AS end_date,
                calendar_date_today.date as calendar_date,
                calendar_date_today.exception_type as today_cd
         FROM trips trip
@@ -223,15 +223,15 @@ def get_next_departure(hass, _data):
         "end_station_id": end_station_id,
         "limit": limit,
         "route_type": route_type,
+        "now_date": now_date,
     }
 
     log_params = {
         **query_params,
-        "now_offset": now.isoformat(sep=" "),
     }
 
-    #_LOGGER.debug("SQL statement:\n%s", sql_query)
-    #_LOGGER.debug("SQL parameters:\n%s", log_params)      
+    _LOGGER.debug("SQL statement:\n%s", sql_query)
+    _LOGGER.debug("SQL parameters:\n%s", log_params)      
     timetable = {}
     yesterday_start = today_start = tomorrow_start = None
     yesterday_last = today_last = ""        
@@ -249,6 +249,7 @@ def get_next_departure(hass, _data):
         
     for row_cursor in rows:
         row = row_cursor._asdict()
+        _LOGGER.debug("Row in cursor: %s", row)
         if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
             extras = {"day": "yesterday", "first": None, "last": False}
             if yesterday_start is None:
@@ -257,7 +258,7 @@ def get_next_departure(hass, _data):
                 idx = f"{now_date_local_tz} {row['origin_depart_time']}"
                 timetable[idx] = {**row, **extras}
                 yesterday_last = idx
-        if row["today"] == 1 or row["today_cd"] == 1:
+        if (row["today"] == 1 or row["today_cd"] == 1) and ("tomorrow" not in row or row["tomorrow"] == 0):
             extras = {"day": "today", "first": False, "last": False}
             if today_start is None:
                 today_start = row["origin_depart_date"]
@@ -354,15 +355,28 @@ def get_next_departure(hass, _data):
     # create upcoming timetable with line info and headsign
     timetable_remaining_line = []
     timetable_remaining_headsign = []
+                                 
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
+                                                                                                                                                                              
         if upcoming > now_local_tz:
+                                                                                                     
             timetable_remaining_line.append(
                 str(dt_util.as_utc(upcoming).isoformat()) + " (" + str(value["route_short_name"]) +  str( ("/" + value["route_long_name"])  if value["route_long_name"] else "") + ")"
             )
             timetable_remaining_headsign.append(
                 str(dt_util.as_utc(upcoming).isoformat()) + " (" + str(value["trip_headsign"]) + ")"
             )
+    # create upcoming trips
+    timetable_upcoming_trips = []
+    for key, value in sorted(timetable.items()):
+        _LOGGER.debug("Key: %s, Value: %s", key,value )
+        upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
+        if upcoming > now_local_tz:
+            timetable_upcoming_trips.append(
+                str(value["trip_id"])
+            )
+            
     _LOGGER.debug(
         "Timetable Remaining Departures on this Start/Stop, per line: %s",
         timetable_remaining_line,
@@ -371,15 +385,11 @@ def get_next_departure(hass, _data):
         "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
         timetable_remaining_headsign,
     )
+    _LOGGER.debug(
+        "Timetable Remaining Trips on this Start/Stop: %s",
+        timetable_upcoming_trips,
+    )
 
-    # create upcoming trips
-    timetable_upcoming_trips = []
-    for key, value in sorted(timetable.items()):
-        upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        if upcoming > now_local_tz:
-            timetable_upcoming_trips.append(
-                str(value["trip_id"])
-            )
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
@@ -493,8 +503,10 @@ def get_gtfs(hass, path, data, update=False):
     if check_extracting(hass, gtfs_dir,filename) and not update :
         _LOGGER.debug("Cannot use this datasource as still unpacking: %s", filename)
         return "extracting"
-    if update and data["extract_from"] == "url" and os.path.exists(os.path.join(gtfs_dir, file)):
-        remove_datasource(hass, path, filename, True)
+    if update and data["extract_from"] == "url":
+        _pending_remove = os.path.exists(os.path.join(gtfs_dir, file))
+    else:
+        _pending_remove = False
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
         os.remove(os.path.join(gtfs_dir, sqlite))      
     if data["extract_from"] == "zip":
@@ -502,12 +514,15 @@ def get_gtfs(hass, path, data, update=False):
             _LOGGER.error("The given GTFS zipfile was not found")
             return "no_zip_file"
     if data["extract_from"] == "url":
-        if not os.path.exists(os.path.join(gtfs_dir, file)):
+        if update or not os.path.exists(os.path.join(gtfs_dir, file)):
             try:
-                r = requests.get(url,headers=_headers, allow_redirects=True)
+                r = requests.get(url,headers=_headers, allow_redirects=True,timeout=15)
+                r.raise_for_status()
+                if _pending_remove:
+                    remove_datasource(hass, path, filename, True)
                 open(os.path.join(gtfs_dir, file), "wb").write(r.content)
             except Exception as ex:  # pylint: disable=broad-except
-                _LOGGER.error("The given URL or GTFS data file/folder was not found")
+                _LOGGER.error("The given URL or GTFS data file/folder was not found: %s", ex)
                 return "no_data_file"                
     
     # if update (servicecall) then check if new file does not only have future dates
@@ -1075,22 +1090,16 @@ def get_local_stops_next_departures(self):
                    ON route.agency_id = agency.agency_id
 		WHERE 
         trip.service_id not in (select service_id from calendar_dates where date = date(:now_offset) and exception_type = 2)
-        
         and (
         (   calendar.{now.strftime("%A").lower()} =1 and
             datetime(date(:now_offset) || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange)
             
         )
-        
         or 
-        
         (   {tomorrow.strftime("%A").lower()} = 1 and
             datetime(date(:now_offset,'+1 day') || ' ' || time(st.departure_time) ) between  datetime(:now_offset,:timerange_history) and  datetime(:now_offset,:timerange)
             )
         )
-        
-        
-        
         AND calendar.start_date <= date(:now_offset) 
         AND calendar.end_date >= date(:now_offset) 
         )
