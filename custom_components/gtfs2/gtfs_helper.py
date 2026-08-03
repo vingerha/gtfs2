@@ -249,7 +249,7 @@ def get_next_departure(hass, _data):
         
     for row_cursor in rows:
         row = row_cursor._asdict()
-        _LOGGER.debug("Row in cursor: %s", row)
+        #_LOGGER.debug("Row in cursor: %s", row)
         if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
             _LOGGER.debug("Row in cursor added to yesterday")
             extras = {"day": "yesterday", "first": None, "last": False}
@@ -258,7 +258,7 @@ def get_next_departure(hass, _data):
             if yesterday_start != row["origin_depart_date"]:
                 idx = f"{now_date_local_tz} {row['origin_depart_time']}"
                 if idx in timetable:
-                    _LOGGER.warning("Duplicate timetable key: %s", idx)
+                    _LOGGER.warning("Duplicate timetable key for yesterday: %s, and trip_id: %s", idx, row['trip_id'])
                 else:
                     timetable[idx] = {**row, **extras}
                     yesterday_last = idx
@@ -274,7 +274,7 @@ def get_next_departure(hass, _data):
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
             if idx in timetable:
-                _LOGGER.warning("Duplicate timetable key: %s", idx)
+                _LOGGER.warning("Duplicate timetable key for today: %s, and trip_id: %s", idx, row['trip_id'])
             else:
                 timetable[idx] = {**row, **extras}
                 today_last = idx      
@@ -292,7 +292,7 @@ def get_next_departure(hass, _data):
                 idx_prefix = tomorrow_date_local_tz
             idx = f"{idx_prefix} {row['origin_depart_time']}"
             if idx in timetable:
-                _LOGGER.warning("Duplicate timetable key: %s", idx)
+                _LOGGER.warning("Duplicate timetable key for tomorrow: %s, and trip_id: %s", idx, row['trip_id'])
             else:
                 timetable[idx] = {**row, **extras}
     # Flag last departures.
@@ -348,13 +348,13 @@ def get_next_departure(hass, _data):
     item={}
     for key in sorted(timetable.keys()):
         upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        _LOGGER.debug ("Upcoming_departure_in_defined_timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
+        #_LOGGER.debug ("Upcoming_departure_in_defined_timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
         if upcoming > now_local_tz:
             if ix == 0 :
                 _LOGGER.debug("Resetting item")
                 item = timetable[key]
                 ix = ix + 1
-            _LOGGER.debug("Adding departure: %s", upcoming)
+            _LOGGER.debug("Adding departure in defined timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
             timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())   
     _LOGGER.debug("Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining)
     if item == {}:
@@ -371,9 +371,9 @@ def get_next_departure(hass, _data):
     #for key, value in sorted(timetable.items()):
     for key, value in timetable.items():
         upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        _LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
+        #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
-            _LOGGER.debug("Adding departure/Key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
+            _LOGGER.debug("Adding list item for departure/key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
             timetable_remaining_line.append(
                 str(dt_util.as_utc(upcoming).isoformat())  + " (" + str(value["route_short_name"]) +  str( ("/" + value["route_long_name"])  if value["route_long_name"] else "") + ")"
             )
@@ -384,18 +384,18 @@ def get_next_departure(hass, _data):
                 str(value["trip_id"])
             )
             
-    _LOGGER.debug(
-        "Timetable Remaining Departures on this Start/Stop, per line: %s",
-        timetable_remaining_line,
-    )
-    _LOGGER.debug(
-        "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
-        timetable_remaining_headsign,
-    )
-    _LOGGER.debug(
-        "Timetable Remaining Trips on this Start/Stop: %s",
-        timetable_upcoming_trips,
-    )
+    #_LOGGER.debug(
+    #    "Timetable Remaining Departures on this Start/Stop, per line: %s",
+    #    timetable_remaining_line,
+    #)
+    #_LOGGER.debug(
+    #    "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
+    #    timetable_remaining_headsign,
+    #)
+    #_LOGGER.debug(
+    #    "Timetable Remaining Trips on this Start/Stop: %s",
+    #    timetable_upcoming_trips,
+    #)
 
 
     # Format arrival and departure dates and times, accounting for the
