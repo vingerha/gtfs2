@@ -262,7 +262,7 @@ def get_next_departure(hass, _data):
                 else:
                     timetable[idx] = {**row, **extras}
                     yesterday_last = idx
-        if (row["today"] == 1 or row["today_cd"] == 1) and ("tomorrow" not in row or row["tomorrow"] == 0):
+        if (row["today"] == 1 or row["today_cd"] == 1) and ("tomorrow" not in row or row["tomorrow"] == 0) or (row["today"] == 1 and row["calendar_date"] == ""):
             _LOGGER.debug("Row in cursor added to today")
             extras = {"day": "today", "first": False, "last": False}
             if today_start is None:
@@ -368,8 +368,7 @@ def get_next_departure(hass, _data):
     timetable_remaining_line = []
     timetable_remaining_headsign = []
     timetable_upcoming_trips = []
-    #for key, value in sorted(timetable.items()):
-    for key, value in timetable.items():
+    for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
         #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
