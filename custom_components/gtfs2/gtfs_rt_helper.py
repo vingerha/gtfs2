@@ -59,8 +59,11 @@ from .const import (
 )
 
 def due_in_minutes(timestamp):
-    """Get the remaining minutes from now until a given datetime object."""
-    diff = timestamp - dt_util.now().replace(tzinfo=None)
+    """Get the remaining minutes from now until a given (aware, UTC) datetime object."""
+    if timestamp.tzinfo is None:
+        timestamp = dt_util.utc_from_timestamp(timestamp.timestamp())
+    diff = timestamp - dt_util.utcnow()
+    _LOGGER.debug(f"GTFS RT due in minutes, timestamp: %s, now_utc: %s", timestamp, dt_util.utcnow())
     return int(diff.total_seconds() / 60)
 
 def get_gtfs_feed_entities(url: str, headers, label: str):
@@ -171,7 +174,7 @@ def get_next_services(self):
 def get_rt_route_trip_statuses(self):
     ''' Get next rt departure for route (multiple) or trip (single) '''
     # explanatory logic
-    # sources can provide tip_id with or without route, route with or without direction hence a lot of conditions as the resultset has (!) to include the direction
+    # sources can provide trip_id with or without route, route with or without direction hence a lot of conditions as the resultset has (!) to include the direction
     # if route-based info is required, for start/end stops, then one needs to cover also for routes without direction_id and thus trip
     # if response does not provide a direction_id then use trip_id, make directon temporarily nn and when the stop is identified make it equal to the requesting direction
     # in this case the trip still covers the direction
@@ -190,7 +193,11 @@ def get_rt_route_trip_statuses(self):
         _LOGGER.debug("No proper RT feed entities: %s", feed_entities)
         return {}
 
-    _LOGGER.debug("Search departure times for route: %s, trip: %s, type: %s, direction: %s, short_name: %s", self._route_id, self._trip_id, self._rt_group, self._direction, self._trip_short_name)
+    if self._rt_group == "route":
+        _LOGGER.debug("Search departure times for route: %s, trip: %s, type: %s, direction: %s, short_name: %s, trip_list: %s", self._route_id, self._trip_id, self._rt_group, self._direction, self._trip_short_name, self._trip_list)
+    else:
+        _LOGGER.debug("Search departure times for trip: %s, type: %s, short_name: %s", self._trip_id, self._rt_group, self._trip_short_name)
+
     for entity in feed_entities:
 
         if entity.get('trip_update', False):
@@ -228,8 +235,20 @@ def get_rt_route_trip_statuses(self):
                 
             # first part covers start/end and thus multiple RT are possible for the same stop, also, for SIRI route_id do not match so a 'in' is used 
             # the second part covers local stops, i.e. per trip, so only one RT possible for that stop         
-            if (self._rt_group == "route" and (str(direction_id) == str(self._direction) and (route_id == self._route_id or self._route_id in route_id)) or (direction_id == "nn" and trip_id == self._trip_id) or (self._trip_id in trip_id)) or (self._rt_group == "trip" and (trip_id == self._trip_id or self._trip_id in trip_id)) or entity_id == self._trip_short_name:
-                
+            if self._rt_group == "route":
+                # route-mode, between predefined start/stop
+                if direction_id != "nn":
+                    matched = (
+                        str(direction_id) == str(self._direction)
+                        and (route_id == self._route_id or self._route_id in route_id)
+                    )  or trip_id in self._trip_list
+                else:
+                    matched = trip_id == self._trip_id or self._trip_id in trip_id or (trip_id in self._trip_list)
+            else:
+                # trip-mode, for local stops which can have multiple routes
+                matched = trip_id == self._trip_id or entity_id == self._trip_short_name
+
+            if matched:
                 _LOGGER.debug("Entity found params - group: %s, route_id: %s, direction_id: %s, self_trip_id: %s, with rt trip: %s, rt id: %s", self._rt_group, route_id, direction_id, self._trip_id, entity["trip_update"]["trip"], entity_id)
                 
                 for stop in entity["trip_update"]["stop_time_update"]:
@@ -275,14 +294,12 @@ def get_rt_route_trip_statuses(self):
                             delay = stop["arrival"].get("delay",0)
                             
                         # Ignore arrival times in the past
-                        
-                        if due_in_minutes(datetime.fromtimestamp(stop_time)) >= 0:
-                            departure_times[self._route_id][direction_id][
-                                stop_id
-                            ]["departures"].append(datetime.utcfromtimestamp(stop_time).replace(tzinfo=dt_util.get_time_zone("UTC")))
-                            _LOGGER.debug("RT stoptime: %s, utcfromtimestamp: %s, format utc: %s", stop_time, datetime.utcfromtimestamp(stop_time), datetime.utcfromtimestamp(stop_time).replace(tzinfo=dt_util.get_time_zone("UTC")))
+                        departure_dt = dt_util.utc_from_timestamp(stop_time)  # aware UTC, epoch is always UTC                       
+                        if due_in_minutes(departure_dt) >= 0:
+                            departure_times[self._route_id][direction_id][stop_id]["departures"].append(departure_dt)
+                            _LOGGER.debug("RT stoptime: %s, in utcfromtimestamp: %s", stop_time, departure_dt)
                         else:
-                            _LOGGER.debug("Not using realtime stop data for old due-in-minutes: %s", due_in_minutes(datetime.fromtimestamp(stop_time)))
+                            _LOGGER.debug("Not using realtime stop data for old due-in-minutes: %s", due_in_minutes(departure_dt))
                             
                         departure_times[self._route_id][direction_id][stop_id]["delays"].append(delay)
 

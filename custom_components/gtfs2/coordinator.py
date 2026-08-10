@@ -154,6 +154,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._trip_id = self._data.get('next_departure', {}).get('trip_id', None) 
                 self._trip_short_name = self._data.get('next_departure', {}).get('trip_short_name', None) 
                 self._direction = str(self._data.get('next_departure', {}).get('trip_direction_id', data["direction"]))
+                self._trip_list = self._data["next_departure"].get("next_departures_trip_id", [])[:10]
                 self._relative = False
                 try:
                     self._get_rt_alerts = await self.hass.async_add_executor_job(get_rt_alerts, self)
@@ -204,6 +205,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                 """Initialize the info object."""
                 self._route_delimiter = None
                 self._headers = {}
+                self._rt_group = "trip"
                 self._trip_update_url = options.get("trip_update_url", None)
                 self._vehicle_position_url = options.get("vehicle_position_url", None)
                 self._alerts_url = options.get("alerts_url", None)
@@ -251,6 +253,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                     get_local_stops_next_departures, self
                 )
         except Exception as ex:
+            _LOGGER.error("Error getting local stops data: %s", ex)
             raise UpdateFailed(f"Error in getting local stops data: {ex}")
         _LOGGER.debug("Data from coordinator: %s", self._data)              
         return self._data
