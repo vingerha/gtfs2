@@ -126,6 +126,14 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         # STILL REQUIRES A SOLUTION IF CONNECTION TIMING OUT
         if "real_time" in options:
             if options["real_time"]:
+                if not self._data.get("next_departure"):
+                    # after the last departure of the day (without include_tomorrow)
+                    # get_next_departure returns {}: skip the realtime block instead
+                    # of crashing on its fields (KeyError: origin_stop_sequence),
+                    # which marked the update failed and took every entity of this
+                    # config entry to unavailable until the next morning
+                    _LOGGER.debug("GTFS RT: no next departure for this entry, skipping realtime update")
+                    return self._data
                 self._get_next_service = {}
                 """Initialize the info object."""
                 self._route_delimiter = None
