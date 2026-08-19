@@ -281,12 +281,15 @@ def get_rt_route_trip_statuses(self):
                             departure_times[self._route_id][direction_id][stop_id]["departures"] = []
                             departure_times[self._route_id][direction_id][stop_id]["delays"] = []
                         
-                        # Use stop arrival time;
-                        # fall back on departure time if not available                            
-                        if stop["arrival"]["time"] == 0:
-                            stop_time = stop["departure"]["time"]
-                        else:
+                        # Use stop departure time;
+                        # fall back on arrival time if not available
+                        # both callers report departures from this stop, so the departure time is
+                        # the correct one: at a terminus or layover the vehicle can stand several
+                        # minutes, and the arrival time would announce a bus that has not left yet
+                        if stop["departure"]["time"] == 0:
                             stop_time = stop["arrival"]["time"]
+                        else:
+                            stop_time = stop["departure"]["time"]
                             
                         if stop["departure"].get("delay",0) >= stop["arrival"].get("delay",0):
                             delay = stop["departure"].get("delay",0)
