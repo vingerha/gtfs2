@@ -119,7 +119,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat()
             except Exception as ex:  # pylint: disable=broad-except
                 _LOGGER.error("Error getting gtfs data from generic helper: %s", ex)
-                return None
+                raise UpdateFailed(f"Error in getting gtfs data: {ex}") from ex
             _LOGGER.debug("GTFS coordinator data from helper: %s", self._data["next_departure"]) 
         
         # collect and return rt attributes
