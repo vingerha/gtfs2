@@ -564,7 +564,7 @@ def get_gtfs(hass, path, data, update=False):
             return
     
     (gtfs_root, _) = os.path.splitext(file)    
-    sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False"
+    sqlite_file = f"{gtfs_root}.sqlite?check_same_thread=False&timeout=60"
     joined_path = os.path.join(gtfs_dir, sqlite_file)  
 
     gtfs = pygtfs.Schedule(joined_path)
