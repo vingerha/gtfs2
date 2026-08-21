@@ -394,8 +394,12 @@ def get_next_departure(hass, _data):
     timetable_remaining_line = []
     timetable_remaining_headsign = []
     timetable_upcoming_trips = []
+    timetable_upcoming_arrivals = []
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
+        upcoming_arrival = datetime.datetime.combine(
+            upcoming.date(),
+            datetime.datetime.strptime(value["dest_arrival_time"],"%H:%M:%S").time()).replace(tzinfo=timezone_dest)
         #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
             _LOGGER.debug("Adding list item for departure/key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
@@ -407,6 +411,9 @@ def get_next_departure(hass, _data):
             )
             timetable_upcoming_trips.append(
                 str(value["trip_id"])
+            )
+            timetable_upcoming_arrivals.append(
+                dt_util.as_utc(upcoming_arrival).isoformat()
             )
             
     #_LOGGER.debug(
@@ -420,6 +427,10 @@ def get_next_departure(hass, _data):
     #_LOGGER.debug(
     #    "Timetable Remaining Trips on this Start/Stop: %s",
     #    timetable_upcoming_trips,
+    #)
+    #_LOGGER.debug(
+    #    "Timetable arrival times on this Start/Stop: %s",
+    #    timetable_upcoming_arrivals,
     #)
 
 
@@ -511,6 +522,7 @@ def get_next_departure(hass, _data):
         "next_departures_lines": timetable_remaining_line,
         "next_departures_headsign": timetable_remaining_headsign,
         "next_departures_trip_id": timetable_upcoming_trips,
+        "next_departures_destination_arrival_times": timetable_upcoming_arrivals,
     }
     
     return data_returned
