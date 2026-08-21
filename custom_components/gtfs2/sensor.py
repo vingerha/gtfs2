@@ -408,6 +408,12 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         if self._next_departures:
             self._attributes["next_departures"] = self._departure[
                 "next_departures"][:10]
+        # Add corresponding next arrivals
+        prefix = "next_departures_arrivals"
+        self._attributes["next_departures_arrivals"] = []
+        if self._next_departures:
+            self._attributes["next_departures_arrivals"] = self._departure[
+                "next_departures_arrivals"][:10]
         # Add next departures with their lines
         prefix = "next_departures_lines"
         self._attributes["next_departures_lines"] = []
