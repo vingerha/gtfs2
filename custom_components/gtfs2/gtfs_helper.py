@@ -400,6 +400,9 @@ def get_next_departure(hass, _data):
         upcoming_arrival = datetime.datetime.combine(
             upcoming.date(),
             datetime.datetime.strptime(value["dest_arrival_time"],"%H:%M:%S").time()).replace(tzinfo=timezone_dest)
+        # Arrival after midnight -> next calendar day
+        if upcoming_arrival.time() < upcoming.time():
+            upcoming_arrival += datetime.timedelta(days=1)
         #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
             _LOGGER.debug("Adding list item for departure/key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
