@@ -147,7 +147,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 if self._route_id == None:
                     _LOGGER.debug("GTFS RT: no route_id in sensor data, using route_id from config_entry")
                     self._route_id = data["route"].split(": ")[0]
-                self._stop_id = self._data["next_departure"].get("origin_stop_id","no_origin_stop: no_origon_stop").split(": ")[0]
+                self._stop_id = self._data["next_departure"].get("origin_stop_id","no_origin_stop: no_origin_stop").split(": ")[0]
                 self._stop_sequence = self._data["next_departure"]["origin_stop_sequence"]
                 self._destination_id = data["destination"].split(": ")[0]
                 self._trip_id = self._data.get('next_departure', {}).get('trip_id', None) 
