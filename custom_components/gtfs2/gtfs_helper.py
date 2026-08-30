@@ -505,6 +505,7 @@ def get_next_departure(hass, _data):
     data_returned = {
         "trip_id": item["trip_id"],
         "route_id": item["route_id"],
+        "route_short_name": item["route_short_name"],
         "trip_direction_id": item["direction_id"],
         "trip_short_name": item["trip_short_name"],
         "day": item["day"],
