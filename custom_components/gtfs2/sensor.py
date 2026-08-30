@@ -98,6 +98,12 @@ async def async_setup_entry(
 class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
     """Implementation of a GTFS departure sensor."""
 
+    # The device already carries the sensor's name: naming the entity too
+    # made Home Assistant compose the two into ids like
+    # sensor.gtfs_x_y_x_y. The entity takes the device name instead.
+    _attr_has_entity_name = True
+    _attr_name = None
+
     def __init__(self, coordinator) -> None:
         """Initialize the GTFSsensor."""
         super().__init__(coordinator)
@@ -114,11 +120,6 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         )
         self._attributes = self._update_attrs()
         self._attr_extra_state_attributes = self._attributes
-
-    @property
-    def name(self) -> str:
-        """Return the name of the sensor."""
-        return self._name
 
     @callback
     def _handle_coordinator_update(self) -> None:
