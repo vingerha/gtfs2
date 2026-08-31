@@ -281,12 +281,11 @@ def get_rt_route_trip_statuses(self):
                             departure_times[self._route_id][direction_id][stop_id]["departures"] = []
                             departure_times[self._route_id][direction_id][stop_id]["delays"] = []
                         
-                        # Use stop arrival time;
-                        # fall back on departure time if not available                            
-                        if stop["arrival"]["time"] == 0:
-                            stop_time = stop["departure"]["time"]
-                        else:
-                            stop_time = stop["arrival"]["time"]
+                        # the later of the two 'time' attributes is the one to announce
+                        # e.g. at a terminus/layover where the vehicle stands several
+                        # minutes at its bay
+                        stop_time = max(stop["arrival"]["time"],
+                                        stop["departure"]["time"])
                             
                         if stop["departure"].get("delay",0) >= stop["arrival"].get("delay",0):
                             delay = stop["departure"].get("delay",0)
