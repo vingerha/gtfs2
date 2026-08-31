@@ -281,13 +281,9 @@ def get_rt_route_trip_statuses(self):
                             departure_times[self._route_id][direction_id][stop_id]["departures"] = []
                             departure_times[self._route_id][direction_id][stop_id]["delays"] = []
                         
-                        # Both callers report departures from this stop, so the
-                        # later of the two times is the one to announce: at a
-                        # terminus or a layover the vehicle stands several
-                        # minutes at its bay, and the arrival would announce a
-                        # bus that has not left yet. A time the feed does not
-                        # publish arrives as 0, so it can never be the later
-                        # one, which is the fallback for the poorer feeds.
+                        # the later of the two 'time' attributes is the one to announce
+                        # e.g. at a terminus/layover where the vehicle stands several
+                        # minutes at its bay
                         stop_time = max(stop["arrival"]["time"],
                                         stop["departure"]["time"])
                             
