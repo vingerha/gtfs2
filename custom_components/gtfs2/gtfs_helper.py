@@ -24,7 +24,6 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import (
     DEFAULT_PATH_GEOJSON,
-    safe_file_part,
     CONF_API_KEY,
     CONF_API_KEY_LOCATION,
     CONF_API_KEY_NAME,
@@ -39,7 +38,7 @@ from .const import (
     DOMAIN,
     TIME_STR_FORMAT
     )
-from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt
+from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_part
 
 _LOGGER = logging.getLogger(__name__)
 

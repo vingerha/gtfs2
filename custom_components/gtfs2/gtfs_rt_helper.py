@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import datetime, timedelta
 import json
 import os
@@ -55,9 +56,27 @@ from .const import (
     DEFAULT_PATH,
     DEFAULT_PATH_GEOJSON,
 
-    TIME_STR_FORMAT,
-    safe_file_part,
+    TIME_STR_FORMAT
 )
+
+_UNSAFE_FILE_PART = re.compile(r"[^a-z0-9._-]+")
+
+
+def safe_file_part(value) -> str:
+    """A route or direction id, made safe to put in a file name.
+
+    Both geojson files are named after ids that come out of the datasource,
+    that is to say out of a url the user pasted: an id like ZOP:653 makes a
+    file no Windows share can read, a percent sign has to be escaped in the
+    /local/ url that serves the file, and an id carrying a slash writes into
+    a directory that does not exist and loses the file to an OSError.
+
+    Rather than list the separators a feed may bring, keep letters, digits,
+    dot, dash and underscore, replace every run of the rest with a single
+    underscore and lowercase, so one route always lands on one file.
+    """
+    return re.sub(r"\.\.+", "_", _UNSAFE_FILE_PART.sub("_", str(value).lower()))
+
 
 def due_in_minutes(timestamp):
     """Get the remaining minutes from now until a given (aware, UTC) datetime object."""

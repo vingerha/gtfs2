@@ -1,27 +1,5 @@
 """Constants for the GTFS integration."""
-import re
-
 from homeassistant.const import CONF_OFFSET, STATE_UNKNOWN, Platform
-
-
-_UNSAFE_FILE_PART = re.compile(r"[^a-z0-9._-]+")
-
-
-def safe_file_part(value) -> str:
-    """A route or direction id, made safe to put in a file name.
-
-    Both geojson files are named after ids that come out of the datasource,
-    that is to say out of a url the user pasted: an id like ZOP:653 makes a
-    file no Windows share can read, a percent sign has to be escaped in the
-    /local/ url that serves the file, and an id carrying a slash writes into
-    a directory that does not exist and loses the file to an OSError.
-
-    Rather than list the separators a feed may bring, keep letters, digits,
-    dot, dash and underscore, replace every run of the rest with a single
-    underscore and lowercase, so one route always lands on one file.
-    """
-    return re.sub(r"\.\.+", "_", _UNSAFE_FILE_PART.sub("_", str(value).lower()))
-
 
 DOMAIN = "gtfs2"
 
