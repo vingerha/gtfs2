@@ -28,7 +28,7 @@ from .const import (
     ICON,
     ICONS
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures, update_route_geojson
 from .gtfs_rt_helper import get_next_services, get_rt_alerts
 
 _LOGGER = logging.getLogger(__name__)
@@ -119,7 +119,18 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat()
             except Exception as ex:  # pylint: disable=broad-except
                 raise UpdateFailed(f"Error in getting gtfs data: {ex}") from ex
-            _LOGGER.debug("GTFS coordinator data from helper: %s", self._data["next_departure"]) 
+            _LOGGER.debug("GTFS coordinator data from helper: %s", self._data["next_departure"])
+            # The planned side of the map: the journey's ordered stops, written
+            # next to the vehicle positions. It follows the static data, needs
+            # no realtime at all, and only changes with the drawn trip, so it
+            # is keyed on the trip rather than rewritten every refresh.
+            trip_for_export = self._data.get("next_departure", {}).get("trip_id", None)
+            if trip_for_export and trip_for_export != getattr(self, "_route_export_trip", None):
+                try:
+                    await self.hass.async_add_executor_job(update_route_geojson, self)
+                    self._route_export_trip = trip_for_export
+                except Exception as ex:  # pylint: disable=broad-except
+                    _LOGGER.error("Error writing route geojson: %s", ex)
         
         # collect and return rt attributes
         # STILL REQUIRES A SOLUTION IF CONNECTION TIMING OUT
