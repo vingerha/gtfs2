@@ -2,17 +2,18 @@
 from __future__ import annotations
 
 import logging
+import os
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 
 from datetime import timedelta
 
-from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_PATH_RT, DEFAULT_REFRESH_INTERVAL
+from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_PATH_RT, DEFAULT_PATH_GEOJSON, DEFAULT_REFRESH_INTERVAL
 from homeassistant.const import CONF_HOST
 from .coordinator import GTFSUpdateCoordinator, GTFSLocalStopUpdateCoordinator
 import voluptuous as vol
 from .gtfs_helper import get_gtfs, update_gtfs_local_stops, get_route_departures, get_trip_stops
-from .gtfs_rt_helper import get_gtfs_rt
+from .gtfs_rt_helper import get_gtfs_rt, safe_file_part
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -157,3 +158,49 @@ async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     hass.data[DOMAIN][entry.entry_id]['coordinator'].update_interval = timedelta(minutes=1)
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove the geojson files an entry leaves behind on disk.
+
+    Home Assistant clears the entity registry of a removed entry by itself,
+    right after this callback, but nothing knows about the files: the map
+    export writes www/gtfs2/<route>_<direction>.json and its _route.json
+    companion, and they would stay there for good.
+
+    Both are named after the route and the direction rather than the entry,
+    so two entries on the same line share them: only remove them when no
+    other entry still needs them.
+    """
+    route = (entry.data.get("route") or "").split(": ")[0]
+    direction = entry.data.get("direction")
+    if not route or direction is None:
+        return
+    still_used = any(
+        e.entry_id != entry.entry_id
+        and (e.data.get("route") or "").split(": ")[0] == route
+        and str(e.data.get("direction")) == str(direction)
+        for e in hass.config_entries.async_entries(DOMAIN)
+    )
+    if still_used:
+        _LOGGER.debug("Keeping geojson for route %s direction %s, another entry uses it",
+                      route, direction)
+        return
+    # www/gtfs2, where the export writes them, not the datasource folder
+    geojson_dir = hass.config.path(DEFAULT_PATH_GEOJSON)
+    base = f"{safe_file_part(route)}_{safe_file_part(direction)}"
+    names = [base + ".json", base + "_route.json"]
+    # the files written before the ids were sanitised carry the raw name and
+    # nothing else would ever remove them; an id that is not a plain file
+    # name never wrote in this directory, so it is not looked for there
+    legacy = f"{route}_{direction}"
+    if os.path.basename(legacy) == legacy and ".." not in legacy:
+        names += [legacy + ".json", legacy + "_route.json"]
+    for name in dict.fromkeys(names):
+        path = os.path.join(geojson_dir, name)
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                _LOGGER.info("Removed %s", path)
+            except OSError as ex:
+                _LOGGER.warning("Could not remove %s: %s", path, ex)
