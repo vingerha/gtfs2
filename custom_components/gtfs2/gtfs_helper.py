@@ -982,7 +982,7 @@ def update_route_geojson(self):
             "geometry": {"type": "Point", "coordinates": [row[3], row[2]]},
             "properties": {
                 "id": str(route_id) + "_" + direction + "_" + str(row[4]),
-                "title": row[1],
+                "title": row[1] + "_stop",
                 "trip_id": trip_id,
                 "stop_id": row[0],
                 "stop_name": row[1],
