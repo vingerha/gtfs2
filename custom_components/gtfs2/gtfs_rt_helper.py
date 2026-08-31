@@ -374,7 +374,7 @@ def get_rt_vehicle_positions(self):
             except Exception: 
                 _line, _dest = "", ""
             if _line and _dest:
-                _label = _line + " → " + _dest + " " + (_veh or _crc)
+                _label = _line + " → " + _dest + " " + (_veh or _crc) + "_" + self._icon.split(':')[1]
             else:
                 _label = str(self._route_id) + "(" + _dir + ")" + _crc + "_" + self._icon.split(':')[1]
             geojson_element["properties"]["id"] = str(self._route_id) + "_" + _dir + "_" + (_veh or _crc)
