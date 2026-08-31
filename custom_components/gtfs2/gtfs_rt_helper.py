@@ -344,25 +344,15 @@ def get_rt_vehicle_positions(self):
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["longitude"])
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["latitude"])
-            # Stable, human-readable marker identity.
-            # geo_json_events registers each marker with unique_id
-            # <config_entry_id>_<properties.id>; the crc32 of the trip_id changes
-            # every trip, so each vehicle came back as a brand-new entity on every
-            # run and the entity registry grew without bound. The vehicle id is
-            # stable across trips and days, so the entity (and its name) is reused.
-            # The id joins the raw route_id, the direction and the vehicle id
-            # with underscores, so it cannot be mistaken for the old
-            # route_id(direction)crc form. The map card uses the title as
-            # entity name: line short name, destination, vehicle. Fall back on
-            # the original crc-based label when the feed publishes no vehicle
-            # id or the sensor carries no usable line name or destination.
+            # Altered to use vehicle_id (if existing) to create the unique indicator instead of trip_id
+            # to reduce number of entities created by geojson. 
             _crc = str(binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))[-3:]
             _veh = str(vehicle.get("vehicle", {}).get("id", "") or vehicle.get("vehicle", {}).get("label", "")).strip()
             _dir = str(vehicle["trip"]["direction_id"])
             try:
                 _line = str(self._data.get("next_departure", {}).get("route_short_name") or "").strip()
                 _dest = self.config_entry.data.get("destination", "").split(": ")[-1].split(" (")[0].split(" - ")[0].strip()
-            except Exception:  # the label is cosmetic, it must never break the update
+            except Exception: 
                 _line, _dest = "", ""
             if _line and _dest:
                 _label = _line + " → " + _dest + " " + (_veh or _crc)
