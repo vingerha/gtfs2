@@ -55,7 +55,8 @@ from .const import (
     DEFAULT_PATH,
     DEFAULT_PATH_GEOJSON,
 
-    TIME_STR_FORMAT
+    TIME_STR_FORMAT,
+    safe_file_part,
 )
 
 def due_in_minutes(timestamp):
@@ -357,7 +358,8 @@ def get_rt_vehicle_positions(self):
     self.geojson = {"features": geojson_body, "type": "FeatureCollection"}
         
     _LOGGER.debug("Vehicle geojson: %s", json.dumps(self.geojson))
-    self._route_dir = str(self._route_id) + "_" + str(self._direction)
+    # named the same way as the route file next to it, see safe_file_part
+    self._route_dir = safe_file_part(self._route_id) + "_" + safe_file_part(self._direction)
     update_geojson(self)
     return geojson_body
     

@@ -24,6 +24,7 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import (
     DEFAULT_PATH_GEOJSON,
+    safe_file_part,
     CONF_API_KEY,
     CONF_API_KEY_LOCATION,
     CONF_API_KEY_NAME,
@@ -991,7 +992,9 @@ def update_route_geojson(self):
         })
     geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
     os.makedirs(geojson_dir, exist_ok=True)
-    file = os.path.join(geojson_dir, str(route_id) + "_" + direction + "_route.json")
+    # the ids come out of the datasource, so they are not file names until
+    # they are made ones: see safe_file_part
+    file = os.path.join(geojson_dir, f"{safe_file_part(route_id)}_{safe_file_part(direction)}_route.json")
     _LOGGER.debug("Creating route geojson file: %s", file)
     with open(file, "w") as outfile:
         json.dump({
