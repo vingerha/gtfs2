@@ -343,8 +343,22 @@ def get_rt_vehicle_positions(self):
             geojson_element["geometry"]["coordinates"] = []
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["longitude"])
             geojson_element["geometry"]["coordinates"].append(vehicle["position"]["latitude"])
-            geojson_element["properties"]["id"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))[-3:]
-            geojson_element["properties"]["title"] = str(self._route_id) + "(" + str(vehicle["trip"]["direction_id"]) + ")" + str(binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))[-3:] + "_" + self._icon.split(':')[1]
+            # Altered to use vehicle_id (if existing) to create the unique indicator instead of trip_id
+            # to reduce number of entities created by geojson. 
+            _crc = str(binascii.crc32((vehicle["trip"]["trip_id"]).encode('utf8')))[-3:]
+            _veh = str(vehicle.get("vehicle", {}).get("id", "") or vehicle.get("vehicle", {}).get("label", "")).strip()
+            _dir = str(vehicle["trip"]["direction_id"])
+            try:
+                _line = str(self._data.get("next_departure", {}).get("route_short_name") or "").strip()
+                _dest = self.config_entry.data.get("destination", "").split(": ")[-1].split(" (")[0].split(" - ")[0].strip()
+            except Exception: 
+                _line, _dest = "", ""
+            if _line and _dest:
+                _label = _line + " → " + _dest + " " + (_veh or _crc)
+            else:
+                _label = str(self._route_id) + "(" + _dir + ")" + _crc + "_" + self._icon.split(':')[1]
+            geojson_element["properties"]["id"] = str(self._route_id) + "_" + _dir + "_" + (_veh or _crc)
+            geojson_element["properties"]["title"] = _label
             geojson_element["properties"]["trip_id"] = vehicle["trip"]["trip_id"]
             geojson_element["properties"]["route_id"] = str(self._route_id)
             geojson_element["properties"]["direction_id"] = vehicle["trip"]["direction_id"]
