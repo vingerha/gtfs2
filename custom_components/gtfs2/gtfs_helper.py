@@ -23,6 +23,7 @@ from homeassistant.const import CONF_NAME
 from homeassistant.helpers import entity_registry as er
 
 from .const import (
+    DEFAULT_PATH_GEOJSON,
     CONF_API_KEY,
     CONF_API_KEY_LOCATION,
     CONF_API_KEY_NAME,
@@ -37,7 +38,7 @@ from .const import (
     DOMAIN,
     TIME_STR_FORMAT
     )
-from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt
+from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_part
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -933,6 +934,78 @@ def create_trip_geojson(self):
     self.geojson = {"features": [{"geometry": {"coordinates": coordinates, "type": "LineString"}, "properties": {"id": self._trip_id, "title": self._trip_id}, "type": "Feature"}], "type": "FeatureCollection"}    
     _LOGGER.debug("Geojson output: %s", json.dumps(self.geojson))
     return None
+
+
+def _fmt_gtfs_time(value):
+    """Render a pygtfs departure_time (seconds since midnight, may exceed 24h) as HH:MM:SS."""
+    try:
+        s = int(value)
+        return f"{s // 3600:02d}:{(s % 3600) // 60:02d}:{s % 60:02d}"
+    except (TypeError, ValueError):
+        return str(value) if value is not None else None
+
+
+def update_route_geojson(self):
+    """Write the journey's ordered stops to www/gtfs2/<route>_<direction>_route.json.
+
+    Companion file to the vehicle-positions geojson. Points only: the geojson
+    integration reads nothing else, and since the import strips shapes.txt a
+    LineString could only duplicate the stops; a map card rebuilds the path by
+    joining the points in stop_sequence order. Each point carries an id and a
+    title the way the geojson integration expects, plus the trip_id; what
+    describes the whole journey sits on the FeatureCollection.
+    Rewritten only when the drawn trip changes (see coordinator).
+    """
+    schedule = self._data["schedule"]
+    departure = self._data.get("next_departure") or {}
+    trip_id = departure.get("trip_id", None)
+    route_id = departure.get("route_id", None)
+    direction = str(departure.get("trip_direction_id", ""))
+    if not trip_id or not route_id:
+        return
+    sql_stops = """
+    SELECT st.stop_id, s.stop_name, s.stop_lat, s.stop_lon, st.stop_sequence, st.departure_time
+    FROM stop_times st
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE st.trip_id = :trip_id
+    ORDER BY st.stop_sequence
+    """
+    with schedule.engine.connect() as conn:
+        stop_rows = conn.execute(text(sql_stops), {"trip_id": trip_id}).fetchall()
+    if not stop_rows:
+        _LOGGER.debug("No stops found for trip: %s", trip_id)
+        return
+    features = []
+    for row in stop_rows:
+        features.append({
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [row[3], row[2]]},
+            "properties": {
+                "id": str(route_id) + "_" + direction + "_" + str(row[4]),
+                "title": row[1],
+                "trip_id": trip_id,
+                "stop_id": row[0],
+                "stop_name": row[1],
+                "stop_sequence": row[4],
+                "departure_time": _fmt_gtfs_time(row[5]),
+            },
+        })
+    geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
+    os.makedirs(geojson_dir, exist_ok=True)
+    # the ids come out of the datasource, so they are not file names until
+    # they are made ones: see safe_file_part
+    file = os.path.join(geojson_dir, f"{safe_file_part(route_id)}_{safe_file_part(direction)}_route.json")
+    _LOGGER.debug("Creating route geojson file: %s", file)
+    with open(file, "w") as outfile:
+        json.dump({
+            "type": "FeatureCollection",
+            "properties": {
+                "trip_id": trip_id,
+                "route_id": str(route_id),
+                "direction_id": direction,
+            },
+            "features": features,
+        }, outfile)
     
 def get_local_stop_list(hass, schedule, data):
     _LOGGER.debug("Getting local stops list with data: %s", data)
