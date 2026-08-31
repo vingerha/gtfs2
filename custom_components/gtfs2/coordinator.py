@@ -52,6 +52,9 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         
         self._pygtfs = ""
         self._data: dict[str, str] = {}
+        # the trip whose stops are already exported, so the geojson is
+        # rewritten when the journey changes and not on every refresh
+        self._route_export_trip = None
 
     async def _async_update_data(self) -> dict[str, str]:
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
@@ -125,7 +128,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             # no realtime at all, and only changes with the drawn trip, so it
             # is keyed on the trip rather than rewritten every refresh.
             trip_for_export = self._data.get("next_departure", {}).get("trip_id", None)
-            if trip_for_export and trip_for_export != getattr(self, "_route_export_trip", None):
+            if trip_for_export and trip_for_export != self._route_export_trip:
                 try:
                     await self.hass.async_add_executor_job(update_route_geojson, self)
                     self._route_export_trip = trip_for_export
