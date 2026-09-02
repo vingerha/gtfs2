@@ -824,7 +824,19 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     FROM sqlite_master
     WHERE
     type= 'index' and tbl_name = 'routes' and name like '%route_type%';
-    """    
+    """
+	sql_index_6 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'trips' and name like '%route_id%';
+    """
+    sql_index_7 = f"""
+    SELECT count(*) as checkidx
+    FROM sqlite_master
+    WHERE
+    type= 'index' and tbl_name = 'trips' and name like '%trip_id%';
+    """
     sql_add_index_1 = f"""
     create index gtfs2_stop_times_trip_id on stop_times(trip_id)
     """
@@ -839,22 +851,6 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     """    
     sql_add_index_5 = f"""
     create index gtfs2_routes_route_type on routes(route_type)
-    """
-    # trips is only reached through route_id (route list, direction labels,
-    # stop list, departures) or trip_id (membership subqueries): without
-    # these, every config flow step scans the whole table, 750k rows and
-    # seconds per screen on a national feed
-    sql_index_6 = f"""
-    SELECT count(*) as checkidx
-    FROM sqlite_master
-    WHERE
-    type= 'index' and tbl_name = 'trips' and name like '%route_id%';
-    """
-    sql_index_7 = f"""
-    SELECT count(*) as checkidx
-    FROM sqlite_master
-    WHERE
-    type= 'index' and tbl_name = 'trips' and name like '%trip_id%';
     """
     sql_add_index_6 = f"""
     create index gtfs2_trips_route_id on trips(route_id)
@@ -917,8 +913,8 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
                 conn.execute(text(sql_add_index_5), {"q": "q"})
 
     with schedule.engine.connect() as conn:
-        rows_i6 = conn.execute(text(sql_index_6), {"q": "q"}).fetchall()
-    for row_cursor in rows_i6:
+        rows_6a = conn.execute(text(sql_index_6), {"q": "q"}).fetchall()
+    for row_cursor in rows_6a:
         _LOGGER.debug("IDX result6: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
             _LOGGER.warning("Adding index 6 to improve performance")
@@ -926,8 +922,8 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
                 conn.execute(text(sql_add_index_6), {"q": "q"})
 
     with schedule.engine.connect() as conn:
-        rows_i7 = conn.execute(text(sql_index_7), {"q": "q"}).fetchall()
-    for row_cursor in rows_i7:
+        rows_7a = conn.execute(text(sql_index_7), {"q": "q"}).fetchall()
+    for row_cursor in rows_7a:
         _LOGGER.debug("IDX result7: %s", row_cursor._asdict())
         if row_cursor._asdict()['checkidx'] == 0:
             _LOGGER.warning("Adding index 7 to improve performance")
