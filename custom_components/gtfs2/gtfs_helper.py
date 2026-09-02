@@ -830,12 +830,6 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     WHERE
     type= 'index' and tbl_name = 'trips' and name like '%route_id%';
     """
-    sql_index_7 = f"""
-    SELECT count(*) as checkidx
-    FROM sqlite_master
-    WHERE
-    type= 'index' and tbl_name = 'trips' and name like '%trip_id%';
-    """
     sql_add_index_1 = f"""
     create index gtfs2_stop_times_trip_id on stop_times(trip_id)
     """
@@ -853,9 +847,6 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     """
     sql_add_index_6 = f"""
     create index gtfs2_trips_route_id on trips(route_id)
-    """
-    sql_add_index_7 = f"""
-    create index gtfs2_trips_trip_id on trips(trip_id)
     """
     sql_check_route_agency = f"""
     SELECT count(*) as check_agency
@@ -919,15 +910,6 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
             _LOGGER.warning("Adding index 6 to improve performance")
             with schedule.engine.connect() as conn:
                 conn.execute(text(sql_add_index_6), {"q": "q"})
-
-    with schedule.engine.connect() as conn:
-        rows_7a = conn.execute(text(sql_index_7), {"q": "q"}).fetchall()
-    for row_cursor in rows_7a:
-        _LOGGER.debug("IDX result7: %s", row_cursor._asdict())
-        if row_cursor._asdict()['checkidx'] == 0:
-            _LOGGER.warning("Adding index 7 to improve performance")
-            with schedule.engine.connect() as conn:
-                conn.execute(text(sql_add_index_7), {"q": "q"})
 
     with schedule.engine.connect() as conn:
         rows_8a = conn.execute(text(sql_check_route_agency), {"q": "q"}).fetchall()
