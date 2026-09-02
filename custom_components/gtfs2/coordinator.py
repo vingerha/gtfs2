@@ -217,9 +217,6 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         previous_data = {} if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)
 
-        # close the previous cycle's schedule before opening the new one, so
-        # the old db file handles are released here and not whenever the
-        # garbage collector gets to the abandoned engine
         if self._pygtfs and hasattr(self._pygtfs, 'session'):
             try:
                 self._pygtfs.session.close()
