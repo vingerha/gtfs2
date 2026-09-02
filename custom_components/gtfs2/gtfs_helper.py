@@ -824,7 +824,7 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     WHERE
     type= 'index' and tbl_name = 'routes' and name like '%route_type%';
     """
-	sql_index_6 = f"""
+    sql_index_6 = f"""
     SELECT count(*) as checkidx
     FROM sqlite_master
     WHERE
@@ -930,8 +930,8 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
                 conn.execute(text(sql_add_index_7), {"q": "q"})
 
     with schedule.engine.connect() as conn:
-        rows_6a = conn.execute(text(sql_check_route_agency), {"q": "q"}).fetchall()
-    for row_cursor in rows_6a:
+        rows_8a = conn.execute(text(sql_check_route_agency), {"q": "q"}).fetchall()
+    for row_cursor in rows_8a:
         _LOGGER.debug("Agency 'None' in routes: %s", row_cursor._asdict())
         if row_cursor._asdict()['check_agency'] > 0:
             _LOGGER.warning("Fix missing agency_id in routes table")
