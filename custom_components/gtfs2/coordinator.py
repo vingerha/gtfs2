@@ -215,11 +215,18 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         data = self.config_entry.data
         options = self.config_entry.options
         previous_data = {} if self.data is None else self.data.copy()
-        _LOGGER.debug("Previous data: %s", previous_data)  
+        _LOGGER.debug("Previous data: %s", previous_data)
+
+        if self._pygtfs and hasattr(self._pygtfs, 'session'):
+            try:
+                self._pygtfs.session.close()
+                self._pygtfs.engine.dispose()
+            except Exception:
+                pass
 
         self._pygtfs = get_gtfs(
             self.hass, DEFAULT_PATH, data, False
-        )        
+        )
 
         self._data = {
             "schedule": self._pygtfs,
@@ -263,15 +270,8 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                     self._headers[CONF_API_KEY] = options.get(CONF_API_KEY, None)
                     self._headers[CONF_ACCEPT_HEADER_PB] = options.get(CONF_ACCEPT_HEADER_PB, False)
                 #_LOGGER.debug("RT header: %s", self._headers)
-                
-        if self._pygtfs and hasattr(self._pygtfs, 'session'):
-            try:
-                self._pygtfs.session.close()
-                self._pygtfs.engine.dispose()
-            except Exception:
-                pass
 
-        try:    
+        try:
             self._data["local_stops_next_departures"] = await self.hass.async_add_executor_job(
                     get_local_stops_next_departures, self
                 )
