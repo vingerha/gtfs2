@@ -577,11 +577,15 @@ def convert_gtfs_realtime_to_json(gtfs_realtime_data):
                     "start_time": entity.trip_update.trip.start_time,
                     "start_date": entity.trip_update.trip.start_date,
                     "route_id": entity.trip_update.trip.route_id,
-                    "direction_id": str(entity.trip_update.trip.direction_id)
                 },
                 "stop_time_update": []
             }
         }
+        # direction_id is optional and protobuf returns 0 when a feed omits
+        # it, which reads as a genuine direction and mislabels every untagged
+        # trip; leave the key out instead so the reader falls back to "nn"
+        if entity.trip_update.trip.HasField("direction_id"):
+            entity_dict["trip_update"]["trip"]["direction_id"] = str(entity.trip_update.trip.direction_id)
         for stop_time_update in entity.trip_update.stop_time_update:
             stop_time_update_dict = {
                 "stop_sequence": stop_time_update.stop_sequence,
