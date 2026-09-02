@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import datetime
-import time
 import logging
 import os
 import glob
@@ -38,7 +37,7 @@ from .const import (
     DOMAIN,
     TIME_STR_FORMAT
     )
-from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_part
+from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_part, get_gtfs_feed_entities
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -231,8 +230,8 @@ def get_next_departure(hass, _data):
         **query_params,
     }
 
-    _LOGGER.debug("SQL statement:\n%s", sql_query)
-    _LOGGER.debug("SQL parameters:\n%s", log_params)      
+    #_LOGGER.debug("SQL statement:\n%s", sql_query)
+    #_LOGGER.debug("SQL parameters:\n%s", log_params)      
     timetable = {}
     yesterday_start = today_start = tomorrow_start = None
     yesterday_last = today_last = ""        
@@ -1029,11 +1028,13 @@ def get_local_stop_list(hass, schedule, data):
 
 def _build_local_stop_element(self, row, base_date, date_label,
                               timezone_agency, timezone_stop, now_tz,
-                              apply_now_filter):
+                              apply_now_filter, feed_entities=None):
     """Build one departure element incl. realtime, for a given service date.
 
     base_date / date_label: 'now_date' for today, 'tomorrow_date' for tomorrow.
     apply_now_filter: True for today (drop already-passed), False for tomorrow.
+    feed_entities: already-fetched/parsed RT feed for this refresh cycle, if any
+    (avoids re-fetching + re-parsing the same feed once per row/stop).
     Relies on self._icon being set by the caller for this row.
     Returns the element dict, or None if filtered out.
     """
@@ -1044,17 +1045,17 @@ def _build_local_stop_element(self, row, base_date, date_label,
     self._route_id = row["route_id"]
     self._stop_id = row["stop_id"]
     self._stop_sequence = row["stop_sequence"]
-    _LOGGER.debug("Row departure_time: %s", row["departure_time"])
-    _LOGGER.debug("Base_date / date_label: %s", base_date)
+    #_LOGGER.debug("Row departure_time: %s", row["departure_time"])
+    #_LOGGER.debug("Base_date / date_label: %s", base_date)
 
     # collect departure time from row, using agency timezone as basis, then transforming it to the stop-specific timezone (based on Amtrak)
     self._departure_datetime = datetime.datetime.strptime(
         base_date + " " + row["departure_time"], "%Y-%m-%d %H:%M:%S"
     ).replace(tzinfo=timezone_agency).astimezone(tz=timezone_stop)
     self._departure_datetime_utc = dt_util.as_utc(self._departure_datetime)
-    _LOGGER.debug("Self._departure datetime in agency_tz: %s", self._departure_datetime)
+    #_LOGGER.debug("Self._departure datetime in agency_tz: %s", self._departure_datetime)
     self._departure_time = self._departure_datetime.replace(tzinfo=None).strftime(TIME_STR_FORMAT)
-    _LOGGER.debug("Self._departure time in stop tz: %s", self._departure_time)
+    #_LOGGER.debug("Self._departure time in stop tz: %s", self._departure_time)
 
     departure_rt = "-"
     departure_rt_datetime = "-"
@@ -1066,7 +1067,7 @@ def _build_local_stop_element(self, row, base_date, date_label,
     if self._realtime:
         self._get_next_service = {}
         _LOGGER.debug("Find rt for local stop route: %s - direction: %s - stop: %s - stop_sequence: %s", self._route, self._direction, self._stop_id, self._stop_sequence)
-        next_service = get_rt_route_trip_statuses(self)
+        next_service = get_rt_route_trip_statuses(self, feed_entities)
         _LOGGER.debug("Next service: %s", next_service)
         if next_service:
             svc = next_service.get(self._route, {}).get(self._direction, {}).get(self._stop_id, [])
@@ -1088,20 +1089,20 @@ def _build_local_stop_element(self, row, base_date, date_label,
         _LOGGER.debug("Delay derived: %s, departure_rt: %s", delay_rt_derived, departure_rt)
     else:
         depart_time_corrected_time = (dt_util.parse_datetime(f"{base_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
-    _LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)
+    #_LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)
 
     if delay_rt != "-" and delay_rt != 0:
         depart_time_corrected_delay = (dt_util.parse_datetime(f"{base_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
     else:
         delay_rt = "-"
         depart_time_corrected_delay = dt_util.parse_datetime(f"{base_date} {self._departure_time}").replace(tzinfo=timezone_stop)
-    _LOGGER.debug("Departure time corrected based on realtime-delay: %s", depart_time_corrected_delay)
+    #_LOGGER.debug("Departure time corrected based on realtime-delay: %s", depart_time_corrected_delay)
 
     if depart_time_corrected_delay > depart_time_corrected_time:
         depart_time_corrected = depart_time_corrected_delay
     else:
         depart_time_corrected = depart_time_corrected_time
-    _LOGGER.debug("Departure time corrected: %s", depart_time_corrected)
+    #_LOGGER.debug("Departure time corrected: %s", depart_time_corrected)
 
     if apply_now_filter and not (depart_time_corrected > now_tz):
         _LOGGER.debug("Departure time corrected: %s, NOT after now in tz with offset: %s", depart_time_corrected, now_tz)
@@ -1151,7 +1152,7 @@ def get_local_stops_next_departures(self):
     if not latitude or not longitude:
         _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
         return []
-    _LOGGER.debug("Query params: Latitude %s - Longitude %s - Timerange %s - Timerange_history %s - Radius %s - Now: %s", latitude, longitude, time_range, time_range_history, radius, now)
+
     sql_query = f"""
         SELECT * FROM (
         SELECT stop.stop_id, stop.stop_name,stop.stop_lat as latitude, stop.stop_lon as longitude, stop.stop_timezone as stop_timezone, agency.agency_timezone as agency_timezone, trip.trip_id, trip.trip_headsign, trip.direction_id, trip.trip_short_name, time(st.departure_time) as departure_time,st.stop_sequence as stop_sequence,
@@ -1266,10 +1267,12 @@ def get_local_stops_next_departures(self):
         "now_offset": now,
     }
 
-    _LOGGER.debug("SQL statement:\n%s", sql_query)
-    _LOGGER.debug("SQL parameters:\n%s", query_params)        
+    #_LOGGER.debug("SQL statement:\n%s", sql_query)
+    #_LOGGER.debug("SQL parameters:\n%s", query_params)        
+
     with schedule.engine.connect() as conn:
         rows = conn.execute(text(sql_query), {"latitude": latitude, "longitude": longitude, "timerange": time_range, "timerange_history": time_range_history, "radius": radius, "now_offset": now}).fetchall()
+
     timetable = []
     local_stops_list = []
     prev_stop_id = ""
@@ -1299,7 +1302,9 @@ def get_local_stops_next_departures(self):
             "file": self._data["name"] + "_localstop",
             }
         _LOGGER.debug("self rt_data: %s, self headers: %s, self data: %s", self._rt_data, self._headers, self._data)
+
         check = get_gtfs_rt(self.hass,DEFAULT_PATH_RT,self._rt_data)
+
         # check if local file created
         if check != "ok":
             _LOGGER.error("Could not download RT data from: %s", self._trip_update_url)
@@ -1308,13 +1313,27 @@ def get_local_stops_next_departures(self):
             # use local file created as new url
             self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
 
+    # Fetch + parse the RT feed once for this refresh cycle. Previously this
+    # happened inside get_rt_route_trip_statuses on every row/stop match,
+    # which re-fetched and re-parsed the same feed once per trip - expensive
+    # when a stop has many routes/trips. The feed itself doesn't change
+    # between rows within a single refresh, only which row is being matched
+    # against it, so fetching it once and passing it into each match call is
+    # equivalent and avoids the redundant work.
+    feed_entities = None
+    if self._realtime:
+
+        feed_entities = get_gtfs_feed_entities(
+            url=self._trip_update_url, headers=self._headers, label="trip_data"
+        ) or []
+
     for row_cursor in rows:
         row = row_cursor._asdict()
-        _LOGGER.debug("Row from query: %s", row)
+        #_LOGGER.debug("Row from query: %s", row)
 
         #defining TZ for row
-        _LOGGER.debug("Configured Agency timezone: %s", row['agency_timezone'])
-        _LOGGER.debug("Configured Stop timezone: %s", row['stop_timezone'])
+        #_LOGGER.debug("Configured Agency timezone: %s", row['agency_timezone'])
+        #_LOGGER.debug("Configured Stop timezone: %s", row['stop_timezone'])
         _LOGGER.debug("Now hist corrected: %s", now_hist_corrected)
         if row['agency_timezone'] is not None:
             timezone_agency = dt_util.get_time_zone(row['agency_timezone'])
@@ -1338,12 +1357,13 @@ def get_local_stops_next_departures(self):
 
         if row["today"] == 1 or (row["today_cd"] == 1 and row["start_date"] == row["calendar_date"]):
             if row["today"] == 1:
-                _LOGGER.debug("Adding row from calendar today=1")
+                _LOGGER.debug("Adding row from calendar for today=1")
             if row["today_cd"] == 1 and row["start_date"] == row["calendar_date"]:
-                _LOGGER.debug("Adding row from calendar_dates today_cd=1 and start_date = calendar_date")
+                _LOGGER.debug("Adding row from calendar_dates for today_cd=1 and start_date = calendar_date")
+            #_t_elem_start = time.monotonic()
             element = _build_local_stop_element(
                 self, row, now_date, now_date, timezone_agency, timezone_stop, now_tz,
-                apply_now_filter=True)
+                apply_now_filter=True, feed_entities=feed_entities)
             if element is not None:					  
                 if element not in timetable:
                     timetable.append(element)
@@ -1351,9 +1371,11 @@ def get_local_stops_next_departures(self):
 
         if (row["tomorrow"] == 1 and datetime.datetime.strptime(now_time_hist_corrected,"%H:%M") > datetime.datetime.strptime(row["departure_time"],"%H:%M:%S")):
             _LOGGER.debug("Tomorrow: adding row for tomorrow_date: %s", tomorrow_date)
+
             element = _build_local_stop_element(
                 self, row, tomorrow_date, tomorrow_date, timezone_agency, timezone_stop, now_tz,
-                apply_now_filter=False)
+                apply_now_filter=False, feed_entities=feed_entities)
+
             if element is not None:
                 if element not in timetable:
                     timetable.append(element)
@@ -1366,10 +1388,10 @@ def get_local_stops_next_departures(self):
 
     if entry:
         local_stops_list.append(entry)
-    
+
     for stop in local_stops_list:
         stop["departure"].sort(key=lambda d: d["departure_datetime"])
-    
+
     data_returned = local_stops_list
     _LOGGER.debug("Stop data returned: %s", data_returned)
     return data_returned
@@ -1421,10 +1443,6 @@ async def get_route_departures(hass, data):
             "alert": {}
         }
         
-    #if check_extracting(hass, _data['gtfs_dir'],_data['file']):    
-    #        _LOGGER.debug("Cannot update this sensor as still unpacking: %s", _data["file"])
-    #        return
-
     departures = await hass.async_add_executor_job(
                     get_next_departure, hass, _data
                 ) 

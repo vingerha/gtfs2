@@ -191,7 +191,7 @@ def get_next_services(self):
     _LOGGER.debug("Next services attributes: %s", attrs)
     return attrs
     
-def get_rt_route_trip_statuses(self):
+def get_rt_route_trip_statuses(self, feed_entities=None):
     ''' Get next rt departure for route (multiple) or trip (single) '''
     # explanatory logic
     # sources can provide trip_id with or without route, route with or without direction hence a lot of conditions as the resultset has (!) to include the direction
@@ -204,9 +204,13 @@ def get_rt_route_trip_statuses(self):
     if self._vehicle_position_url:   
         vehicle_positions = get_rt_vehicle_positions(self)
 
-    feed_entities = get_gtfs_feed_entities(
-        url=self._trip_update_url, headers=self._headers, label="trip_data"
-    )
+    # feed_entities may be passed in by a caller that already fetched/parsed
+    # it once for the current refresh cycle (e.g. matching many stops against
+    # the same feed), avoiding a re-fetch + re-parse per call.
+    if feed_entities is None:
+        feed_entities = get_gtfs_feed_entities(
+            url=self._trip_update_url, headers=self._headers, label="trip_data"
+        )
     self._feed_entities = feed_entities
     
     if not feed_entities:
@@ -251,7 +255,7 @@ def get_rt_route_trip_statuses(self):
             trip_id = entity["trip_update"]["trip"]["trip_id"]
             entity_id = entity["id"]
             
-            _LOGGER.debug("Search for entity with params - group: %s, route_id: %s, direction_id: %s, self_trip_id: %s, with rt trip: %s, rt id: %s", self._rt_group, route_id, direction_id, self._trip_id, entity["trip_update"]["trip"], entity_id)            
+            #_LOGGER.debug("Search for entity with params - group: %s, route_id: %s, direction_id: %s, self_trip_id: %s, with rt trip: %s, rt id: %s", self._rt_group, route_id, direction_id, self._trip_id, entity["trip_update"]["trip"], entity_id)            
                 
             # first part covers start/end and thus multiple RT are possible for the same stop, also, for SIRI route_id do not match so a 'in' is used 
             # the second part covers local stops, i.e. per trip, so only one RT possible for that stop         
@@ -484,7 +488,6 @@ def get_gtfs_rt(hass, path, data):
         _headers = {data[CONF_API_KEY_NAME]: data[CONF_API_KEY]}
         if data.get(CONF_ACCEPT_HEADER_PB, False):
             _headers["Accept"] = "application/x-protobuf"
-    _LOGGER.debug("Getting gtfs rt locally with headers: %s", _headers)
     
     if data.get('entity_for_siri',None):
         _LOGGER.debug("Getting siri RT departures with data: %s", data)
@@ -499,13 +502,13 @@ def get_gtfs_rt(hass, path, data):
         _LOGGER.debug("_stop_id: %s", _stop_id)
         _LOGGER.debug("config entry data: %s, options: %s", cf_data, cf_options)
         file = data["file"] + "_rt.json"
-        #try:
-        r = convert_realtime_siri_trips_to_json(url,_headers,_stop_id)
-        open(os.path.join(gtfs_dir, file), "w").write(json.dumps(r))
-        return "ok"
-        #except Exception as ex:  # pylint: disable=broad-except
-        #    _LOGGER.error("Ìssues with downloading GTFS RT SIRI data to: %s with error: 5s", os.path.join(gtfs_dir, file), ex)
-        #    return "no_rt_data_file" 
+        try:
+            r = convert_realtime_siri_trips_to_json(url,_headers,_stop_id)
+            open(os.path.join(gtfs_dir, file), "w").write(json.dumps(r))
+            return "ok"
+        except Exception as ex:  # pylint: disable=broad-except
+            _LOGGER.error("Ìssues with downloading GTFS RT SIRI data to: %s with error: 5s", os.path.join(gtfs_dir, file), ex)
+            return "no_rt_data_file" 
         return "ok"                                
     try:
         r = requests.get(url, headers = _headers , allow_redirects=True)

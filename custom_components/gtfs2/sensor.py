@@ -133,12 +133,17 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
 
     def _update_attrs(self):  # noqa: C901 PLR0911
         _LOGGER.debug("SENSOR update attr data: %s", self.coordinator.data)
+        self._icon = ICON
         if self.coordinator.data["extracting"]:  
             _LOGGER.warning("Extracting datasource: %s ,for sensor: %s", self.coordinator.data["file"], self._name)
             self._attr_native_value = None
-            return
+            self._attributes = {"extracting": True}
+            self._attr_extra_state_attributes = self._attributes
+            return self._attributes
+        self._attributes = {}
+        
         self._pygtfs = self.coordinator.data["schedule"]
-        self.extracting = self.coordinator.data["extracting"]
+        self.extracting = self.coordinator.data.get("extracting", False)
         self.origin = self.coordinator.data["origin"].split(": ")[0]
         self.destination = self.coordinator.data["destination"].split(": ")[0]
         self._include_tomorrow = self.coordinator.data["include_tomorrow"]
@@ -147,7 +152,6 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._departure_rt = self.coordinator.data.get("next_departure_realtime_attr",None)
         self._route_type = self.coordinator.data["route_type"]
         self._available = False
-        self._icon = ICON
         self._state: datetime.datetime | None = None
         self._attr_device_class = SensorDeviceClass.TIMESTAMP
         self._trip = None
@@ -540,7 +544,11 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
         if self.coordinator.data["extracting"]:  
             _LOGGER.warning("Extracting datasource: %s ,for sensor: %s", self.coordinator.data["file"], self._name)
             self._attr_native_value = None
-            return
+            self._attributes = {"extracting": True}
+            self._attr_extra_state_attributes = self._attributes
+            return self._attributes
+        
+        self._attributes = {}
         
         self._state = self._stop["stop_name"] + " (" +  str(dt_util.now().replace(tzinfo=None).strftime(TIME_STR_FORMAT)) + ")"
 
@@ -561,6 +569,5 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
                     self._attributes["latitude"] = stop["latitude"]  
                     self._attributes["longitude"] = stop["longitude"]  
                     
-          
         self._attr_extra_state_attributes = self._attributes
         return self._attr_extra_state_attributes

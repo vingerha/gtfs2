@@ -5,7 +5,6 @@ import datetime
 from datetime import timedelta
 import logging
 
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -60,7 +59,7 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = None if self.data is None else self.data.copy()
+        previous_data = {} if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
 
         if self._pygtfs and hasattr(self._pygtfs, 'session'):
@@ -93,16 +92,19 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         
         if check_extracting(self.hass, self.hass.config.path(self._data['gtfs_dir']), self._data['file']):   
             _LOGGER.debug("Cannot update this sensor as still unpacking: %s", self._data["file"])
-            previous_data["extracting"] = True
-            return previous_data
+            self._data.update(previous_data)
+            self._data["extracting"] = True
+            return self._data
         
 
         # determine static + rt or only static (refresh schedule depending)
         #1. sensor exists with data but refresh interval not yet reached, use existing data
-        if previous_data is not None and (datetime.datetime.strptime(previous_data["gtfs_updated_at"],'%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))) >  dt_util.utcnow() + timedelta(seconds=1) :        
+        if "gtfs_updated_at" in previous_data and (
+            datetime.datetime.strptime(previous_data["gtfs_updated_at"], '%Y-%m-%dT%H:%M:%S.%f%z')
+            + timedelta(minutes=options.get("refresh_interval", DEFAULT_REFRESH_INTERVAL))
+        ) > dt_util.utcnow() + timedelta(seconds=1):
             run_static = False
             _LOGGER.debug("No run static refresh: sensor exists but not yet refresh for name: %s", data["name"])
-        #2. sensor exists and refresh interval reached, get static data
         else:
             run_static = True
             _LOGGER.debug("Run static refresh: sensor without gtfs data OR refresh for name: %s", data["name"])
@@ -212,8 +214,33 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""      
         data = self.config_entry.data
         options = self.config_entry.options
-        previous_data = None if self.data is None else self.data.copy()
+        previous_data = {} if self.data is None else self.data.copy()
         _LOGGER.debug("Previous data: %s", previous_data)  
+
+        self._pygtfs = get_gtfs(
+            self.hass, DEFAULT_PATH, data, False
+        )        
+
+        self._data = {
+            "schedule": self._pygtfs,
+            "include_tomorrow": True,
+            "gtfs_dir": DEFAULT_PATH,
+            "name": data["name"],
+            "file": data["file"],
+            "offset": options["offset"] if "offset" in options else 0,
+            "timerange": options.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE),
+            "radius": options.get("radius", DEFAULT_LOCAL_STOP_RADIUS),
+            "device_tracker_id": data["device_tracker_id"],
+            "extracting": False,
+        }           
+        self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat() 
+        
+        if check_extracting(self.hass, self.hass.config.path(self._data['gtfs_dir']), self._data['file']):   
+            _LOGGER.debug("Cannot update this sensor as still unpacking: %s", self._data["file"])
+            self._data.update(previous_data)
+            self._data["extracting"] = True
+            return self._data
+            
         self._realtime = False
         if "real_time" in options: 
             if options["real_time"]:
@@ -235,7 +262,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                     self._headers[CONF_API_KEY_NAME] = options.get(CONF_API_KEY_NAME, None)
                     self._headers[CONF_API_KEY] = options.get(CONF_API_KEY, None)
                     self._headers[CONF_ACCEPT_HEADER_PB] = options.get(CONF_ACCEPT_HEADER_PB, False)
-                _LOGGER.debug("RT header: %s", self._headers)
+                #_LOGGER.debug("RT header: %s", self._headers)
                 
         if self._pygtfs and hasattr(self._pygtfs, 'session'):
             try:
@@ -243,28 +270,7 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                 self._pygtfs.engine.dispose()
             except Exception:
                 pass
-                
-        self._pygtfs = get_gtfs(
-            self.hass, DEFAULT_PATH, data, False
-        )        
-        self._data = {
-            "schedule": self._pygtfs,
-            "include_tomorrow": True,
-            "gtfs_dir": DEFAULT_PATH,
-            "name": data["name"],
-            "file": data["file"],
-            "offset": options["offset"] if "offset" in options else 0,
-            "timerange": options.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE),
-            "radius": options.get("radius", DEFAULT_LOCAL_STOP_RADIUS),
-            "device_tracker_id": data["device_tracker_id"],
-            "extracting": False,
-        }           
-        self._data["gtfs_updated_at"] = dt_util.utcnow().isoformat() 
-        
-        if check_extracting(self.hass, self.hass.config.path(self._data['gtfs_dir']), self._data['file']):   
-            _LOGGER.debug("Cannot update this sensor as still unpacking: %s", self._data["file"])
-            previous_data["extracting"] = True
-            return previous_data
+
         try:    
             self._data["local_stops_next_departures"] = await self.hass.async_add_executor_job(
                     get_local_stops_next_departures, self
@@ -272,5 +278,5 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         except Exception as ex:
             _LOGGER.error("Error getting local stops data: %s", ex)
             raise UpdateFailed(f"Error in getting local stops data: {ex}")
-        _LOGGER.debug("Data from coordinator: %s", self._data)              
+        #_LOGGER.debug("Data from coordinator: %s", self._data)              
         return self._data
