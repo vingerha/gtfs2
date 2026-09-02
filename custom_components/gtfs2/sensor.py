@@ -556,7 +556,10 @@ class GTFSLocalStopSensor(CoordinatorEntity, SensorEntity):
         self._attributes["next_departures_lines"] = {}
         if self._departure:
             for stop in self._departure:
-                if self._name.startswith(stop["stop_id"]):
+                # matched on the id itself, not on the sensor name: the name
+                # starts with the stop_id, so a prefix test also claimed the
+                # departures of any stop whose id is a prefix of this one
+                if stop["stop_id"] == self._stop["stop_id"]:
                     self._attributes["next_departures_lines"] = stop["departure"]
                     self._attributes["latitude"] = stop["latitude"]  
                     self._attributes["longitude"] = stop["longitude"]  
