@@ -55,7 +55,7 @@ def get_next_departure(hass, _data):
     
     # if type 2 (train) then filter on that and use name-like search 
     if route_type == "2":
-        route_type_where = f"route_type in (2,100,101,102,103,104,105,106,107,108, 109,100,111,112,113,114,115,116,117)"
+        route_type_where = f"route_type in (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)"
         start_station_id = str(_data['origin'])+'%'
         end_station_id = str(_data['destination'])+'%'
         start_station_where = f"AND start_station.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
