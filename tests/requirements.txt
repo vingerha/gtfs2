@@ -1,0 +1,6 @@
+pytest
+freezegun
+homeassistant
+pygtfs==0.1.9
+gtfs-realtime-bindings==1.0.0
+protobuf
