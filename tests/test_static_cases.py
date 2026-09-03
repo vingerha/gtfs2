@@ -29,9 +29,19 @@ from pathlib import Path
 import pytest
 from freezegun import freeze_time
 
-import homeassistant.util.dt as dt_util
+import ha_stub
 
-from custom_components.gtfs2.gtfs_helper import _interpret_departure_rows, TIME_STR_FORMAT
+# Registers the homeassistant stand-ins, and does nothing where a real Home
+# Assistant is installed. Has to run before anything imports homeassistant.
+ha_stub.install()
+
+import homeassistant.util.dt as dt_util  # noqa: E402
+
+# Loaded on its own rather than through the package, whose __init__ pulls in
+# the coordinator and the platforms, and with them the rest of Home Assistant.
+gtfs_helper = ha_stub.load("gtfs_helper")
+_interpret_departure_rows = gtfs_helper._interpret_departure_rows
+TIME_STR_FORMAT = gtfs_helper.TIME_STR_FORMAT
 
 CASE_ROOT = Path(__file__).parent / "case_route"
 
