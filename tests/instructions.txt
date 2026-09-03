@@ -1,0 +1,23 @@
+Context, route bases only for now:
+- db free testing, input is the pre-constructed output of the 'rows' of the db query and a file with the 'now' to bypass issues with actual now
+- the 'rows' are then sent through the interpreter code and the output is compared with the expected output file
+- then the output of the interpreation is sent thouhg coordinatore and again compared with the output of that one, as the coordinator output is used in the actual entity/sensor
+
+Install:
+run in /tests .... 
+	pip install requirements.txt
+Note: sadly, this is outside of a HA container, and requires the install of homeassistant
+
+run from the component root (where /tests and /custom_components reside):
+	pytest tests/test_static_cases.py --tb=short
+	
+Ananlyse the output in tests/case_route/results.txt
+
+
+20260903 open/comments:
+- created only one example with synthtic input/output, this needs to be extended with cases including data for 'tomorrow'
+- no realtime yet, untill the static tests construct proves to be ok, no futher complexity 
+- no loca_stop testing yet, untill the static tests construct proves to be ok, no futher complexity 
+
+ToDo:
+- testscript should output the calculated next to the expected (file) so this can be better analysed in another tool, the current results.txt is outputting pytest stuff and this reads poorly in a rgular editor
