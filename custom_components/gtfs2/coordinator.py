@@ -155,9 +155,12 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 self._alerts_url = options.get("alerts_url", None)
                 if options.get(CONF_API_KEY_LOCATION, None) == "query_string":
                   if options.get(CONF_API_KEY, None):
-                    self._trip_update_url = self._trip_update_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
-                    self._vehicle_position_url = self._vehicle_position_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
-                    self._alerts_url = self._alerts_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
+                    if self._trip_update_url:
+                        self._trip_update_url = self._trip_update_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
+                    if self._vehicle_position_url:
+                        self._vehicle_position_url = self._vehicle_position_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
+                    if self._alerts_url:
+                        self._alerts_url = self._alerts_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
                 if options.get(CONF_API_KEY_LOCATION, None) == "header":
                     self._headers = {options[CONF_API_KEY_NAME]: options[CONF_API_KEY]}               
                     if options.get(CONF_ACCEPT_HEADER_PB, False):
@@ -262,7 +265,8 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
                 self._alerts_url = options.get("alerts_url", None)
                 if options.get(CONF_API_KEY_LOCATION, None) == "query_string":
                   if options.get(CONF_API_KEY, None):
-                    self._trip_update_url = self._trip_update_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
+                    if self._trip_update_url:
+                        self._trip_update_url = self._trip_update_url + "?" + options[CONF_API_KEY_NAME] + "=" + options[CONF_API_KEY]
                 if options.get(CONF_API_KEY_LOCATION, None) == "header":
                     self._headers = {options[CONF_API_KEY_NAME]: options[CONF_API_KEY]}   
                     self._headers[CONF_API_KEY_LOCATION] = options.get(CONF_API_KEY_LOCATION,None)
