@@ -1553,5 +1553,5 @@ async def get_trip_stops(hass, data):
     }
     
     _LOGGER.debug("Tripstops returned: %s", _tripstops)
-    _pygtfs.engine.dispose()
+    schedule.engine.dispose()
     return _tripstops       
