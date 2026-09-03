@@ -127,17 +127,9 @@ def _find_case_file(case_dir: Path, case_id: str, suffix: str) -> Path:
     return matches[0]
 
 
-def _parse_rows_capture(text: str) -> tuple[list[dict], str]:
-    """Format: "TEST FIXTURE rows: [...] | start_station_id: <id>"."""
-    match = re.match(
-        r"TEST FIXTURE rows: (?P<rows>\[.*\]) \| start_station_id: (?P<station_id>.+)\s*$",
-        text.strip(),
-        re.DOTALL,
-    )
-    if not match:
-        raise ValueError("Rows capture did not match the expected 'TEST FIXTURE rows: ... | start_station_id: ...' format")
-    rows = eval(match.group("rows"), _EVAL_GLOBALS)  # noqa: S307 - trusted, locally captured fixture
-    return rows, match.group("station_id").strip()
+def _parse_rows_capture(text: str) -> list[dict]:
+    """Format: a bare Python list-of-dicts literal, nothing else."""
+    return eval(text.strip(), _EVAL_GLOBALS)  # noqa: S307 - trusted, locally captured fixture
 
 
 def _parse_datetime_capture(text: str) -> tuple[str, datetime.datetime]:
@@ -156,15 +148,11 @@ def _parse_datetime_capture(text: str) -> tuple[str, datetime.datetime]:
 
 def _parse_interpret_output_capture(text: str) -> dict:
     """Format: "TEST FIXTURE interpret_departure_times: {...}"."""
-    prefix = "TEST FIXTURE interpret_departure_times: "
-    stripped = text.strip()
-    if not stripped.startswith(prefix):
-        raise ValueError(f"Expected capture to start with {prefix!r}")
-    return eval(stripped[len(prefix):], _EVAL_GLOBALS)  # noqa: S307 - trusted, locally captured fixture
+    return eval(text.strip(), _EVAL_GLOBALS)
 
 
 def _parse_coordinator_data_capture(text: str) -> dict:
-    """Format: "TEST FIXTURE coordinator.data: {...}".
+    """Format: a bare Python dict literal, nothing else.
 
     The captured dict contains one non-literal value -- the live
     `schedule` object's default repr (`<pygtfs.schedule.Schedule object
@@ -172,12 +160,7 @@ def _parse_coordinator_data_capture(text: str) -> dict:
     replaced with `None` before parsing since no test compares against
     it; everything else in the capture is parsed as-is.
     """
-    prefix = "TEST FIXTURE coordinator.data: "
-    stripped = text.strip()
-    if not stripped.startswith(prefix):
-        raise ValueError(f"Expected capture to start with {prefix!r}")
-    body = stripped[len(prefix):]
-    body = re.sub(r"<pygtfs\.schedule\.Schedule object at 0x[0-9a-fA-F]+>", "None", body)
+    body = re.sub(r"<pygtfs\.schedule\.Schedule object at 0x[0-9a-fA-F]+>", "None", text.strip())
     return eval(body, _EVAL_GLOBALS)  # noqa: S307 - trusted, locally captured fixture
 
 
@@ -186,9 +169,10 @@ CASES = _discover_cases(CASE_ROOT)
 
 @pytest.mark.parametrize("case_id,case_dir", CASES, ids=[c[0] for c in CASES])
 def test_static_case(case_id: str, case_dir: Path):
-    rows, start_station_id = _parse_rows_capture(
+    rows = _parse_rows_capture(
         _find_case_file(case_dir, case_id, "_static_input_fetch_departure_rows.txt").read_text(encoding="utf-8")
     )
+    start_station_id = rows[0]["origin_stop_id"]
     label, captured_at = _parse_datetime_capture(
         _find_case_file(case_dir, case_id, "_static_input_datetime.txt").read_text(encoding="utf-8")
     )
