@@ -41,16 +41,17 @@ def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001 - exitstatus requ
         if outcome in ("failed", "error"):
             failure_text = str(report.longrepr)
             failure_lines = failure_text.splitlines()
-            # The custom assertion message (the f-string passed to
-            # `assert x, "..."`) always lands on the `E   AssertionError:`
-            # line -- prefer that over an arbitrary last "E " line, which
-            # can be a truncation notice ("...Full output truncated...")
-            # on large diffs instead of anything useful.
-            assertion_line = next(
-                (line for line in failure_lines if "AssertionError:" in line),
-                next((line for line in reversed(failure_lines) if line.strip().startswith("E ")), failure_lines[-1] if failure_lines else ""),
-            )
-            lines.append(f"  detail: {assertion_line.strip()}")
+            # Keep the whole "E   ..." block: the AssertionError line,
+            # the value summary, and the "Differing items:" section that
+            # actually shows which field changed and how -- not just
+            # the first line, which is only the custom message.
+            detail_lines = [line for line in failure_lines if line.startswith("E ")]
+            if detail_lines:
+                lines.append("  detail:")
+                for detail_line in detail_lines:
+                    lines.append(f"    {detail_line[2:].strip()}")
+            else:
+                lines.append(f"  detail: {failure_lines[-1].strip() if failure_lines else ''}")
         lines.append("")
 
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)

@@ -147,8 +147,8 @@ def _parse_datetime_capture(text: str) -> tuple[str, datetime.datetime]:
 
 
 def _parse_interpret_output_capture(text: str) -> dict:
-    """Format: "TEST FIXTURE interpret_departure_times: {...}"."""
-    return eval(text.strip(), _EVAL_GLOBALS)
+    """Format: a bare Python dict literal, nothing else"""
+    return eval(text.strip(), _EVAL_GLOBALS)  # noqa: S307 - trusted, locally captured fixture
 
 
 def _parse_coordinator_data_capture(text: str) -> dict:

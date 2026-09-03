@@ -1,4 +1,7 @@
-Static case results -- 1 case(s)
+Static case results -- 2 case(s)
 
 case: case_1
+  result: PASSED
+
+case: case_2
   result: PASSED
