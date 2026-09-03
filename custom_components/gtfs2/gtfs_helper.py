@@ -42,49 +42,49 @@ from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_p
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_next_departure(hass, _data):
-    _LOGGER.debug("Get next departure with data: %s", _data)
-    if check_extracting(hass, _data['gtfs_dir'],_data['file']):
-        _LOGGER.debug("Cannot get next departures on this datasource as still unpacking: %s", _data["file"])
-        return {}
+def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
+                           now, now_date, yesterday, tomorrow, tomorrow_date, schedule):
+    """Run the static-GTFS SQL query and return matching rows as plain dicts.
+                                                                                                            
+                 
 
-    """Get next departures from data."""
+                                        
 
-    schedule = _data["schedule"]
-    route_type = _data["route_type"]
-    
-    # if type 2 (train) then filter on that and use name-like search 
+    This is the only part of get_next_departure that touches the database.
+    Split out so its output (`rows`) can be handed in directly by a test,
+    without a real schedule/database, instead of always coming from here.
+    """
     if route_type == "2":
         route_type_where = f"route_type in (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)"
-        start_station_id = str(_data['origin'])+'%'
-        end_station_id = str(_data['destination'])+'%'
+        start_station_id = str(origin)+'%'
+        end_station_id = str(destination)+'%'
         start_station_where = f"AND start_station.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
         end_station_where = f"AND end_station.stop_id in (select stop_id from stops where stop_name like :end_station_id)"
         _LOGGER.debug("Setting up TRAIN Route for start/end : %s / %s ", start_station_id, end_station_id)
     else:
         route_type_where = "1=1"
-        start_station_id = _data['origin'].split(': ')[0]
-        end_station_id = _data['destination'].split(': ')[0]
+        start_station_id = origin.split(': ')[0]
+        end_station_id = destination.split(': ')[0]
         start_station_where = f"AND start_station.stop_id = :origin_station_id"
         end_station_where = f"AND end_station.stop_id = :end_station_id"
         _LOGGER.debug("Setting up Route for start/end : %s / %s ", start_station_id, end_station_id)
-    offset = _data["offset"]
-    include_tomorrow = _data["include_tomorrow"]
-    now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
-    now_local_tz = dt_util.now() + datetime.timedelta(minutes=offset)
-    now_date = now.strftime(dt_util.DATE_STR_FORMAT)
-    now_date_local_tz = now_local_tz.strftime(dt_util.DATE_STR_FORMAT)
-    now_time = now.strftime(TIME_STR_FORMAT)
-    yesterday = now - datetime.timedelta(days=1)
-    yesterday_date = yesterday.strftime(dt_util.DATE_STR_FORMAT)
-    tomorrow = now + datetime.timedelta(days=1)
-    tomorrow_local_tz = dt_util.now() + datetime.timedelta(minutes=offset) + datetime.timedelta(days=1) 
-    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
-    tomorrow_date_local_tz = tomorrow_local_tz.strftime(dt_util.DATE_STR_FORMAT)
+                            
+                                                
+                                                                                 
+                                                                     
+                                                    
+                                                                      
+                                            
+                                                
+                                                                
+                                               
+                                                                                                        
+                                                              
+                                                                                
 
-    # Fetch all departures for yesterday, today and optionally tomorrow,
-    # up to an overkill maximum in case of a departure every minute for those
-    # days.
+                                                                        
+                                                                             
+           
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
     tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}'))"
@@ -232,9 +232,9 @@ def get_next_departure(hass, _data):
 
     #_LOGGER.debug("SQL statement:\n%s", sql_query)
     #_LOGGER.debug("SQL parameters:\n%s", log_params)      
-    timetable = {}
-    yesterday_start = today_start = tomorrow_start = None
-    yesterday_last = today_last = ""        
+                  
+                                                         
+                                            
     with schedule.engine.connect() as conn:
         result = conn.execute(
             text(sql_query),
@@ -246,9 +246,24 @@ def get_next_departure(hass, _data):
             },
         )
         rows = result.fetchall()
-        
-    for row_cursor in rows:
-        row = row_cursor._asdict()
+
+    return [row_cursor._asdict() for row_cursor in rows], start_station_id
+
+
+def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
+                               now_date_local_tz, now_time, yesterday_date,
+                               tomorrow, tomorrow_date, tomorrow_date_local_tz):
+    """Turn raw SQL-shaped rows into the `next_departure` dict.
+
+    No database, no schedule object: `rows` only needs to be a list of
+    plain dicts shaped like `_fetch_departure_rows`' output. This is what
+    a test builds by hand to simulate a specific condition (a midnight
+    crossing, a yesterday-late departure, ...) without a real GTFS feed.
+    """
+    timetable = {}
+    yesterday_start = today_start = tomorrow_start = None
+    yesterday_last = today_last = ""        
+    for row in rows:
         #_LOGGER.debug("Row in cursor: %s", row)
         if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
             _LOGGER.debug("Row in cursor added to yesterday")
@@ -530,6 +545,48 @@ def get_next_departure(hass, _data):
     }
     
     return data_returned
+
+
+
+def get_next_departure(hass, _data):
+    _LOGGER.debug("Get next departure with data: %s", _data)
+    if check_extracting(hass, _data['gtfs_dir'],_data['file']):
+        _LOGGER.debug("Cannot get next departures on this datasource as still unpacking: %s", _data["file"])
+        return {}
+
+    """Get next departures from data."""
+
+    schedule = _data["schedule"]
+    route_type = _data["route_type"]
+
+    offset = _data["offset"]
+    include_tomorrow = _data["include_tomorrow"]
+    now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
+    now_local_tz = dt_util.now() + datetime.timedelta(minutes=offset)
+    now_date = now.strftime(dt_util.DATE_STR_FORMAT)
+    now_date_local_tz = now_local_tz.strftime(dt_util.DATE_STR_FORMAT)
+    now_time = now.strftime(TIME_STR_FORMAT)
+    yesterday = now - datetime.timedelta(days=1)
+    yesterday_date = yesterday.strftime(dt_util.DATE_STR_FORMAT)
+    tomorrow = now + datetime.timedelta(days=1)
+    tomorrow_local_tz = dt_util.now() + datetime.timedelta(minutes=offset) + datetime.timedelta(days=1) 
+    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
+    tomorrow_date_local_tz = tomorrow_local_tz.strftime(dt_util.DATE_STR_FORMAT)
+
+    # Fetch all departures for yesterday, today and optionally tomorrow,
+    # up to an overkill maximum in case of a departure every minute for those
+    # days.
+    rows, start_station_id = _fetch_departure_rows(
+        route_type, _data["origin"], _data["destination"], include_tomorrow,
+        now, now_date, yesterday, tomorrow, tomorrow_date, schedule,
+    )
+
+    return _interpret_departure_rows(
+        hass, rows, start_station_id, now, now_local_tz,
+        now_date_local_tz, now_time, yesterday_date,
+        tomorrow, tomorrow_date, tomorrow_date_local_tz,
+    )
+
 
 def get_gtfs(hass, path, data, update=False):
     _LOGGER.debug("Getting gtfs with data: %s", data)
@@ -1553,5 +1610,5 @@ async def get_trip_stops(hass, data):
     }
     
     _LOGGER.debug("Tripstops returned: %s", _tripstops)
-    _pygtfs.engine.dispose()
+    schedule.engine.dispose()
     return _tripstops       
