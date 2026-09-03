@@ -96,7 +96,6 @@
       "stop_incorrect": "Start- und/oder Endziel falsch, möglicherweise kein Transport ‚heute‘ oder nicht in die gleiche Richtung, Protokolle prüfen",
       "generic_failure": "Gesamtfehler, Protokolle prüfen",
       "no_data_file": "Problem bei der Datenerfassung: URL falsch oder Dateiname nicht im richtigen Ordner",
-	  "stop_limit_reached": "Es wurde eine hohe Anzahl von Stopps für diesen Umkreis festgestellt. \n Es besteht die Gefahr einer Beeinträchtigung der Systemleistung. \n Sie können die Limite auf eigenes Risiko ändern, bevor Sie den Umkreis ändern",
       "no_zip_file": "Problem bei der Datenerfassung: ZIP-Datei nicht im richtigen Ordner"
     },
     "abort": {
@@ -121,7 +120,9 @@
           "real_time": "Echtzeitintegration einrichten? \n (benötigt Daten aus derselben Quelle)",
           "local_stop_refresh_interval": "Datenaktualisierungsintervall (in Minuten)",
           "timerange": "Prüfung auf zukünftige Abfahrten ab ‚jetzt‘ (in Minuten: zwischen 15 und 120)",
-          "radius": "Radius für die Suche nach Haltestellen (in Metern zwischen 50 und 500)"
+          "radius": "Radius für die Suche nach Haltestellen (in Metern zwischen 50 und 500)",
+          "source_timezone_correction": "Zeitzone der GTFS-Quelle korrigieren (in Stunden)",
+          "check_source_dates": "experimentell: vermeiden, ein neues ZIP bzw. eine Quelle ohne aktuelle Informationen zu verwenden"
         }
       },
       "real_time": {
@@ -159,6 +160,13 @@
         "2": "Züge, zwischen manuell eingegebene Städte (nächsten Bildschirm)",
         "99": "Alle, außer Züge, zwischen ausgewählte Haltestellen (nächsten Bildschirm)"
       }
+    },
+    "api_key_location": {
+      "options": {
+        "not_applicable": "kein Schlüssel verwendet (Standard)",
+        "header": "header: den Aufruf mit Header/Schlüssel aufbauen",
+        "query_string": "query-string: den Aufruf mit Query/Schlüssel aufbauen"
+      }
     }
   },
   "services": {
@@ -195,6 +203,34 @@
         "url": {
           "name": "URL",
           "description": "Geben Sie den vollständigen Pfad zu den Echtzeitdaten an."
+        },
+        "api_key": {
+          "name": "api_schlüssel",
+          "description": "API-Schlüssel angeben, falls erforderlich"
+        },
+        "api_key_name": {
+          "name": "api_schlüssel_name",
+          "description": "Name des API-Schlüssels, Standard ist api_key"
+        },
+        "api_key_location": {
+          "name": "api_schlüssel_ort",
+          "description": "Ort des Schlüssels auswählen"
+        },
+        "accept": {
+          "name": "Accept",
+          "description": "application/protobuf zum Header hinzufügen"
+        },
+        "rt_type": {
+          "name": "Art der Echtzeitdaten angeben",
+          "description": "Art der Echtzeitdaten der Quelle auswählen"
+        },
+        "entity_for_siri": {
+          "name": "SIRI-RT-Linie",
+          "description": "Experimentell: nur Echtzeit im SIRI-Format (!) wählen Sie Ihre Konfiguration. siehe Dokumentation > Dienst"
+        },
+        "debug_output": {
+          "name": "debug_ausgabe",
+          "description": "In eine lesbare lokale Datei speichern"
         }
       }
     },
