@@ -96,7 +96,6 @@
       "stop_incorrect": "Paragem de início e/ou de fim incorreta, possivelmente sem transporte 'hoje' ou não na mesma direção, verifique os logs",
       "generic_failure": "Falha geral, verifique os logs",
       "no_data_file": "Problema de recolha de dados: URL incorreta ou nome do ficheiro não está na pasta correta",
-	  "stop_limit_reached": "Mais de 15 paragens encontradas para este raio. \n Risco de impacto no desempenho do sistema. \n Por favor, selecione um raio menor",
 	  "no_zip_file": "Problema de recolha de dados: Ficheiro ZIP não está na pasta correta"
     },
     "abort": {
@@ -122,7 +121,8 @@
 		  "local_stop_refresh_interval": "Intervalo de atualização de dados (em minutos)",
           "timerange": "Verificação de partidas no futuro a partir de 'agora' (em minutos: entre 15 e 120)",
 		  "check_source_dates": "experimental: evitar usar uma nova zip/fonte contendo informações desatualizadas",
-		  "radius": "Raio para procurar paragens (em metros entre 50 e 500)"
+		  "radius": "Raio para procurar paragens (em metros entre 50 e 500)",
+          "source_timezone_correction": "Corrigir o fuso horário da fonte gtfs (em horas)"
         }
       },
 	  "real_time": {
@@ -223,6 +223,14 @@
         "debug_output": {
           "name": "output_debug",
           "description": "Guardar em ficheiro local num formato legível"
+        },
+        "rt_type": {
+          "name": "Indique o tipo de dados em tempo real",
+          "description": "Selecione o tipo de dados em tempo real da fonte"
+        },
+        "entity_for_siri": {
+          "name": "Rota RT SIRI",
+          "description": "Experimental: apenas tempo real em formato SIRI (!) selecione a sua configuração. ver documentação > serviço"
         }
       }
     },
