@@ -178,7 +178,7 @@ CASES = _discover_cases(CASE_ROOT)
 
 
 @pytest.mark.parametrize("case_id,case_dir", CASES, ids=[c[0] for c in CASES])
-def test_static_case(case_id: str, case_dir: Path):
+def test_route_static(case_id: str, case_dir: Path):
     rows = _parse_rows_capture(
         _find_case_file(case_dir, case_id, "_static_route_input_fetch_departure_rows.txt").read_text(encoding="utf-8")
     )
@@ -223,8 +223,8 @@ def test_static_case(case_id: str, case_dir: Path):
     # 1. The real function, given this case's real inputs, must
     #    reproduce this case's real output capture.
     assert result == expected_interpret_result, (
-        f"[{case_id}] ({label}) result did not match "
-        f"case_*_static_output_interpret_departure_rows.txt"
+        f"[{case_id}] ({label}) real _interpret_departure_rows() output "
+        f"does not match case_*_static_route_output_interpret_departure_rows.txt"
     )
 
     # 2. The two output captures for this case must be mutually
@@ -232,5 +232,7 @@ def test_static_case(case_id: str, case_dir: Path):
     #    sub-dict must be the exact same result, proving both were
     #    captured from the same event and not two mismatched runs.
     assert coordinator_data["next_departure"] == expected_interpret_result, (
-        f"[{case_id}] ({label}) output captures 1c/1d are mutually inconsistent"
+        f"[{case_id}] ({label}) 'next_departure' inside "
+        f"case_*_static_route_output_coordinator_data.txt does not match "
+        f"case_*_static_route_output_interpret_departure_rows.txt"
     )

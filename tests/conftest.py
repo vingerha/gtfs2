@@ -31,7 +31,7 @@ _TEST_FILE_TO_CASE_FOLDER = {
     "test_route_combined.py": "case_route_combined",
 }
 
-_CASE_NODEID_RE = re.compile(r"^(?P<file>[^:]+)::test_\w+_case\[")
+_CASE_NODEID_RE = re.compile(r"^(?P<file>[^:]+)::test_\w+\[")
 
 
 def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001 - exitstatus required by hook signature

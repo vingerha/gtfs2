@@ -35,8 +35,8 @@ case_4_static_route: synthetic test,
 Data:
 - 1 before 'now', running today, should show only tomorrow
 - 1 after 'now' for tomorrow only
-- 1 after 'now' for tomorrow only
-> expected output: 2 next trips, 2nd trip shows as first trip with tomorrow date
+- 1 after now but for  today/tomorrow 0
+> expected output: 2 next trips, 1st trip shows as first trip with tomorrow date
 
 1b. Local-stop based:
 case_1_static_localstop
