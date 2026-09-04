@@ -14,6 +14,13 @@ run from the component root (where /tests and /custom_components reside):
 Ananlyse the output in tests/case_route/results.txt
 
 
+Fixtures (tests/fixtures):
+- real feeds cut down to a few routes, 24 to 88 KB each: gvb, palmbus, sncf (with trip updates and alerts), sncf-journeys, tao-journeys
+- manifest.json in each says where the bytes came from, what was kept and why; sncf also carries scenarios.json, the journeys its entities make testable
+- build_fixture.py cuts any static zip down to named routes, a few trips per stop pattern
+- capture_rt.py freezes a static + trip updates + alerts capture, SNCF by default, any feed with --static/--trip-updates/--alerts
+- a test pins its clock at the manifest's captured_at (freezegun or ha_stub.freeze), so the data never has to be shifted to today
+
 20260903 open/comments:
 - created only one example with synthtic input/output, this needs to be extended with cases including data for 'tomorrow'
 - no realtime yet, untill the static tests construct proves to be ok, no futher complexity 
