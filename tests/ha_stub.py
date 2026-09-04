@@ -279,6 +279,34 @@ def installed() -> bool:
     return True
 
 
+def _gtfs_realtime_bindings_installed() -> bool:
+    """Whether the real `gtfs-realtime-bindings` package (and, with it,
+    `protobuf`) can be imported -- same "a real install wins" rule as
+    `installed()` above, kept separate since this package has nothing
+    to do with Home Assistant and can be present or absent independently.
+    """
+    if "google.transit.gtfs_realtime_pb2" in sys.modules:
+        return True
+    try:
+        from google.transit import gtfs_realtime_pb2  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+def _pygtfs_installed() -> bool:
+    """Whether the real `pygtfs` package (and, with it, `sqlalchemy`) can
+    be imported. Same "a real install wins" rule as the checks above.
+    """
+    if "pygtfs" in sys.modules:
+        return True
+    try:
+        import pygtfs  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
 def install() -> None:
     """Register the homeassistant modules the gtfs2 import chain touches.
 
@@ -341,6 +369,35 @@ def install() -> None:
     _module("homeassistant.exceptions", HomeAssistantError=Exception)
     if _MissingStub not in sys.meta_path:
         sys.meta_path.append(_MissingStub)
+
+    # gtfs_rt_helper.py imports this at module level (`from google.transit
+    # import gtfs_realtime_pb2`), so gtfs_helper.py's own import of
+    # gtfs_rt_helper.py pulls it in even for tests that never touch RT.
+    # The only thing ever used from it, across the whole codebase, is
+    # FeedMessage() -- and only inside the raw-protobuf fallback branch of
+    # get_gtfs_feed_entities(), a function every current test replaces
+    # entirely. Stubbed the same way as the Home Assistant symbols above:
+    # a real install wins if present, and an unstubbed path raises instead
+    # of returning something plausible.
+    if not _gtfs_realtime_bindings_installed():
+        _module("google")
+        _module("google.transit")
+        _module(
+            "google.transit.gtfs_realtime_pb2",
+            FeedMessage=_Unreached("gtfs_realtime_pb2.FeedMessage"),
+        )
+
+    # gtfs_helper.py imports pygtfs and sqlalchemy.sql.text at module level
+    # (get_gtfs, _fetch_departure_rows), but every current test either
+    # never calls those functions or replaces them with
+    # unittest.mock.patch.object before they'd touch a real database --
+    # same reasoning as the gtfs_realtime_pb2 stub above.
+    if not _pygtfs_installed():
+        _module("pygtfs",
+                Schedule=_Unreached("pygtfs.Schedule"),
+                append_feed=_Unreached("pygtfs.append_feed"))
+        _module("sqlalchemy")
+        _module("sqlalchemy.sql", text=_Unreached("sqlalchemy.sql.text"))
 
 
 def load(module_name: str, component: str | Path = COMPONENT,
