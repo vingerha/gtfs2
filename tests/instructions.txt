@@ -20,6 +20,7 @@ Fixtures (tests/fixtures):
 - build_fixture.py cuts any static zip down to named routes, a few trips per stop pattern
 - capture_rt.py freezes a static + trip updates + alerts capture, SNCF by default, any feed with --static/--trip-updates/--alerts
 - a test pins its clock at the manifest's captured_at (freezegun or ha_stub.freeze), so the data never has to be shifted to today
+- test_journeys.py reads them: one test per fixture, route, direction and promise (stop list, a valid pair, the swapped pair), through the real query on a db built from the zip by fixture_db.py, no pygtfs; the cases known to fail on main are marked xfail with the reason, strict, so a fix has to lift its mark
 
 20260903 open/comments:
 - created only one example with synthtic input/output, this needs to be extended with cases including data for 'tomorrow'
