@@ -1,0 +1,94 @@
+{
+  'schedule': '<pygtfs.schedule.Scheduleobjectat0x4972e601520>',
+  'origin': 'origin_stop_id: origin_stop_name (20)',
+  'destination': 'dest_stop_id: dest_stop_name (37)',
+  'offset': 0,
+  'include_tomorrow': True,
+  'gtfs_dir': 'gtfs2',
+  'name': 'route_name',
+  'file': 'zou_proximite',
+  'route_type': '3',
+  'route': 'route_id',
+  'extracting': False,
+  'next_departure': {
+    'trip_id': 'trip_id_1',
+    'route_id': 'route_id',
+    'route_short_name': 'route_short_name',
+    'trip_direction_id': 0,
+    'trip_short_name': 'trip_short_name_1',
+    'day': 'today',
+    'first': False,
+    'last': False,
+    'origin_stop_id': 'origin_stop_id',
+    'origin_stop_sequence': 20,
+    'origin_stop_name': 'origin_stop_name',
+    'departure_time': datetime.datetime(2026,
+    9,
+    3,
+    14,
+    14,
+    tzinfo=zoneinfo.ZoneInfo(key='Europe/Paris')),
+    'arrival_time': datetime.datetime(2026,
+    9,
+    3,
+    14,
+    36,
+    tzinfo=zoneinfo.ZoneInfo(key='Europe/Paris')),
+    'origin_stop_time': {
+      'Arrival Time': '2026-09-03T12:14:00+00:00',
+      'Departure Time': '2026-09-03T12:14:00+00:00',
+      'Drop Off Type': 0,
+      'Pickup Type': 0,
+      'Shape Dist Traveled': None,
+      'Headsign': None,
+      'Sequence': 20,
+      'Timepoint': 1
+    },
+    'origin_stop_timezone': None,
+    'destination_stop_time': {
+      'Arrival Time': '2026-09-03T12:36:00+00:00',
+      'Departure Time': '2026-09-03T12:36:00+00:00',
+      'Drop Off Type': 0,
+      'Pickup Type': 1,
+      'Shape Dist Traveled': None,
+      'Headsign': None,
+      'Sequence': 37,
+      'Timepoint': 1
+    },
+    'destination_stop_timezone': None,
+    'destination_stop_id': 'dest_stop_id',
+    'destination_stop_name': 'dest_stop_name',
+    'next_departures': [
+      '2026-09-03T12:14:00+00:00',
+      '2026-09-03T13:14:00+00:00',
+      '2026-09-03T14:15:00+00:00'
+    ],
+    'next_departures_lines': [
+    '2026-09-03T12:14:00+00:00 (route_short_name/route_long_name)',
+    '2026-09-03T13:14:00+00:00 (route_short_name/route_long_name)',
+    '2026-09-03T14:15:00+00:00 (route_short_name/route_long_name)'
+    ],
+    'next_departures_headsign': [
+    '2026-09-03T12:14:00+00:00 (trip_headsign_1)',
+    '2026-09-03T13:14:00+00:00 (trip_headsign_3)',
+    '2026-09-03T14:15:00+00:00 (trip_headsign_4)'
+    ],
+    'next_departures_trip_id': [
+    'trip_id_1',
+    'trip_id_3',
+    'trip_id_4'
+    ],
+    'next_departures_destination_arrival_times': [
+    '2026-09-03T12:36:00+00:00',
+    '2026-09-03T13:36:00+00:00',
+    '2026-09-03T14:37:00+00:00'
+    ]
+  },
+  'next_departure_realtime_attr': {
+    
+  },
+  'alert': {
+    
+  },
+  'gtfs_updated_at': '2026-09-03T12:03:10.036070+00:00'
+}

@@ -320,13 +320,12 @@ def get_rt_route_trip_statuses(self, feed_entities=None):
                         departure_dt = dt_util.utc_from_timestamp(stop_time)  # aware UTC, epoch is always UTC                       
                         if due_in_minutes(departure_dt) >= 0:
                             departure_times[self._route_id][direction_id][stop_id]["departures"].append(departure_dt)
+                            departure_times[self._route_id][direction_id][stop_id]["delays"].append(delay)
                             _LOGGER.debug("RT stoptime: %s, in utcfromtimestamp: %s", stop_time, departure_dt)
                         else:
                             _LOGGER.debug("Not using realtime stop data for old due-in-minutes: %s", due_in_minutes(departure_dt))
                             
-                        departure_times[self._route_id][direction_id][stop_id]["delays"].append(delay)
-
-                        
+                       
     # Sort by time
     for route in departure_times:
         for direction in departure_times[self._route_id]:

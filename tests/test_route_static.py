@@ -29,9 +29,19 @@ from pathlib import Path
 import pytest
 from freezegun import freeze_time
 
-import homeassistant.util.dt as dt_util
-
-from custom_components.gtfs2.gtfs_helper import _interpret_departure_rows, TIME_STR_FORMAT
+import ha_stub
+ 
+# Registers the homeassistant stand-ins, and does nothing where a real Home
+# Assistant is installed. Has to run before anything imports homeassistant.
+ha_stub.install()
+ 
+import homeassistant.util.dt as dt_util  # noqa: E402
+ 
+# Loaded on its own rather than through the package, whose __init__ pulls in
+# the coordinator and the platforms, and with them the rest of Home Assistant.
+gtfs_helper = ha_stub.load("gtfs_helper")
+_interpret_departure_rows = gtfs_helper._interpret_departure_rows
+TIME_STR_FORMAT = gtfs_helper.TIME_STR_FORMAT
 
 CASE_ROOT = Path(__file__).parent / "case_route"
 
@@ -170,17 +180,17 @@ CASES = _discover_cases(CASE_ROOT)
 @pytest.mark.parametrize("case_id,case_dir", CASES, ids=[c[0] for c in CASES])
 def test_static_case(case_id: str, case_dir: Path):
     rows = _parse_rows_capture(
-        _find_case_file(case_dir, case_id, "_static_input_fetch_departure_rows.txt").read_text(encoding="utf-8")
+        _find_case_file(case_dir, case_id, "_static_route_input_fetch_departure_rows.txt").read_text(encoding="utf-8")
     )
     start_station_id = rows[0]["origin_stop_id"]
     label, captured_at = _parse_datetime_capture(
-        _find_case_file(case_dir, case_id, "_static_input_datetime.txt").read_text(encoding="utf-8")
+        _find_case_file(case_dir, case_id, "_static_route_input_datetime.txt").read_text(encoding="utf-8")
     )
     expected_interpret_result = _parse_interpret_output_capture(
-        _find_case_file(case_dir, case_id, "_static_output_interpret_departure_rows.txt").read_text(encoding="utf-8")
+        _find_case_file(case_dir, case_id, "_static_route_output_interpret_departure_rows.txt").read_text(encoding="utf-8")
     )
     coordinator_data = _parse_coordinator_data_capture(
-        _find_case_file(case_dir, case_id, "_static_output_coordinator_data.txt").read_text(encoding="utf-8")
+        _find_case_file(case_dir, case_id, "_static_route_output_coordinator_data.txt").read_text(encoding="utf-8")
     )
 
     # HA sets its own default timezone once at startup from

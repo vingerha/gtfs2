@@ -1,0 +1,79 @@
+1. Static test cases
+Context:
+- verify end-2-end with assumed query output, no actual db query
+- simulated query data will focus on today and/or tomorrow, ignoring testing any trips reported for yesterday (even if the output shows '1')
+- simulated query assumes that tomorrow is selected as an option
+- verification if the interpretation of the query outut is properly done
+- verification if the coordinator receives proper data after interpretation (this is more a prep. for cases with realtime data)
+
+1a. Route based:
+
+case_1_static_route: real life case static only for zou route 653, not further maintained if crashing
+
+case_2_static: synthetic test, 
+- today trips only
+> verify it filters out properly old and non-applicable trips
+Data:
+- 1st before 'now'
+- 3 after 'now' of which one has today/tomorrow 0
+> expected output: 3 next trips, 2nd trip shows as first trip
+
+case_3_static_route: synthetic test, 
+- today and tomorrow trips
+> verify if it puts trips for today, today&tomorrow and tomorrow-only in proper order
+Data:
+- 1 before 'now', running today and tomorrow, should show only tomorrow
+- 1 after 'now' for today only
+- 1 after now but for  today/tomorrow 0
+- 1 after 'now' for today&tomorrow
+- 1 after 'now' for tomorrow only
+> expected output: 5 next trips, 2nd trip shows as first trip, 2 trips for today, 2 for tomorrow
+
+case_4_static_route: synthetic test, 
+- only tomorrow trips
+> verify if it puts trips for tomorrow
+Data:
+- 1 before 'now', running today, should show only tomorrow
+- 1 after 'now' for tomorrow only
+- 1 after 'now' for tomorrow only
+> expected output: 2 next trips, 2nd trip shows as first trip with tomorrow date
+
+1b. Local-stop based:
+case_1_static_localstop
+
+
+2. Static&Realtime tests
+
+2a. route based
+case_20_static_realtime: synthetic test, 
+- today trips only
+- realtime provides 2 next rt trips
+> verify if properly adds realtime data
+Data:
+- 1st before 'now'
+- 3 after 'now' of which one has today/tomorrow 0
+> expected output: 3 next trips, 2nd trip shows as first trip, realtime attrib populated as well as realtime next departures
+
+case_23_static_realtime: synthetic test, 
+- today and tomorrow trips
+- realtime is providing departures for today and first tomorrow trip 
+> verify if it puts trips for today, today&tomorrow and tomorrow-only in proper order and with proper realtime
+Data:
+- 1 before 'now', for today and tomorrow, should show only tomorrow
+- 1 after 'now' for today only
+- 1 after 'now' for today&tomorrow
+- 1 after 'now' for tomorrow only
+> expected output: 5 next trips, 2nd trip shows as first trip, 2 trips for today, 2 for tomorrow, realtime attrib populated as well as realtime next departures
+
+case_23_static_realtime: synthetic test, missing direction_id
+- today trips only
+- static data provides empty direction_id
+- realtime provides direction 0 only and data for 2 next rt trips
+> verify if properly adds realtime data
+Data:
+- 1st before 'now'
+- 3 after 'now' of which one has today/tomorrow 0
+> expected output: 3 next trips, 2nd trip shows as first trip, realtime attrib populated as well as realtime next departures
+
+2b. local-stop based
+...
