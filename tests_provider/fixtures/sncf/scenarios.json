@@ -1,0 +1,64 @@
+{
+  "scenarios": [
+    {
+      "name": "alert names this trip",
+      "route_id": "FR:Line::1f647a2c-138d-47de-8fb5-333f230e16f7:",
+      "trip_id": "OCESN853603F1187_F:TER:FR:Line::1f647a2c-138d-47de-8fb5-333f230e16f7::87444711:87444000:7:802:20261211",
+      "direction": "0",
+      "stop_id": "StopPoint:OCETrain TER-87444711",
+      "stop_sequence": 0,
+      "destination_id": "StopPoint:OCETrain TER-87444000",
+      "destination_sequence": 6
+    },
+    {
+      "name": "alert names the station of the origin stop",
+      "route_id": "FR:Line::16d3fc7b-59da-4b5b-b50f-8ff6e11eaea4:",
+      "trip_id": "OCESN427250R1187_R:CTE:FR:Line::16d3fc7b-59da-4b5b-b50f-8ff6e11eaea4::87172254:87172007:4:1024:20261113",
+      "direction": "1",
+      "stop_id": "StopPoint:OCECar TER-87172254",
+      "stop_sequence": 0,
+      "destination_id": "StopPoint:OCECar TER-87172007",
+      "destination_sequence": 3
+    },
+    {
+      "name": "alert names a stop along the way",
+      "route_id": "FR:Line::FFE3AD14-D5A0-413B-B26A-E2BC5D788DD8:",
+      "trip_id": "OCESN43001R1187_R:CTE:FR:Line::FFE3AD14-D5A0-413B-B26A-E2BC5D788DD8::87108829:87173401:18:830:20261211",
+      "direction": "0",
+      "stop_id": "StopPoint:OCECar TER-87108829",
+      "stop_sequence": 0,
+      "destination_id": "StopPoint:OCECar TER-87173401",
+      "destination_sequence": 17
+    },
+    {
+      "name": "alert names a stop already behind you",
+      "route_id": "FR:Line::FFE3AD14-D5A0-413B-B26A-E2BC5D788DD8:",
+      "trip_id": "OCESN43001R1187_R:CTE:FR:Line::FFE3AD14-D5A0-413B-B26A-E2BC5D788DD8::87108829:87173401:18:830:20261211",
+      "direction": "0",
+      "stop_id": "StopPoint:OCECar TER-87173302",
+      "stop_sequence": 2,
+      "destination_id": "StopPoint:OCECar TER-87173401",
+      "destination_sequence": 17
+    },
+    {
+      "name": "trip update carries a delay",
+      "route_id": "OCESN-87547000-87611483",
+      "trip_id": "OCESN3971F1187_F:ICN:OCESN-87547000-87611483:87547000:87611483:15:3410:20260827",
+      "direction": "0",
+      "stop_id": "StopPoint:OCEINTERCITES de nuit-87547000",
+      "stop_sequence": 0,
+      "destination_id": "StopPoint:OCEINTERCITES de nuit-87611483",
+      "destination_sequence": 14
+    },
+    {
+      "name": "nothing announced on this trip",
+      "route_id": "FR:Line::8440e055-0d15-4156-9e77-017af816441a:",
+      "trip_id": "OCEEA436011R5235_R:CTE:FR:Line::8440e055-0d15-4156-9e77-017af816441a::87296442:87296012:5:1327:20260828",
+      "direction": "0",
+      "stop_id": "StopPoint:OCECar TER-87296442",
+      "stop_sequence": 0,
+      "destination_id": "StopPoint:OCECar TER-87296012",
+      "destination_sequence": 4
+    }
+  ]
+}

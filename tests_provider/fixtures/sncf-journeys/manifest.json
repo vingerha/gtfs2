@@ -1,0 +1,33 @@
+{
+  "captured_at": 1788255260,
+  "kept": {
+    "agency": 1,
+    "calendar_dates": 1337,
+    "feed_info": 1,
+    "routes": 4,
+    "stop_times": 965,
+    "stops": 61,
+    "trips": 133
+  },
+  "provider": "SNCF via transport.data.gouv.fr",
+  "routes_kept": {
+    "K8+": [
+      "FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532:"
+    ],
+    "P8": [
+      "FR:Line::79F02D11-43E5-467F-ACFC-6DDA1A594575:",
+      "FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95:",
+      "FR:Line::9F9C7618-AF98-47D8-BFB4-0B1C2924A148:"
+    ]
+  },
+  "source_totals": {
+    "stop_times": 347974,
+    "trips": 394
+  },
+  "sources": {
+    "static": "https://eu.ftp.opendatasoft.com/sncf/plandata/Export_OpenData_SNCF_GTFS_NewTripId.zip"
+  },
+  "static_only": true,
+  "trip_cap_per_pattern": 5,
+  "why": "trains, matched by stop name without direction; K8+ Paris-Orleans carries counter-sense trips in direction 1; P8 exists three times in the feed"
+}

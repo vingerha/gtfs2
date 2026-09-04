@@ -1,0 +1,16 @@
+Provider tree, separate from tests/ on purpose.
+
+What it is:
+- real feeds cut down to a few routes, 24 to 88 KB each, under fixtures/: gvb, palmbus, sncf (with trip updates and alerts), sncf-journeys, tao-journeys
+- manifest.json in each says where the bytes came from, what was kept and why; sncf also carries scenarios.json, the journeys its entities make testable
+- fixtures/build_fixture.py cuts any static zip down to named routes, a few trips per stop pattern
+- fixtures/capture_rt.py freezes a static + trip updates + alerts capture, SNCF by default, any feed with --static/--trip-updates/--alerts
+- test_journeys.py reads them: one test per fixture, route, direction and promise (stop list, a valid pair, the swapped pair), through the real query on a db fixture_db.py builds from the zip, no pygtfs import
+- the clock is pinned with freezegun to a day the trips run, in the agency's zone, so the data never has to be shifted to today
+- the cases known to fail on main are marked xfail with the reason, strict, so a fix has to lift its mark
+
+Install and run, from the component root:
+	pip install -r tests_provider/requirements.txt
+	pytest tests_provider/
+
+Needs pygtfs, sqlalchemy and the protobuf bindings for real, which tests/ does not; that is why the tree, its requirements and its workflow are separate. tests/ha_stub.py is shared, nothing else is.

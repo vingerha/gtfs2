@@ -1,0 +1,40 @@
+{
+  "captured_at": 1788503062,
+  "kept": {
+    "agency": 1,
+    "calendar_dates": 180,
+    "feed_info": 1,
+    "routes": 5,
+    "stop_times": 3639,
+    "stops": 209,
+    "trips": 215
+  },
+  "provider": "GVB via OVapi (Dutch national feed)",
+  "routes_kept": {
+    "1": [
+      "152323"
+    ],
+    "13": [
+      "152330"
+    ],
+    "14": [
+      "152331"
+    ],
+    "17": [
+      "152324"
+    ],
+    "7": [
+      "152328"
+    ]
+  },
+  "source_totals": {
+    "stop_times": 15109027,
+    "trips": 7980
+  },
+  "sources": {
+    "static": "http://gtfs.ovapi.nl/nl/gtfs-nl.zip"
+  },
+  "static_only": true,
+  "trip_cap_per_pattern": 5,
+  "why": "trams 1, 7 and 17 label 30 to 40 percent of their trips with the wrong direction_id; 14 is circular; 13 is healthy but its short runs trap a coverage-based classifier"
+}

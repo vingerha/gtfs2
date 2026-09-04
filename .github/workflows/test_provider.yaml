@@ -1,0 +1,21 @@
+name: Provider Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r tests_provider/requirements.txt
+
+      - name: Run tests
+        run: pytest tests_provider/
