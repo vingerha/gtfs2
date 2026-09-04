@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
+from homeassistant.exceptions import ConfigEntryNotReady
 
 from datetime import timedelta
 
