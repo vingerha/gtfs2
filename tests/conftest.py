@@ -7,10 +7,24 @@ re-running pytest or scrolling terminal history.
 
 Only concerns itself with `test_static_case` (test_static_cases.py);
 other tests in this tree are unaffected and not written to the report.
+
+Also registers the Home Assistant stand-ins of ha_stub before any test
+module is imported, so the suite runs without a homeassistant install.
 """
 from __future__ import annotations
 
 from pathlib import Path
+
+import ha_stub
+
+# Before any test module is imported: the homeassistant stand-ins, and the
+# integration's package name, so that a plain
+# `from custom_components.gtfs2.gtfs_helper import ...` loads that module on
+# its own instead of running __init__.py and the platforms behind it.
+# install() steps aside where a real Home Assistant is installed; the claim
+# holds either way, nothing here needs __init__.py.
+ha_stub.install()
+ha_stub.claim()
 
 REPORT_PATH = Path(__file__).parent / "case_route" / "results.txt"
 

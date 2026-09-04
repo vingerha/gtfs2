@@ -6,7 +6,7 @@ Context, route bases only for now:
 Install:
 run in /tests .... 
 	pip install requirements.txt
-Note: sadly, this is outside of a HA container, and requires the install of homeassistant
+Note: runs outside of a HA container and needs no homeassistant install, tests/ha_stub.py stands in for the modules gtfs_helper imports
 
 run from the component root (where /tests and /custom_components reside):
 	pytest tests/test_static_cases.py --tb=short
