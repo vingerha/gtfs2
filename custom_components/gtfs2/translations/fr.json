@@ -77,7 +77,8 @@
           "origin": "Ville de départ",
           "destination": "Ville d'arrivée",
           "name": "Nom de la ligne",
-          "include_tomorrow": "Inclure le lendemain?"
+          "include_tomorrow": "Inclure le lendemain?",
+          "refresh_interval": "Intervalle de rafraîchissement en minutes"
         },
 		"description": "Sélectionnez parmi les options [(docu)]({docu_setup_train})"
       },	  
@@ -119,7 +120,9 @@
 		  "real_time": "Ajoute intégration temps réel? \n (nécessite données de la même source)",
 		  "local_stop_refresh_interval": "Intervalle d'actualisation en minutes",
           "timerange": "Période dans la future pour départs depuis 'maintenant' (en minutes entre 15 et 120)",
-		  "radius": "Radius pour la recherche des stops (en metres entre 50 et 500)"
+		  "radius": "Radius pour la recherche des stops (en metres entre 50 et 500)",
+          "source_timezone_correction": "Corriger le fuseau horaire de la source gtfs (en heures)",
+          "check_source_dates": "expérimental : éviter d'utiliser un nouveau zip/source ne contenant aucune information actuelle"
         }
       },
 	  "real_time": {
@@ -130,7 +133,8 @@
 		  "api_key": "API_KEY, si nécessaire",
 		  "api_key_name": "Nom de API_KEY, si nécessaire",  
 		  "api_key_location": "L'endroit ou (X_)API_KEY doit être appliqué",
-		  "accept": "Ajoutez Accept:application/x-protobuf à l'en-tête"
+		  "accept": "Ajoutez Accept:application/x-protobuf à l'en-tête",
+          "alerts_url": "URL vers les alertes"
         }
       }
     },
@@ -155,6 +159,13 @@
       "options": {
 		"2": "Voyages ferroviaires, entre villes manuellement définiés (prochain écran)",
 		"99": "Tout à part des ferroviaires, entre stops sélectionnés (prochain écran)"
+      }
+    },
+    "api_key_location": {
+      "options": {
+        "not_applicable": "aucune clé utilisée (par défaut)",
+        "header": "header : construire l'appel avec en-tête/clé",
+        "query_string": "query-string : construire l'appel avec requête/clé"
       }
     }
   },
@@ -192,7 +203,35 @@
 		"url": {
           "name": "URL",
 		  "description": "URL externe vers les données GTFS temp réels"
-		}
+		},
+        "api_key": {
+          "name": "clé_api",
+          "description": "fournissez la clé API si nécessaire"
+        },
+        "api_key_name": {
+          "name": "nom_clé_api",
+          "description": "Nom de la clé API, api_key par défaut"
+        },
+        "api_key_location": {
+          "name": "emplacement_clé_api",
+          "description": "Sélectionnez l'emplacement de la clé"
+        },
+        "accept": {
+          "name": "Accept",
+          "description": "Ajouter application/protobuf à l'en-tête"
+        },
+        "rt_type": {
+          "name": "Indiquez le type de données temps réel",
+          "description": "Sélectionnez le type de données temps réel de la source"
+        },
+        "entity_for_siri": {
+          "name": "Ligne RT SIRI",
+          "description": "Expérimental : temps réel au format SIRI uniquement (!) sélectionnez votre configuration. voir documentation > service"
+        },
+        "debug_output": {
+          "name": "sortie_debug",
+          "description": "Enregistrer dans un fichier local, en format lisible"
+        }
 	  }
 	},
 	"update_gtfs_local_stops": {

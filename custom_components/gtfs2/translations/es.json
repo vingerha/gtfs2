@@ -120,7 +120,9 @@
 		  "real_time": "¿Integración en tiempo real? \n (necesita datos de la misma fuente)",
 		  "local_stop_refresh_interval": "Intervalo de actualización de datos (en minutos)",
           "timerange": "Comprobación de salidas en el futuro a partir de 'ahora' (en minutos: entre 15 y 120)",
-		  "radius": "Radio de búsqueda de paradas (en metros entre 50 y 500)"
+		  "radius": "Radio de búsqueda de paradas (en metros entre 50 y 500)",
+          "source_timezone_correction": "Corregir la zona horaria de la fuente gtfs (en horas)",
+          "check_source_dates": "experimental: evitar usar un nuevo zip/fuente que no contenga información actual"
         }
       },
 	  "real_time": {
@@ -158,6 +160,13 @@
 		"99": "Todos menos los trenes, entre las paradas seleccionadas (pantalla siguiente)",
 		"2": "Sólo trenes, entre ciudades introducidas manualmente (pantalla siguiente)"
       }
+    },
+    "api_key_location": {
+      "options": {
+        "not_applicable": "no se usa clave (por defecto)",
+        "header": "header: construir la llamada con cabecera/clave",
+        "query_string": "query-string: construir la llamada con consulta/clave"
+      }
     }
   },
   "services": {
@@ -194,7 +203,35 @@
 		"url": {
           "name": "URL",
 		  "description": "Proporcione la ruta completa a los datos en tiempo real"
-		}
+		},
+        "api_key": {
+          "name": "clave_api",
+          "description": "proporcione la clave API si es necesario"
+        },
+        "api_key_name": {
+          "name": "nombre_clave_api",
+          "description": "Nombre de la clave API, por defecto api_key"
+        },
+        "api_key_location": {
+          "name": "ubicación_clave_api",
+          "description": "Seleccione la ubicación de la clave"
+        },
+        "accept": {
+          "name": "Aceptar",
+          "description": "Añadir application/protobuf a la cabecera"
+        },
+        "rt_type": {
+          "name": "Indique el tipo de datos en tiempo real",
+          "description": "Seleccione el tipo de datos en tiempo real de la fuente"
+        },
+        "entity_for_siri": {
+          "name": "Ruta RT SIRI",
+          "description": "Experimental: solo tiempo real en formato SIRI (!) seleccione su configuración. ver documentación > servicio"
+        },
+        "debug_output": {
+          "name": "salida_depuración",
+          "description": "Guardar en un archivo local, en formato legible"
+        }
 	  }
 	},
 	"update_gtfs_local_stops": {
