@@ -1,0 +1,43 @@
+{
+  "captured_at": 1788255252,
+  "kept": {
+    "agency": 1,
+    "calendar_dates": 83,
+    "feed_info": 1,
+    "routes": 6,
+    "stop_times": 3540,
+    "stops": 273,
+    "trips": 150
+  },
+  "provider": "TAO Orleans",
+  "routes_kept": {
+    "22": [
+      "ORLEANS:Line:22"
+    ],
+    "40": [
+      "ORLEANS:Line:40"
+    ],
+    "41": [
+      "ORLEANS:Line:41"
+    ],
+    "A": [
+      "ORLEANS:Line:A"
+    ],
+    "B": [
+      "ORLEANS:Line:B"
+    ],
+    "N": [
+      "ORLEANS:Line:N"
+    ]
+  },
+  "source_totals": {
+    "stop_times": 2612014,
+    "trips": 26516
+  },
+  "sources": {
+    "static": "https://chouette.enroute.mobi/api/v1/datas/keolis_orleans/gtfs.zip"
+  },
+  "static_only": true,
+  "trip_cap_per_pattern": 5,
+  "why": "22 circular Zenith to Zenith; N night line, service Thu to Sun; 40 and 41 weekday only; A and B trams, B interleaves 110 short runs"
+}

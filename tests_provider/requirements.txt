@@ -1,0 +1,8 @@
+pytest
+freezegun
+requests
+voluptuous
+pygtfs==0.1.9
+gtfs-realtime-bindings==1.0.0
+protobuf
+tzdata; sys_platform == 'win32'

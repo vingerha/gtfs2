@@ -1,0 +1,38 @@
+{
+  "alerts_timestamp": 1787732223,
+  "captured_at": 1787732226,
+  "informed_entity_cap": 12,
+  "informed_entity_dropped": {
+    "QOM:Broadcast::1493644421287477085:LOC": 104,
+    "QOM:Broadcast::1741847614032784197:LOC": 74,
+    "QOM:Broadcast::2986014499466154806:LOC": 611,
+    "QOM:Broadcast::3119955844495387251:LOC": 77,
+    "QOM:Broadcast::5036298090821725016:LOC": 66,
+    "QOM:Broadcast::6511438163654902075:LOC": 102,
+    "QOM:Broadcast::685824398639520435:LOC": 59,
+    "QOM:Broadcast::7930472748039117733:LOC": 12,
+    "QOM:Broadcast::8740283639850067563:LOC": 72
+  },
+  "kept": {
+    "alert_entities": 10,
+    "calendar_dates": 2555,
+    "routes": 33,
+    "stop_times": 1717,
+    "stops": 586,
+    "trip_update_entities": 9,
+    "trips": 182
+  },
+  "provider": "SNCF via transport.data.gouv.fr",
+  "source_totals": {
+    "alert_entities": 440,
+    "routes": 711,
+    "stops": 8928,
+    "trip_update_entities": 1187,
+    "trips": 43425
+  },
+  "sources": {
+    "service_alerts": "https://proxy.transport.data.gouv.fr/resource/sncf-gtfs-rt-service-alerts",
+    "static": "https://eu.ftp.opendatasoft.com/sncf/plandata/Export_OpenData_SNCF_GTFS_NewTripId.zip",
+    "trip_updates": "https://proxy.transport.data.gouv.fr/resource/sncf-gtfs-rt-trip-updates"
+  }
+}
