@@ -8,7 +8,8 @@ Context:
 
 1a. Route based:
 
-case_1_static_route: real life case static only for zou route 653, not further maintained if crashing
+case_1_static_route: real life case static only for french 'zou' route 653, not further maintained if crashing
+>> IMPLEMENTATION STATUS: done 
 
 case_2_static: synthetic test, 
 - today trips only
@@ -17,6 +18,7 @@ Data:
 - 1st before 'now'
 - 3 after 'now' of which one has today/tomorrow 0
 > expected output: 3 next trips, 2nd trip shows as first trip
+>> IMPLEMENTATION STATUS: done 
 
 case_3_static_route: synthetic test, 
 - today and tomorrow trips
@@ -28,6 +30,7 @@ Data:
 - 1 after 'now' for today&tomorrow
 - 1 after 'now' for tomorrow only
 > expected output: 5 next trips, 2nd trip shows as first trip, 2 trips for today, 2 for tomorrow
+>> IMPLEMENTATION STATUS: done 
 
 case_4_static_route: synthetic test, 
 - only tomorrow trips
@@ -37,6 +40,8 @@ Data:
 - 1 after 'now' for tomorrow only
 - 1 after now but for  today/tomorrow 0
 > expected output: 2 next trips, 1st trip shows as first trip with tomorrow date
+>> IMPLEMENTATION STATUS: done 
+
 
 1b. Local-stop based:
 case_1_static_localstop
@@ -53,6 +58,7 @@ Data:
 - 1st before 'now'
 - 3 after 'now' of which one has today/tomorrow 0
 > expected output: 3 next trips, 2nd trip shows as first trip, realtime attrib populated as well as realtime next departures
+>> IMPLEMENTATION STATUS: done 
 
 case_2_static_realtime: synthetic test, 
 - today and tomorrow trips
@@ -63,6 +69,7 @@ Data:
 - 1 after 'now' for today
 - 1 after 'now' for tomorrow only
 > expected output: 3 next trips, 2nd trip shows as first trip, 1 trip for today, 2 for tomorrow, realtime attrib populated to today as well as as for first trip tomorrow
+>> IMPLEMENTATION STATUS: done 
 
 case_3_static_realtime: synthetic test, missing direction_id
 - today trips only
