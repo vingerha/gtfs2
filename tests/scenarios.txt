@@ -71,15 +71,49 @@ Data:
 > expected output: 3 next trips, 2nd trip shows as first trip, 1 trip for today, 2 for tomorrow, realtime attrib populated to today as well as as for first trip tomorrow
 >> IMPLEMENTATION STATUS: done 
 
-case_3_static_realtime: synthetic test, missing direction_id
+case_3_static_realtime: synthetic test, 
 - today trips only
 - static data provides empty direction_id
 - realtime provides direction 0 only and data for 2 next rt trips
-> verify if properly adds realtime data
+> verify if properly adds realtime data with missing direction_id
 Data:
 - 1st before 'now'
 - 3 after 'now' of which one has today/tomorrow 0
 > expected output: 3 next trips, 2nd trip shows as first trip, realtime attrib populated as well as realtime next departures
+
+Focus missing direction_id
+- missing in static
+- missing in RT
+- RT always 0
+case_4_static_realtime: synthetic test, 
+- today trips only
+- static data provides empty direction_id
+- realtime provides direction_id and data for 2 next rt trips
+> verify if properly adds realtime data with only RT direction_id
+
+case_5_static_realtime: synthetic test, 
+- today trips only
+- static data provides proper direction_id
+- realtime provides no direction id
+> verify if properly adds realtime data without direction_id = 0
+
+case_6_static_realtime: synthetic test, 
+- today trips only
+- static data provides proper direction_id
+- realtime provides no direction id
+> verify if properly adds realtime data without direction_id = 0
+
+Missing other elements:
+
+case_7_static_realtime: synthetic test, 
+- today trips only
+- static data 
+- realtime missing stop_id
+Data:
+- 2 trips only today bot direction 0
+- 2 rt sets, one for trip_1, direction 1 and one for trip_2 directon 0, both contain the stop sequence on the 2nd element
+> #119 verify if properly adds realtime only for the first one
+>> IMPLEMENTATION STATUS: done 
 
 2b. local-stop based
 ...
