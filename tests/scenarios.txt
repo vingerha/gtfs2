@@ -117,8 +117,7 @@ Data:
 - 2 trips after 'now', one with direction_id 1 the other 0
 - realtime provides data for both but without direction_id, i.e. empty string ""
 > expected output: 2 next trips, 1st shown as main, both in next departures, both have realtime data
-
-
+>> IMPLEMENTATION STATUS: done 
 
 Missing other elements:
 
