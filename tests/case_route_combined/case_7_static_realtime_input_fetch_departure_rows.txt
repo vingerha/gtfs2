@@ -43,7 +43,7 @@
     'trip_id': 'trip_id_3',
     'route_id': 'route_id',
     'trip_headsign': 'trip_headsign_3',
-    'direction_id': 1,
+    'direction_id': 0,
     'trip_short_name': 'trip_short_name_3',
     'route_long_name': 'route_long_name',
     'route_short_name': 'route_short_name',
@@ -78,5 +78,5 @@
     'end_date': '2026-12-31',
     'calendar_date': '',
     'today_cd': 0
-  },
+  }
 ]

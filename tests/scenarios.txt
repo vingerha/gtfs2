@@ -101,16 +101,28 @@ case_5_static_realtime: synthetic test,
 - today trips only
 - static data provides proper direction_id
 - realtime provides no direction id, 
-> verify if properly adds realtime data without direction_id = 0
+> verify if properly adds realtime data with direction_id = '' 'so not 0 or 1
 Data:
 - 2 trips after 'now', one with direction_id 1 the other 0
 - realtime provides data for both but without direction_id, i.e. empty string ""
 > expected output: 2 next trips, 1st shown as main, both in next departures, both have realtime data
 >> IMPLEMENTATION STATUS: done 
 
+case_6_static_realtime: synthetic test, 
+- today trips only
+- static data provides proper direction_id
+- realtime provides no direction id, 
+> verify if properly adds realtime data with direction_id field at all
+Data:
+- 2 trips after 'now', one with direction_id 1 the other 0
+- realtime provides data for both but without direction_id, i.e. empty string ""
+> expected output: 2 next trips, 1st shown as main, both in next departures, both have realtime data
+
+
+
 Missing other elements:
 
-case_6_static_realtime: synthetic test, 
+case_7_static_realtime: synthetic test, 
 - today trips only
 - static data 
 - realtime missing stop_id

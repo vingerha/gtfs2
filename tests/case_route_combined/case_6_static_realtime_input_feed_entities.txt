@@ -4,22 +4,15 @@
     "trip_update": {
       "trip": {
         "route_id": "route_id",
-        "trip_id": "trip_id_1",
-        "direction_id": "0"
+        "trip_id": "trip_id_1"
       },
       "stop_time_update": [
         {
-          "stop_id": "",
-          "stop_sequence": 19,
-          "arrival": { "time": 1788437400, "delay": 0 },
-          "departure": { "time": 1788437400, "delay": 0 }
-        },
-        {
-          "stop_id": "",
+          "stop_id": "origin_stop_id",
           "stop_sequence": 20,
           "arrival": { "time": 1788437820, "delay": 180 },
           "departure": { "time": 1788437820, "delay": 180 }
-        }		
+        }
       ]
     }
   },
@@ -28,21 +21,14 @@
     "trip_update": {
       "trip": {
         "route_id": "route_id",
-        "trip_id": "trip_id_3",
-        "direction_id": "1"
+        "trip_id": "trip_id_3"
       },
       "stop_time_update": [
-		{
-          "stop_id": "",
-          "stop_sequence": 19,
-          "arrival": { "time": 1788437400, "delay": 0 },
-          "departure": { "time": 1788437400, "delay": 0 }
-        },
-		{
-          "stop_id": "",
+        {
+          "stop_id": "origin_stop_id",
           "stop_sequence": 20,
-          "arrival": { "time": 1788441262, "delay": 22 },
-          "departure": { "time": 1788441262, "delay": 22 }
+          "arrival": { "time": 1788441255, "delay": 15 },
+          "departure": { "time": 1788441255, "delay": 15 }
         }
       ]
     }

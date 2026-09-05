@@ -1,4 +1,4 @@
-test_route_combined.py case results -- 5 case(s)
+test_route_combined.py case results -- 6 case(s)
 
 case: case_1
   result: PASSED
@@ -13,4 +13,7 @@ case: case_5
   result: PASSED
 
 case: case_6
+  result: PASSED
+
+case: case_7
   result: PASSED
