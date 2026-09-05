@@ -1,7 +1,7 @@
 import requests
 
 REPO = "vingerha/gtfs2"
-TOKEN = "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"
+TOKEN = "TOKEN FROM USER ACCOUNT"
 
 headers = {"Authorization": f"token {TOKEN}"} if TOKEN else {}
  
