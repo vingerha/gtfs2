@@ -85,27 +85,32 @@ Focus missing direction_id
 - missing in static
 - missing in RT
 - RT always 0
+
 case_4_static_realtime: synthetic test, 
-- today trips only
+- 2 today trips only
 - static data provides empty direction_id
 - realtime provides direction_id and data for 2 next rt trips
 > verify if properly adds realtime data with only RT direction_id
+Data:
+- 2 trips after 'now', both with direction_id None
+- realtime provides data for both, with direction_id
+> expected output: 2 next trips, 1st shown as main, both in next departures, both have realtime data
+>> IMPLEMENTATION STATUS: done 
 
 case_5_static_realtime: synthetic test, 
 - today trips only
 - static data provides proper direction_id
-- realtime provides no direction id
+- realtime provides no direction id, 
 > verify if properly adds realtime data without direction_id = 0
-
-case_6_static_realtime: synthetic test, 
-- today trips only
-- static data provides proper direction_id
-- realtime provides no direction id
-> verify if properly adds realtime data without direction_id = 0
+Data:
+- 2 trips after 'now', one with direction_id 1 the other 0
+- realtime provides data for both but without direction_id, i.e. empty string ""
+> expected output: 2 next trips, 1st shown as main, both in next departures, both have realtime data
+>> IMPLEMENTATION STATUS: done 
 
 Missing other elements:
 
-case_7_static_realtime: synthetic test, 
+case_6_static_realtime: synthetic test, 
 - today trips only
 - static data 
 - realtime missing stop_id

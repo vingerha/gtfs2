@@ -194,6 +194,31 @@ def _parse_datetime_capture(text: str) -> tuple[str, datetime.datetime]:
     return label, datetime.datetime.fromisoformat(lines[0].strip())
 
 
+def _normalize_datetimes(value):
+    """Recursively convert any datetime subclass (e.g. freezegun's
+    FakeDatetime, produced by code running inside a `freeze_time` block)
+    into a plain `datetime.datetime` with identical field values.
+
+    Without this, a value computed under `freeze_time` and a value
+    parsed from a captured expected-output file can be equal (same
+    year/month/day/hour/minute/second/tzinfo) but different *types* --
+    pytest's diff then shows a class-name difference as if it were a
+    real one. Generic: doesn't know or care about field names, so unlike
+    filtering the printed diff text, it can't accidentally hide an
+    actual difference.
+    """
+    if isinstance(value, datetime.datetime) and type(value) is not datetime.datetime:
+        return datetime.datetime(
+            value.year, value.month, value.day, value.hour,
+            value.minute, value.second, value.microsecond, value.tzinfo,
+        )
+    if isinstance(value, dict):
+        return {k: _normalize_datetimes(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_normalize_datetimes(v) for v in value]
+    return value
+
+
 CASES = _discover_cases(CASE_ROOT)
 
 
@@ -246,6 +271,7 @@ def test_coordinator_case(case_id: str, case_dir: Path):
              patch.object(gtfs_rt_helper_mod, "get_gtfs_feed_entities", return_value=feed_entities):
             result = asyncio.run(coord._async_update_data())
 
+    result = _normalize_datetimes(result)
     assert result == expected, (
         f"[{case_id}] ({label}) coordinator.data did not match "
         f"case_*_coordinator_output_data.txt"

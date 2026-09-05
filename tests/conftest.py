@@ -71,11 +71,26 @@ def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001 - exitstatus requ
             if outcome in ("failed", "error"):
                 failure_text = str(report.longrepr)
                 failure_lines = failure_text.splitlines()
+                                                                   
                 # Keep the whole "E   ..." block: the AssertionError line,
                 # the value summary, and the "Differing items:" section
                 # that actually shows which field changed and how -- not
                 # just the first line, which is only the custom message.
+                                                                          
+                                                                         
+                                                                           
+                                                                        
+                                                                           
+                                                                            
+                                                                         
+                                                                              
+                                 
                 detail_lines = [line for line in failure_lines if line.startswith("E ")]
+                                                 
+                                
+                                                        
+                             
+                                             
                 if detail_lines:
                     lines.append("  detail:")
                     for detail_line in detail_lines:
