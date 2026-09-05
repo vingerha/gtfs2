@@ -13,4 +13,44 @@ Install and run, from the component root:
 	pip install -r tests_provider/requirements.txt
 	pytest tests_provider/
 
+How a case is built:
+- the routes come from the fixture's manifest (routes_kept); for each one and
+  each direction_id its trips carry, the distinct stop sequences of those trips
+  are read from stop_times. That is the expected side: there is no expected
+  file, the feed itself says what the line rides
+- stop_list asks get_stop_list for the route and direction and checks the list
+  against every sequence: each stop once, in an order every trip agrees with
+- pairs and swapped take three pairs per sequence (the two ends, first stop to
+  middle, middle to last), pin the clock with freezegun at 00:05 in the agency's
+  zone on the first day one of those trips runs, and hand get_next_departure
+  the same data dict a sensor would
+- the answer is checked against the sequence: the asked stops (a platform of the
+  same station counts), origin before destination, arrival not before
+  departure. The swapped pair may answer nothing, or only a ride this direction
+  really makes
+- trains (route_type 2) are asked by stop name and line, the way the train
+  sensor does, and only pairs is checked: a swapped pair is the return journey
+
+Reading a failure:
+- a test id reads fixture-line-direction-promise: palmbus-A-d0-swapped is the
+  Palm Bus fixture, line A, direction 0, the swapped pair promise; a train line
+  carries the last characters of its route_id, P8(A594575:)
+- every run writes tests_provider/results.txt: one entry per
+  case, PASSED, XFAILED, XPASSED or FAILED, its reason when it carries a mark,
+  and for a case that did not pass the lines that broke the promise: what was
+  asked (origin -> destination, line, direction, where the two stops sit in
+  the ride) and what get_next_departure gave back (stops, line, direction and
+  trip it took them from), so the trip can be looked up in the fixture zip
+- a plain full run also writes tests_provider/results.json: the same records,
+  every check of every case whether it passed or not, as fields, keys sorted.
+  A run with -k, -m or --runxfail leaves the file alone
+- both files in the repo are the run on main, as examples of the output. Run
+  the suite on another branch and `git diff tests_provider/results.json` is
+  what that branch changed, pair by pair
+- for a spreadsheet, one line turns it into csv, one row per check:
+  python -c "import json, pandas as pd; pd.json_normalize(json.load(open('tests_provider/results.json'))['cases'], 'checks', ['id', 'outcome']).to_csv('results.csv', index=False)"
+- on screen, pytest -rx lists the marked cases with their reason, and
+  --runxfail prints the failing lines as well
+- pytest tests_provider/ -k "palmbus and A" narrows to one line
+
 Needs pygtfs, sqlalchemy and the protobuf bindings for real, which tests/ does not; that is why the tree, its requirements and its workflow are separate. tests/ha_stub.py is shared, nothing else is.

@@ -1,0 +1,427 @@
+test_journeys.py case results -- 95 case(s)
+
+case: gvb-1-d0-pairs
+  result: PASSED
+
+case: gvb-1-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+
+case: gvb-1-d0-swapped
+  result: PASSED
+
+case: gvb-1-d1-pairs
+  result: PASSED
+
+case: gvb-1-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3979766', '3980631')]
+
+case: gvb-1-d1-swapped
+  result: PASSED
+
+case: gvb-13-d0-pairs
+  result: PASSED
+
+case: gvb-13-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3980268', '3980182')]
+
+case: gvb-13-d0-swapped
+  result: PASSED
+
+case: gvb-13-d1-pairs
+  result: PASSED
+
+case: gvb-13-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+
+case: gvb-13-d1-swapped
+  result: PASSED
+
+case: gvb-14-d0-pairs
+  result: PASSED
+
+case: gvb-14-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3980489', '3980251')]
+
+case: gvb-14-d0-swapped
+  result: PASSED
+
+case: gvb-14-d1-pairs
+  result: PASSED
+
+case: gvb-14-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('4045456', '3981274')]
+    the list contradicts the riding order 3980234 .. 3981274
+    the list contradicts the riding order 3981274 .. 3980992
+
+case: gvb-14-d1-swapped
+  result: PASSED
+
+case: gvb-17-d0-pairs
+  result: PASSED
+
+case: gvb-17-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3981140', '3980752')]
+    the list contradicts the riding order 3981271 .. 4132580
+
+case: gvb-17-d0-swapped
+  result: PASSED
+
+case: gvb-17-d1-pairs
+  result: PASSED
+
+case: gvb-17-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3980573', '3980418')]
+    the list contradicts the riding order 3981271 .. 3980351
+
+case: gvb-17-d1-swapped
+  result: PASSED
+
+case: gvb-7-d0-pairs
+  result: PASSED
+
+case: gvb-7-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3980060', '3980854')]
+    the list contradicts the riding order 3980102 .. 3979878
+
+case: gvb-7-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked 3979878 -> 3980102 on 152328 d0 (stop 23 to stop 1 of a 23-stop ride, this direction does not make it): got 3979878 -> 3980102 on 152328 d1, trip 380799628
+
+case: gvb-7-d1-pairs
+  result: PASSED
+
+case: gvb-7-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('3980752', '3981140')]
+    the list contradicts the riding order 3980102 .. 3980992
+
+case: gvb-7-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked 3980102 -> 3979878 on 152328 d1 (stop 24 to stop 1 of a 24-stop ride, this direction does not make it): got 3980102 -> 3979878 on 152328 d0, trip 380799711
+
+case: palmbus-21-d0-pairs
+  result: PASSED
+
+case: palmbus-21-d0-stop_list
+  result: PASSED
+
+case: palmbus-21-d0-swapped
+  result: PASSED
+
+case: palmbus-22-d0-pairs
+  result: PASSED
+
+case: palmbus-22-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+
+case: palmbus-22-d0-swapped
+  result: PASSED
+
+case: palmbus-22-d1-pairs
+  result: PASSED
+
+case: palmbus-22-d1-stop_list
+  result: PASSED
+
+case: palmbus-22-d1-swapped
+  result: PASSED
+
+case: palmbus-A-d0-pairs
+  result: PASSED
+
+case: palmbus-A-d0-stop_list
+  result: PASSED
+
+case: palmbus-A-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked GSNF0A -> CCO15A on A d0 (stop 35 to stop 1 of a 35-stop ride, this direction does not make it): got GSNF0A -> CCO15A on A d1, trip 1418363764878
+
+case: palmbus-A-d1-pairs
+  result: PASSED
+
+case: palmbus-A-d1-stop_list
+  result: PASSED
+
+case: palmbus-A-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked CCO15A -> GSNF0A on A d1 (stop 36 to stop 1 of a 36-stop ride, this direction does not make it): got CCO15A -> GSNF0A on A d0, trip 1418363764404
+
+case: palmbus-B-d0-pairs
+  result: PASSED
+
+case: palmbus-B-d0-stop_list
+  result: PASSED
+
+case: palmbus-B-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked MSCE0A -> GSNF0R on B d0 (stop 29 to stop 1 of a 29-stop ride, this direction does not make it): got MSCE0A -> GSNF0R on B d1, trip 1418363764159
+
+case: palmbus-B-d1-pairs
+  result: PASSED
+
+case: palmbus-B-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+
+case: palmbus-B-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked GSNF0R -> MSCE0A on B d1 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got GSNF0R -> MSCE0A on B d0, trip 1418363764271
+
+case: sncf-journeys-K8+-d0-pairs
+  result: XFAILED
+  reason: a train journey is matched by stop name prefix on any line, not the asked one
+  detail:
+    asked Paris Austerlitz -> Les Aubrais on K8+ (stop 1 to stop 2 of a 2-stop ride): got Paris Austerlitz -> Les Aubrais on P8 d0, trip OCESN860581F1187_F:TER:FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95::87547000:87543009:13:720:20261106
+    asked Paris Austerlitz -> Orléans on K8+ (stop 1 to stop 3 of a 3-stop ride): got Paris Austerlitz -> Orléans on P8 d0, trip OCESN860581F1187_F:TER:FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95::87547000:87543009:13:720:20261106
+    asked Paris Austerlitz -> Les Aubrais on K8+ (stop 1 to stop 2 of a 3-stop ride): got Paris Austerlitz -> Les Aubrais on P8 d0, trip OCESN860581F1187_F:TER:FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95::87547000:87543009:13:720:20261106
+    asked Les Aubrais -> Orléans on K8+ (stop 2 to stop 3 of a 3-stop ride): got Les Aubrais -> Orléans on P8 d0, trip OCESN860581F1187_F:TER:FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95::87547000:87543009:13:720:20261106
+
+case: sncf-journeys-K8+-d1-pairs
+  result: XFAILED
+  reason: a train journey is matched by stop name prefix on any line, not the asked one
+  detail:
+    asked Orléans -> Les Aubrais Gare Routière on K8+ (stop 1 to stop 2 of a 3-stop ride): got Orléans -> Les Aubrais Gare Routière on P8 d1, trip OCESN424586R1187_R:CTE:FR:Line::89BD9468-3499-4B6B-B3CB-50073CDD3F95::87543009:87543090:8:1350:20261211
+
+case: sncf-journeys-P8(924A148:)-d0-pairs
+  result: PASSED
+
+case: sncf-journeys-P8(924A148:)-d1-pairs
+  result: PASSED
+
+case: sncf-journeys-P8(A594575:)-d0-pairs
+  result: PASSED
+
+case: sncf-journeys-P8(A594575:)-d1-pairs
+  result: XFAILED
+  reason: a train journey is matched by stop name prefix on any line, not the asked one
+  detail:
+    asked La Chaumusse - Fort-du-Plasne -> Champagnole on P8 (stop 5 to stop 8 of a 8-stop ride): got La Chaumusse - Fort-du-Plasne -> Champagnole Paul-Émile Victor on P8 d1, trip OCESN895512F1187_F:TER:FR:Line::79F02D11-43E5-467F-ACFC-6DDA1A594575::87743633:87713412:13:841:20261212
+
+case: sncf-journeys-P8(CDD3F95:)-d0-pairs
+  result: PASSED
+
+case: sncf-journeys-P8(CDD3F95:)-d1-pairs
+  result: XFAILED
+  reason: a train journey is matched by stop name prefix on any line, not the asked one
+  detail:
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 11 of a 11-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 12 of a 12-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 10 of a 10-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 9 of a 9-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 11 of a 11-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 8 of a 8-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+    asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 5 of a 5-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
+
+case: tao-journeys-22-d0-pairs
+  result: PASSED
+
+case: tao-journeys-22-d0-stop_list
+  result: PASSED
+
+case: tao-journeys-22-d0-swapped
+  result: PASSED
+
+case: tao-journeys-22-d1-pairs
+  result: PASSED
+
+case: tao-journeys-22-d1-stop_list
+  result: PASSED
+
+case: tao-journeys-22-d1-swapped
+  result: PASSED
+
+case: tao-journeys-40-d0-pairs
+  result: PASSED
+
+case: tao-journeys-40-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+
+case: tao-journeys-40-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:01001712 -> ORLEANS:StopArea:00035910 on ORLEANS:Line:40 d0 (stop 25 to stop 1 of a 25-stop ride, this direction does not make it): got ORLEANS:StopArea:01001712 -> ORLEANS:StopArea:00035910 on ORLEANS:Line:40 d1, trip ORLEANS:VehicleJourney:40_R_85_10_4002_1_061401
+
+case: tao-journeys-40-d1-pairs
+  result: PASSED
+
+case: tao-journeys-40-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+
+case: tao-journeys-40-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:00035910 -> ORLEANS:StopArea:01001712 on ORLEANS:Line:40 d1 (stop 26 to stop 1 of a 26-stop ride, this direction does not make it): got ORLEANS:StopArea:00035910 -> ORLEANS:StopArea:01001712 on ORLEANS:Line:40 d0, trip ORLEANS:VehicleJourney:40_A_86_10_4002_1_070100
+
+case: tao-journeys-41-d0-pairs
+  result: PASSED
+
+case: tao-journeys-41-d0-stop_list
+  result: PASSED
+
+case: tao-journeys-41-d0-swapped
+  result: PASSED
+
+case: tao-journeys-41-d1-pairs
+  result: PASSED
+
+case: tao-journeys-41-d1-stop_list
+  result: PASSED
+
+case: tao-journeys-41-d1-swapped
+  result: PASSED
+
+case: tao-journeys-A-d0-pairs
+  result: PASSED
+
+case: tao-journeys-A-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('ORLEANS:StopArea:THOPIT2', 'ORLEANS:StopArea:THOPIT1')]
+
+case: tao-journeys-A-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:TVERNE1 -> ORLEANS:StopArea:THOPIT1 on ORLEANS:Line:A d0 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:TVERNE1 -> ORLEANS:StopArea:THOPIT1 on ORLEANS:Line:A d1, trip ORLEANS:VehicleJourney:A_R_470_21_A01_1_085930
+    asked ORLEANS:StopArea:TVERNE2 -> ORLEANS:StopArea:THOPIT1 on ORLEANS:Line:A d0 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:TVERNE2 -> ORLEANS:StopArea:THOPIT1 on ORLEANS:Line:A d1, trip ORLEANS:VehicleJourney:A_R_469_10_A01_1_050000
+    asked ORLEANS:StopArea:TVERNE1 -> ORLEANS:StopArea:THOPIT2 on ORLEANS:Line:A d0 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:TVERNE1 -> ORLEANS:StopArea:THOPIT2 on ORLEANS:Line:A d1, trip ORLEANS:VehicleJourney:A_R_472_21_A01_1_065900
+    asked ORLEANS:StopArea:TVERNE2 -> ORLEANS:StopArea:THOPIT2 on ORLEANS:Line:A d0 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:TVERNE2 -> ORLEANS:StopArea:THOPIT2 on ORLEANS:Line:A d1, trip ORLEANS:VehicleJourney:A_R_468_10_A01_1_145630
+
+case: tao-journeys-A-d1-pairs
+  result: PASSED
+
+case: tao-journeys-A-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the list offers one station twice in a row [('ORLEANS:StopArea:TVERNE2', 'ORLEANS:StopArea:TVERNE1')]
+
+case: tao-journeys-A-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:THOPIT1 -> ORLEANS:StopArea:TVERNE1 on ORLEANS:Line:A d1 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:THOPIT1 -> ORLEANS:StopArea:TVERNE1 on ORLEANS:Line:A d0, trip ORLEANS:VehicleJourney:A_A_477_21_A01_1_055950
+    asked ORLEANS:StopArea:THOPIT2 -> ORLEANS:StopArea:TVERNE1 on ORLEANS:Line:A d1 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:THOPIT2 -> ORLEANS:StopArea:TVERNE1 on ORLEANS:Line:A d0, trip ORLEANS:VehicleJourney:A_A_471_21_A01_1_080005
+    asked ORLEANS:StopArea:THOPIT1 -> ORLEANS:StopArea:TVERNE2 on ORLEANS:Line:A d1 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:THOPIT1 -> ORLEANS:StopArea:TVERNE2 on ORLEANS:Line:A d0, trip ORLEANS:VehicleJourney:A_A_467_10_A01_1_060100
+    asked ORLEANS:StopArea:THOPIT2 -> ORLEANS:StopArea:TVERNE2 on ORLEANS:Line:A d1 (stop 27 to stop 1 of a 27-stop ride, this direction does not make it): got ORLEANS:StopArea:THOPIT2 -> ORLEANS:StopArea:TVERNE2 on ORLEANS:Line:A d0, trip ORLEANS:VehicleJourney:A_A_466_10_A01_1_155930
+
+case: tao-journeys-B-d0-pairs
+  result: PASSED
+
+case: tao-journeys-B-d0-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+    the list offers one station twice in a row [('ORLEANS:StopArea:THAMEA1', 'ORLEANS:StopArea:THAMEA2')]
+
+case: tao-journeys-B-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:THAMEA1 -> ORLEANS:StopArea:TPOMPI2 on ORLEANS:Line:B d0 (stop 25 to stop 1 of a 25-stop ride, this direction does not make it): got ORLEANS:StopArea:THAMEA1 -> ORLEANS:StopArea:TPOMPI2 on ORLEANS:Line:B d1, trip ORLEANS:VehicleJourney:B_R_173_10_B01_1_055030
+    asked ORLEANS:StopArea:THAMEA2 -> ORLEANS:StopArea:TPOMPI2 on ORLEANS:Line:B d0 (stop 25 to stop 1 of a 25-stop ride, this direction does not make it): got ORLEANS:StopArea:THAMEA2 -> ORLEANS:StopArea:TPOMPI2 on ORLEANS:Line:B d1, trip ORLEANS:VehicleJourney:B_R_175_10_B09_1_201110
+
+case: tao-journeys-B-d1-pairs
+  result: PASSED
+
+case: tao-journeys-B-d1-stop_list
+  result: XFAILED
+  reason: the stop selector offers a stop twice or out of riding order (discussion #198)
+  detail:
+    the stop list repeats a stop_id
+
+case: tao-journeys-B-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:TPOMPI2 -> ORLEANS:StopArea:THAMEA1 on ORLEANS:Line:B d1 (stop 25 to stop 1 of a 25-stop ride, this direction does not make it): got ORLEANS:StopArea:TPOMPI2 -> ORLEANS:StopArea:THAMEA1 on ORLEANS:Line:B d0, trip ORLEANS:VehicleJourney:B_A_167_10_B01_1_050300
+    asked ORLEANS:StopArea:TPOMPI2 -> ORLEANS:StopArea:THAMEA2 on ORLEANS:Line:B d1 (stop 25 to stop 1 of a 25-stop ride, this direction does not make it): got ORLEANS:StopArea:TPOMPI2 -> ORLEANS:StopArea:THAMEA2 on ORLEANS:Line:B d0, trip ORLEANS:VehicleJourney:B_A_168_10_B06_1_195730
+
+case: tao-journeys-N-d0-pairs
+  result: PASSED
+
+case: tao-journeys-N-d0-stop_list
+  result: PASSED
+
+case: tao-journeys-N-d0-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:01002003 -> ORLEANS:StopArea:01086001 on ORLEANS:Line:N d0 (stop 30 to stop 1 of a 30-stop ride, this direction does not make it): got ORLEANS:StopArea:01002003 -> ORLEANS:StopArea:01086001 on ORLEANS:Line:N d1, trip ORLEANS:VehicleJourney:N_R_16_21_2184_4_013000
+
+case: tao-journeys-N-d1-pairs
+  result: PASSED
+
+case: tao-journeys-N-d1-stop_list
+  result: PASSED
+
+case: tao-journeys-N-d1-swapped
+  result: XFAILED
+  reason: the swapped pair is answered although the asked direction does not ride it: the query filters neither route nor direction
+  detail:
+    asked ORLEANS:StopArea:01086001 -> ORLEANS:StopArea:01002003 on ORLEANS:Line:N d1 (stop 30 to stop 1 of a 30-stop ride, this direction does not make it): got ORLEANS:StopArea:01086001 -> ORLEANS:StopArea:01002003 on ORLEANS:Line:N d0, trip ORLEANS:VehicleJourney:N_A_17_21_2184_4_003001
