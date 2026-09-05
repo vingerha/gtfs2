@@ -68,23 +68,7 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
         start_station_where = f"AND start_station.stop_id = :origin_station_id"
         end_station_where = f"AND end_station.stop_id = :end_station_id"
         _LOGGER.debug("Setting up Route for start/end : %s / %s ", start_station_id, end_station_id)
-                            
-                                                
-                                                                                 
-                                                                     
-                                                    
-                                                                      
-                                            
-                                                
-                                                                
-                                               
-                                                                                                        
-                                                              
-                                                                                
 
-                                                                        
-                                                                             
-           
     limit = 24 * 60 * 60 * 2
     tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
     tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}'))"
@@ -232,9 +216,7 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
 
     #_LOGGER.debug("SQL statement:\n%s", sql_query)
     #_LOGGER.debug("SQL parameters:\n%s", log_params)      
-                  
-                                                         
-                                            
+                        
     with schedule.engine.connect() as conn:
         result = conn.execute(
             text(sql_query),

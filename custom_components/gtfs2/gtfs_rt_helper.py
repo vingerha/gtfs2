@@ -238,7 +238,7 @@ def get_rt_route_trip_statuses(self, feed_entities=None):
             else:
                 route_id = entity["trip_update"]["trip"]["route_id"]
 
-            if "direction_id" in entity["trip_update"]["trip"]:
+            if "direction_id" in entity["trip_update"]["trip"] and entity["trip_update"]["trip"]["direction_id"] not in ("", None):
                     direction_id = entity["trip_update"]["trip"]["direction_id"]
             else:
                 direction_id = "nn"
@@ -288,7 +288,7 @@ def get_rt_route_trip_statuses(self, feed_entities=None):
                         if self._route_id not in departure_times:
                             departure_times[self._route_id] = {}
                                                
-                        if direction_id == "nn" or entity_id == self._trip_short_name: # in this case the trip_id serves as a basis so one can safely set direction to the requesting entity direction
+                        if direction_id == "nn" or self._direction in (None, "None") or entity_id == self._trip_short_name: # in this case the trip_id serves as a basis so one can safely set direction to the requesting entity direction
                             direction_id = self._direction                   
 
                         if direction_id not in departure_times[self._route_id]:
