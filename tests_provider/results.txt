@@ -7,7 +7,7 @@ case: gvb-1-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: 4138837 Amsterdam, Leidseplein at 1 and 4 and 16 and 19, 3979966 Amsterdam, Rhijnvis Feithstraat at 1 and 13, 3980187 Amsterdam, Rijksmuseum at 2 and 5 and 17 and 20, and 12 more
 
 case: gvb-1-d0-swapped
   result: PASSED
@@ -19,8 +19,8 @@ case: gvb-1-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3979766', '3980631')]
+    the stop list offers a stop twice: 3979966 Amsterdam, Rhijnvis Feithstraat at 1 and 2, 3979725 Amsterdam, Surinameplein at 1 and 16 and 19, 3980938 Amsterdam, Jan Pieter Heijestraat at 2 and 3, and 24 more
+    the list offers one station twice in a row: 3979766 Amsterdam, Weesperplein then 3980631 Amsterdam, Weesperplein
 
 case: gvb-1-d1-swapped
   result: PASSED
@@ -32,8 +32,8 @@ case: gvb-13-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3980268', '3980182')]
+    the stop list offers a stop twice: 3979794 Amsterdam, Mercatorplein at 1 and 10, 3980464 Amsterdam, Marco Polostraat at 2 and 11, 3980544 Amsterdam, Admiraal de Ruijterweg at 3 and 12, and 10 more
+    the list offers one station twice in a row: 3980268 Amsterdam, Elandsgracht then 3980182 Amsterdam, Elandsgracht
 
 case: gvb-13-d0-swapped
   result: PASSED
@@ -45,7 +45,7 @@ case: gvb-13-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: 3980794 Amsterdam, Admiraal Helfrichstraat at 1 and 14, 3980974 Amsterdam, Jan Voermanstraat at 2 and 15, 3980162 Amsterdam, Jan Tooropstraat at 3 and 16, and 6 more
 
 case: gvb-13-d1-swapped
   result: PASSED
@@ -57,8 +57,8 @@ case: gvb-14-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3980489', '3980251')]
+    the stop list offers a stop twice: 3981274 Amsterdam, Centraal Station at 1 and 16, 3979805 Amsterdam, Mauritskade at 1 and 9, 3980549 Amsterdam, Mauritskade at 1 and 8, and 16 more
+    the list offers one station twice in a row: 3980489 Amsterdam, Dam then 3980251 Amsterdam, Dam, 3981274 Amsterdam, Centraal Station then 4045456 Amsterdam, Centraal Station
 
 case: gvb-14-d0-swapped
   result: PASSED
@@ -70,8 +70,8 @@ case: gvb-14-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('4045456', '3981274')]
+    the stop list offers a stop twice: 3980549 Amsterdam, Mauritskade at 1 and 7 and 8, 3980234 Amsterdam, Javaplein at 1 and 4 and 12, 3981274 Amsterdam, Centraal Station at 1 and 9 and 15 and 16, and 14 more
+    the list offers one station twice in a row: 4045456 Amsterdam, Centraal Station then 3981274 Amsterdam, Centraal Station, 3980234 Amsterdam, Javaplein then 3981356 Amsterdam, Javaplein, 3979768 Amsterdam, Plantage Lepellaan then 3981148 Amsterdam, Plantage Lepellaan
     the list contradicts the riding order 3980234 .. 3981274
     the list contradicts the riding order 3981274 .. 3980992
 
@@ -85,8 +85,8 @@ case: gvb-17-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3981140', '3980752')]
+    the stop list offers a stop twice: 3980305 Amsterdam, Corantijnstraat at 1 and 11, 3981271 Amsterdam, Centraal Station at 1 and 8 and 14 and 24, 3980599 Amsterdam, Leidseplein at 1 and 7 and 17, and 11 more
+    the list offers one station twice in a row: 3981140 Amsterdam, Witte de Withstraat then 3980752 Amsterdam, Witte de Withstraat
     the list contradicts the riding order 3981271 .. 4132580
 
 case: gvb-17-d0-swapped
@@ -99,8 +99,8 @@ case: gvb-17-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3980573', '3980418')]
+    the stop list offers a stop twice: 3981271 Amsterdam, Centraal Station at 1 and 8 and 15, 3979725 Amsterdam, Surinameplein at 1 and 15, 3980599 Amsterdam, Leidseplein at 1 and 8, and 15 more
+    the list offers one station twice in a row: 3980573 Amsterdam, Koningsplein then 3980418 Amsterdam, Koningsplein
     the list contradicts the riding order 3981271 .. 3980351
 
 case: gvb-17-d1-swapped
@@ -113,8 +113,8 @@ case: gvb-7-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3980060', '3980854')]
+    the stop list offers a stop twice: 3980004 Amsterdam, Frederiksplein at 1 and 11, 3980102 Amsterdam, Sloterpark at 1 and 20 and 30, 3981181 Amsterdam, Frederiksplein at 1 and 19, and 22 more
+    the list offers one station twice in a row: 3980060 Amsterdam, Willem Schoutenstraat then 3980854 Amsterdam, Willem Schoutenstraat
     the list contradicts the riding order 3980102 .. 3979878
 
 case: gvb-7-d0-swapped
@@ -130,8 +130,8 @@ case: gvb-7-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198); trams 1, 7 and 17 also carry wrong direction_ids
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('3980752', '3981140')]
+    the stop list offers a stop twice: 3980102 Amsterdam, Sloterpark at 1 and 20 and 24, 3981181 Amsterdam, Frederiksplein at 1 and 19, 3980004 Amsterdam, Frederiksplein at 1 and 5, and 28 more
+    the list offers one station twice in a row: 3980752 Amsterdam, Witte de Withstraat then 3981140 Amsterdam, Witte de Withstraat
     the list contradicts the riding order 3980102 .. 3980992
 
 case: gvb-7-d1-swapped
@@ -156,7 +156,7 @@ case: palmbus-22-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: THEC0A Théoule Plages at 1 and 13, ISL22R Le Princes des Iles at 2 and 14, THEG0A Théoule Gare at 3 and 15, and 24 more
 
 case: palmbus-22-d0-swapped
   result: PASSED
@@ -213,7 +213,7 @@ case: palmbus-B-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: TOUR0A Tournamy at 1 and 5, BLAN0C Blanchisserie at 1 and 7 and 11, OLI01A L'Olivet at 1 and 5 and 11 and 15, and 20 more
 
 case: palmbus-B-d1-swapped
   result: XFAILED
@@ -291,7 +291,7 @@ case: tao-journeys-40-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: ORLEANS:StopArea:00007923 Chèques Postaux - M. Ricoud - Quai C at 0 and 10, ORLEANS:StopArea:00034303 Montesquieu at 1 and 11, ORLEANS:StopArea:01036003 Théâtre Philipe at 2 and 12, and 12 more
 
 case: tao-journeys-40-d0-swapped
   result: XFAILED
@@ -306,7 +306,7 @@ case: tao-journeys-40-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: ORLEANS:StopArea:01017071 Gare d'Orléans - Quai M bis at 0 and 1, ORLEANS:StopArea:00019303 Halmagrand at 1 and 2, ORLEANS:StopArea:00005401 Carré St-Vincent at 2 and 3, and 23 more
 
 case: tao-journeys-40-d1-swapped
   result: XFAILED
@@ -339,8 +339,8 @@ case: tao-journeys-A-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('ORLEANS:StopArea:THOPIT2', 'ORLEANS:StopArea:THOPIT1')]
+    the stop list offers a stop twice: ORLEANS:StopArea:THOPAC1 Hôpital-Accueil at 0 and 1, ORLEANS:StopArea:TBOLIE1 Bolière at 1 and 2, ORLEANS:StopArea:TPOSTA1 Chèques Postaux - Michel Ricoud at 2 and 3, and 24 more
+    the list offers one station twice in a row: ORLEANS:StopArea:THOPIT2 Hôpital de La Source then ORLEANS:StopArea:THOPIT1 Hôpital de La Source, ORLEANS:StopArea:TZENIT1 Zénith then ORLEANS:StopArea:TZENIT1 Zénith, ORLEANS:StopArea:TVERNE2 Jules Verne then ORLEANS:StopArea:TVERNE1 Jules Verne, and 2 more
 
 case: tao-journeys-A-d0-swapped
   result: XFAILED
@@ -358,7 +358,7 @@ case: tao-journeys-A-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the list offers one station twice in a row [('ORLEANS:StopArea:TVERNE2', 'ORLEANS:StopArea:TVERNE1')]
+    the list offers one station twice in a row: ORLEANS:StopArea:TVERNE2 Jules Verne then ORLEANS:StopArea:TVERNE1 Jules Verne, ORLEANS:StopArea:THOPIT2 Hôpital de La Source then ORLEANS:StopArea:THOPIT1 Hôpital de La Source
 
 case: tao-journeys-A-d1-swapped
   result: XFAILED
@@ -376,8 +376,8 @@ case: tao-journeys-B-d0-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
-    the list offers one station twice in a row [('ORLEANS:StopArea:THAMEA1', 'ORLEANS:StopArea:THAMEA2')]
+    the stop list offers a stop twice: ORLEANS:StopArea:TGAUBR2 Gaudier-Brzeska at 0 and 19, ORLEANS:StopArea:TPTBOR2 Pont Bordeau at 1 and 20, ORLEANS:StopArea:TVERVI2 Verville at 2 and 21, and 3 more
+    the list offers one station twice in a row: ORLEANS:StopArea:THAMEA1 Clos du Hameau then ORLEANS:StopArea:THAMEA2 Clos du Hameau
 
 case: tao-journeys-B-d0-swapped
   result: XFAILED
@@ -393,7 +393,7 @@ case: tao-journeys-B-d1-stop_list
   result: XFAILED
   reason: the stop selector offers a stop twice or out of riding order (discussion #198)
   detail:
-    the stop list repeats a stop_id
+    the stop list offers a stop twice: ORLEANS:StopArea:TAMBER1 Ambert at 0 and 6, ORLEANS:StopArea:TGVILL1 Grand Villiers at 1 and 7, ORLEANS:StopArea:TMOZAR1 Mozart at 2 and 8, and 16 more
 
 case: tao-journeys-B-d1-swapped
   result: XFAILED

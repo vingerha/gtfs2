@@ -357,22 +357,47 @@ def check_route(check, fx, route_id, direction, kind):
         return min(offered, key=lambda n: (n < previous, abs(n - previous)))
 
     if kind == "stop_list":
-        check.note(len(ids) == len(set(ids)), "the stop list repeats a stop_id")
+        # The entries read "STOP: Name (12)", the number being the
+        # stop_sequence the selector showed; a stop offered twice is one
+        # stop_id under two of those numbers, which is what a reader has to
+        # be told to find it again in the feed.
+        offered_at = {}
+        for entry, stop_id in zip(entries, ids):
+            place = entry.rsplit(" (", 1)[-1].rstrip(")") if " (" in entry else "?"
+            offered_at.setdefault(stop_id, []).append(place)
+        repeated = {stop_id: places for stop_id, places in offered_at.items()
+                    if len(places) > 1}
+        text = "the stop list offers a stop twice"
+        if repeated:
+            text += ": " + listed([f"{named(fx, stop_id)} at "
+                                   + " and ".join(places)
+                                   for stop_id, places in repeated.items()])
+        check.note(not repeated, text,
+                   repeated={stop_id: places
+                             for stop_id, places in repeated.items()})
         # Two platforms of one place, called one after the other, are one
         # entry: TAO line A offered Jules Verne twice and each choice hid
         # half the trams. Two records of a station the line calls at twice,
         # far apart in the ride, are not that case and stay offered.
         folded = [(a, b) for a, b in zip(ids, ids[1:])
                   if fx.station_of(a) and fx.station_of(a) == fx.station_of(b)]
-        check.note(not folded,
-                   f"the list offers one station twice in a row {folded[:1]}")
+        text = "the list offers one station twice in a row"
+        if folded:
+            text += ": " + listed([f"{named(fx, a)} then {named(fx, b)}"
+                                   for a, b in folded])
+        check.note(not folded, text, folded=[list(pair) for pair in folded])
         for pattern in grouped:
             places = []
             for stop in pattern:
                 previous = next((p for p in reversed(places) if p is not None), None)
                 places.append(place_of(stop, previous))
-            check.note(None not in places,
-                       "a trip serves a stop the list does not offer")
+            unoffered = [stop for stop, place in zip(pattern, places)
+                         if place is None]
+            text = "a trip serves a stop the list does not offer"
+            if unoffered:
+                text += (": " + listed([named(fx, stop) for stop in unoffered])
+                         + f" (on the ride {pattern[0]} .. {pattern[-1]})")
+            check.note(not unoffered, text, unoffered=list(unoffered))
             known = [place for place in places if place is not None]
             descents = sum(1 for a, b in zip(known, known[1:]) if a >= b)
             # a rotation of a circular line reads k..n then 0..k-1: one
@@ -474,6 +499,19 @@ def got_of(result, by_name=False):
             "route": result.get("route_id"),
             "direction": result.get("trip_direction_id"),
             "trip": result.get("trip_id")}
+
+
+def named(fx, stop_id):
+    """A stop as a reader can look it up: its id and the name it carries."""
+    name = fx.stop_names.get(stop_id)
+    return f"{stop_id} {name}" if name else stop_id
+
+
+def listed(items, limit=3):
+    """The first few of a list, then how many were left out."""
+    shown = ", ".join(items[:limit])
+    rest = len(items) - limit
+    return f"{shown}, and {rest} more" if rest > 0 else shown
 
 
 def answered(asked, got):

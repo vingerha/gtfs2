@@ -315,15 +315,103 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979766": [
+              "5",
+              "8",
+              "20",
+              "23"
+            ],
+            "3979810": [
+              "12",
+              "15",
+              "27",
+              "30"
+            ],
+            "3979846": [
+              "3",
+              "6",
+              "18",
+              "21"
+            ],
+            "3979966": [
+              "1",
+              "13"
+            ],
+            "3980107": [
+              "10",
+              "13",
+              "25",
+              "28"
+            ],
+            "3980187": [
+              "2",
+              "5",
+              "17",
+              "20"
+            ],
+            "3980498": [
+              "6",
+              "9",
+              "21",
+              "24"
+            ],
+            "3980764": [
+              "11",
+              "14",
+              "26",
+              "29"
+            ],
+            "3980814": [
+              "7",
+              "10",
+              "22",
+              "25"
+            ],
+            "3980938": [
+              "2",
+              "14"
+            ],
+            "3981021": [
+              "8",
+              "11",
+              "23",
+              "26"
+            ],
+            "3981063": [
+              "3",
+              "15"
+            ],
+            "3981181": [
+              "4",
+              "7",
+              "19",
+              "22"
+            ],
+            "3981412": [
+              "9",
+              "12",
+              "24",
+              "27"
+            ],
+            "4138837": [
+              "1",
+              "4",
+              "16",
+              "19"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 4138837 Amsterdam, Leidseplein at 1 and 4 and 16 and 19, 3979966 Amsterdam, Rhijnvis Feithstraat at 1 and 13, 3980187 Amsterdam, Rijksmuseum at 2 and 5 and 17 and 20, and 12 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -331,7 +419,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -339,7 +428,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -347,7 +437,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -355,7 +446,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -921,15 +1013,144 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979725": [
+              "1",
+              "16",
+              "19"
+            ],
+            "3979766": [
+              "8",
+              "9"
+            ],
+            "3979810": [
+              "15",
+              "16"
+            ],
+            "3979846": [
+              "6",
+              "7"
+            ],
+            "3979851": [
+              "8",
+              "23",
+              "26"
+            ],
+            "3979966": [
+              "1",
+              "2"
+            ],
+            "3980050": [
+              "4",
+              "19",
+              "22"
+            ],
+            "3980107": [
+              "13",
+              "14"
+            ],
+            "3980113": [
+              "9",
+              "24",
+              "27"
+            ],
+            "3980187": [
+              "5",
+              "6"
+            ],
+            "3980204": [
+              "7",
+              "22",
+              "25"
+            ],
+            "3980220": [
+              "2",
+              "17",
+              "20"
+            ],
+            "3980231": [
+              "5",
+              "20",
+              "23"
+            ],
+            "3980258": [
+              "6",
+              "21",
+              "24"
+            ],
+            "3980498": [
+              "9",
+              "10"
+            ],
+            "3980711": [
+              "11",
+              "26",
+              "29"
+            ],
+            "3980743": [
+              "12",
+              "27",
+              "30"
+            ],
+            "3980764": [
+              "14",
+              "15"
+            ],
+            "3980814": [
+              "10",
+              "11"
+            ],
+            "3980938": [
+              "2",
+              "3"
+            ],
+            "3981021": [
+              "11",
+              "12"
+            ],
+            "3981063": [
+              "3",
+              "4"
+            ],
+            "3981181": [
+              "7",
+              "8"
+            ],
+            "3981217": [
+              "10",
+              "25",
+              "28"
+            ],
+            "3981412": [
+              "12",
+              "13"
+            ],
+            "3981436": [
+              "3",
+              "18",
+              "21"
+            ],
+            "4138837": [
+              "4",
+              "5"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3979966 Amsterdam, Rhijnvis Feithstraat at 1 and 2, 3979725 Amsterdam, Surinameplein at 1 and 16 and 19, 3980938 Amsterdam, Jan Pieter Heijestraat at 2 and 3, and 24 more"
         },
         {
+          "folded": [
+            [
+              "3979766",
+              "3980631"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3979766', '3980631')]"
+          "text": "the list offers one station twice in a row: 3979766 Amsterdam, Weesperplein then 3980631 Amsterdam, Weesperplein"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -937,7 +1158,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -945,7 +1167,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -953,7 +1176,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -961,7 +1185,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1407,15 +1632,76 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979794": [
+              "1",
+              "10"
+            ],
+            "3980128": [
+              "6",
+              "15"
+            ],
+            "3980268": [
+              "7",
+              "16"
+            ],
+            "3980349": [
+              "11",
+              "20"
+            ],
+            "3980464": [
+              "2",
+              "11"
+            ],
+            "3980544": [
+              "3",
+              "12"
+            ],
+            "3980579": [
+              "4",
+              "13"
+            ],
+            "3980590": [
+              "10",
+              "19"
+            ],
+            "3980701": [
+              "8",
+              "17"
+            ],
+            "3980882": [
+              "9",
+              "18"
+            ],
+            "3981052": [
+              "12",
+              "21"
+            ],
+            "3981133": [
+              "13",
+              "22"
+            ],
+            "3981334": [
+              "5",
+              "14"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3979794 Amsterdam, Mercatorplein at 1 and 10, 3980464 Amsterdam, Marco Polostraat at 2 and 11, 3980544 Amsterdam, Admiraal de Ruijterweg at 3 and 12, and 10 more"
         },
         {
+          "folded": [
+            [
+              "3980268",
+              "3980182"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3980268', '3980182')]"
+          "text": "the list offers one station twice in a row: 3980268 Amsterdam, Elandsgracht then 3980182 Amsterdam, Elandsgracht"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1423,7 +1709,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1431,7 +1718,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1787,15 +2075,55 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979744": [
+              "8",
+              "21"
+            ],
+            "3979970": [
+              "7",
+              "20"
+            ],
+            "3980106": [
+              "9",
+              "22"
+            ],
+            "3980162": [
+              "3",
+              "16"
+            ],
+            "3980246": [
+              "6",
+              "19"
+            ],
+            "3980252": [
+              "5",
+              "18"
+            ],
+            "3980794": [
+              "1",
+              "14"
+            ],
+            "3980974": [
+              "2",
+              "15"
+            ],
+            "3981165": [
+              "4",
+              "17"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3980794 Amsterdam, Admiraal Helfrichstraat at 1 and 14, 3980974 Amsterdam, Jan Voermanstraat at 2 and 15, 3980162 Amsterdam, Jan Tooropstraat at 3 and 16, and 6 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1803,7 +2131,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -1811,7 +2140,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2407,15 +2737,104 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979727": [
+              "2",
+              "10"
+            ],
+            "3979768": [
+              "2",
+              "9"
+            ],
+            "3979798": [
+              "6",
+              "13"
+            ],
+            "3979805": [
+              "1",
+              "9"
+            ],
+            "3979826": [
+              "9",
+              "16"
+            ],
+            "3979886": [
+              "3",
+              "10"
+            ],
+            "3979931": [
+              "5",
+              "13"
+            ],
+            "3980213": [
+              "7",
+              "14"
+            ],
+            "3980234": [
+              "4",
+              "12"
+            ],
+            "3980239": [
+              "5",
+              "12"
+            ],
+            "3980489": [
+              "8",
+              "15"
+            ],
+            "3980549": [
+              "1",
+              "8"
+            ],
+            "3980629": [
+              "7",
+              "15"
+            ],
+            "3980771": [
+              "4",
+              "11"
+            ],
+            "3980804": [
+              "6",
+              "14"
+            ],
+            "3980826": [
+              "3",
+              "11"
+            ],
+            "3980992": [
+              "8",
+              "16"
+            ],
+            "3981274": [
+              "1",
+              "16"
+            ],
+            "4045456": [
+              "10",
+              "17"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3981274 Amsterdam, Centraal Station at 1 and 16, 3979805 Amsterdam, Mauritskade at 1 and 9, 3980549 Amsterdam, Mauritskade at 1 and 8, and 16 more"
         },
         {
+          "folded": [
+            [
+              "3980489",
+              "3980251"
+            ],
+            [
+              "3981274",
+              "4045456"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3980489', '3980251')]"
+          "text": "the list offers one station twice in a row: 3980489 Amsterdam, Dam then 3980251 Amsterdam, Dam, 3981274 Amsterdam, Centraal Station then 4045456 Amsterdam, Centraal Station"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2423,7 +2842,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2431,7 +2851,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2439,7 +2860,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2447,7 +2869,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2455,7 +2878,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -2463,7 +2887,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3185,15 +3610,111 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979727": [
+              "2",
+              "10"
+            ],
+            "3979768": [
+              "2",
+              "8",
+              "9"
+            ],
+            "3979798": [
+              "6",
+              "12",
+              "13"
+            ],
+            "3979805": [
+              "1",
+              "9"
+            ],
+            "3979886": [
+              "3",
+              "9",
+              "10"
+            ],
+            "3979931": [
+              "5",
+              "13"
+            ],
+            "3980213": [
+              "7",
+              "13",
+              "14"
+            ],
+            "3980234": [
+              "1",
+              "4",
+              "12"
+            ],
+            "3980239": [
+              "5",
+              "11",
+              "12"
+            ],
+            "3980251": [
+              "8",
+              "14",
+              "15"
+            ],
+            "3980549": [
+              "1",
+              "7",
+              "8"
+            ],
+            "3980629": [
+              "7",
+              "15"
+            ],
+            "3980771": [
+              "4",
+              "10",
+              "11"
+            ],
+            "3980804": [
+              "6",
+              "14"
+            ],
+            "3980826": [
+              "3",
+              "11"
+            ],
+            "3980992": [
+              "8",
+              "16"
+            ],
+            "3981274": [
+              "1",
+              "9",
+              "15",
+              "16"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3980549 Amsterdam, Mauritskade at 1 and 7 and 8, 3980234 Amsterdam, Javaplein at 1 and 4 and 12, 3981274 Amsterdam, Centraal Station at 1 and 9 and 15 and 16, and 14 more"
         },
         {
+          "folded": [
+            [
+              "4045456",
+              "3981274"
+            ],
+            [
+              "3980234",
+              "3981356"
+            ],
+            [
+              "3979768",
+              "3981148"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('4045456', '3981274')]"
+          "text": "the list offers one station twice in a row: 4045456 Amsterdam, Centraal Station then 3981274 Amsterdam, Centraal Station, 3980234 Amsterdam, Javaplein then 3981356 Amsterdam, Javaplein, 3979768 Amsterdam, Plantage Lepellaan then 3981148 Amsterdam, Plantage Lepellaan"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3201,7 +3722,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3209,7 +3731,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -3217,7 +3740,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3225,7 +3749,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -3233,7 +3758,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3790,15 +4316,89 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979746": [
+              "5",
+              "15"
+            ],
+            "3979826": [
+              "7",
+              "13",
+              "23"
+            ],
+            "3979912": [
+              "2",
+              "8",
+              "18"
+            ],
+            "3980023": [
+              "5",
+              "11",
+              "21"
+            ],
+            "3980305": [
+              "1",
+              "11"
+            ],
+            "3980394": [
+              "6",
+              "16"
+            ],
+            "3980489": [
+              "6",
+              "12",
+              "22"
+            ],
+            "3980573": [
+              "4",
+              "10",
+              "20"
+            ],
+            "3980593": [
+              "2",
+              "12"
+            ],
+            "3980596": [
+              "4",
+              "14"
+            ],
+            "3980599": [
+              "1",
+              "7",
+              "17"
+            ],
+            "3980642": [
+              "3",
+              "9",
+              "19"
+            ],
+            "3980752": [
+              "3",
+              "13"
+            ],
+            "3981271": [
+              "1",
+              "8",
+              "14",
+              "24"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3980305 Amsterdam, Corantijnstraat at 1 and 11, 3981271 Amsterdam, Centraal Station at 1 and 8 and 14 and 24, 3980599 Amsterdam, Leidseplein at 1 and 7 and 17, and 11 more"
         },
         {
+          "folded": [
+            [
+              "3981140",
+              "3980752"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3981140', '3980752')]"
+          "text": "the list offers one station twice in a row: 3981140 Amsterdam, Witte de Withstraat then 3980752 Amsterdam, Witte de Withstraat"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3806,7 +4406,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -3814,7 +4415,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -3822,7 +4424,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4283,15 +4886,97 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979725": [
+              "1",
+              "15"
+            ],
+            "3979826": [
+              "7",
+              "14"
+            ],
+            "3979912": [
+              "2",
+              "9"
+            ],
+            "3979971": [
+              "8",
+              "22"
+            ],
+            "3980023": [
+              "5",
+              "12"
+            ],
+            "3980050": [
+              "4",
+              "18"
+            ],
+            "3980220": [
+              "2",
+              "16"
+            ],
+            "3980231": [
+              "5",
+              "19"
+            ],
+            "3980240": [
+              "7",
+              "21"
+            ],
+            "3980351": [
+              "10",
+              "24"
+            ],
+            "3980489": [
+              "6",
+              "13"
+            ],
+            "3980573": [
+              "4",
+              "11"
+            ],
+            "3980599": [
+              "1",
+              "8"
+            ],
+            "3980642": [
+              "3",
+              "10"
+            ],
+            "3980728": [
+              "9",
+              "23"
+            ],
+            "3980933": [
+              "6",
+              "20"
+            ],
+            "3981271": [
+              "1",
+              "8",
+              "15"
+            ],
+            "3981436": [
+              "3",
+              "17"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3981271 Amsterdam, Centraal Station at 1 and 8 and 15, 3979725 Amsterdam, Surinameplein at 1 and 15, 3980599 Amsterdam, Leidseplein at 1 and 8, and 15 more"
         },
         {
+          "folded": [
+            [
+              "3980573",
+              "3980418"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3980573', '3980418')]"
+          "text": "the list offers one station twice in a row: 3980573 Amsterdam, Koningsplein then 3980418 Amsterdam, Koningsplein"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -4299,7 +4984,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4307,7 +4993,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4315,7 +5002,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4776,15 +5464,125 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979766": [
+              "2",
+              "20"
+            ],
+            "3979816": [
+              "11",
+              "21"
+            ],
+            "3979878": [
+              "5",
+              "23"
+            ],
+            "3979897": [
+              "2",
+              "12"
+            ],
+            "3979909": [
+              "17",
+              "27"
+            ],
+            "3979969": [
+              "18",
+              "28"
+            ],
+            "3980004": [
+              "1",
+              "11"
+            ],
+            "3980013": [
+              "5",
+              "15"
+            ],
+            "3980057": [
+              "4",
+              "22"
+            ],
+            "3980060": [
+              "10",
+              "20"
+            ],
+            "3980102": [
+              "1",
+              "20",
+              "30"
+            ],
+            "3980149": [
+              "12",
+              "22"
+            ],
+            "3980176": [
+              "13",
+              "23"
+            ],
+            "3980235": [
+              "7",
+              "17"
+            ],
+            "3980270": [
+              "9",
+              "19"
+            ],
+            "3980379": [
+              "4",
+              "14"
+            ],
+            "3980413": [
+              "14",
+              "24"
+            ],
+            "3980469": [
+              "3",
+              "13"
+            ],
+            "3980564": [
+              "16",
+              "26"
+            ],
+            "3980572": [
+              "15",
+              "25"
+            ],
+            "3980735": [
+              "3",
+              "21"
+            ],
+            "3980825": [
+              "19",
+              "29"
+            ],
+            "3980831": [
+              "6",
+              "16"
+            ],
+            "3981140": [
+              "8",
+              "18"
+            ],
+            "3981181": [
+              "1",
+              "19"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3980004 Amsterdam, Frederiksplein at 1 and 11, 3980102 Amsterdam, Sloterpark at 1 and 20 and 30, 3981181 Amsterdam, Frederiksplein at 1 and 19, and 22 more"
         },
         {
+          "folded": [
+            [
+              "3980060",
+              "3980854"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3980060', '3980854')]"
+          "text": "the list offers one station twice in a row: 3980060 Amsterdam, Willem Schoutenstraat then 3980854 Amsterdam, Willem Schoutenstraat"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4792,7 +5590,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -4800,7 +5599,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -4808,7 +5608,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5275,15 +6076,149 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "3979766": [
+              "2",
+              "20"
+            ],
+            "3979816": [
+              "11",
+              "15"
+            ],
+            "3979897": [
+              "2",
+              "6"
+            ],
+            "3979909": [
+              "17",
+              "21"
+            ],
+            "3979969": [
+              "18",
+              "22"
+            ],
+            "3980004": [
+              "1",
+              "5"
+            ],
+            "3980013": [
+              "5",
+              "9"
+            ],
+            "3980060": [
+              "10",
+              "14"
+            ],
+            "3980102": [
+              "1",
+              "20",
+              "24"
+            ],
+            "3980149": [
+              "12",
+              "16"
+            ],
+            "3980176": [
+              "13",
+              "17"
+            ],
+            "3980235": [
+              "7",
+              "11"
+            ],
+            "3980270": [
+              "9",
+              "13"
+            ],
+            "3980379": [
+              "4",
+              "8"
+            ],
+            "3980413": [
+              "14",
+              "18"
+            ],
+            "3980469": [
+              "3",
+              "7"
+            ],
+            "3980480": [
+              "7",
+              "25"
+            ],
+            "3980498": [
+              "3",
+              "21"
+            ],
+            "3980564": [
+              "16",
+              "20"
+            ],
+            "3980572": [
+              "15",
+              "19"
+            ],
+            "3980605": [
+              "8",
+              "26"
+            ],
+            "3980629": [
+              "10",
+              "28"
+            ],
+            "3980804": [
+              "9",
+              "27"
+            ],
+            "3980825": [
+              "19",
+              "23"
+            ],
+            "3980831": [
+              "6",
+              "10"
+            ],
+            "3980992": [
+              "11",
+              "29"
+            ],
+            "3981110": [
+              "4",
+              "22"
+            ],
+            "3981140": [
+              "8",
+              "12"
+            ],
+            "3981181": [
+              "1",
+              "19"
+            ],
+            "4015596": [
+              "5",
+              "23"
+            ],
+            "4015723": [
+              "6",
+              "24"
+            ]
+          },
+          "text": "the stop list offers a stop twice: 3980102 Amsterdam, Sloterpark at 1 and 20 and 24, 3981181 Amsterdam, Frederiksplein at 1 and 19, 3980004 Amsterdam, Frederiksplein at 1 and 5, and 28 more"
         },
         {
+          "folded": [
+            [
+              "3980752",
+              "3981140"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('3980752', '3981140')]"
+          "text": "the list offers one station twice in a row: 3980752 Amsterdam, Witte de Withstraat then 3981140 Amsterdam, Witte de Withstraat"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": false,
@@ -5291,7 +6226,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5299,7 +6235,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5307,7 +6244,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5594,15 +6532,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5808,15 +6749,127 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "BDMMBA": [
+              "10",
+              "22"
+            ],
+            "CMID0A": [
+              "12",
+              "24"
+            ],
+            "EROMAN": [
+              "11",
+              "23"
+            ],
+            "GMA0AR": [
+              "25",
+              "37"
+            ],
+            "GSNF0R": [
+              "27",
+              "39"
+            ],
+            "HDV08A": [
+              "24",
+              "36"
+            ],
+            "ISL22R": [
+              "2",
+              "14"
+            ],
+            "JHIB0A": [
+              "22",
+              "34"
+            ],
+            "KI290A": [
+              "15",
+              "27"
+            ],
+            "KI310A": [
+              "14",
+              "26"
+            ],
+            "LMOR0A": [
+              "13",
+              "25"
+            ],
+            "MCOL0A": [
+              "20",
+              "32"
+            ],
+            "MIN22R": [
+              "5",
+              "17"
+            ],
+            "MLEA0A": [
+              "19",
+              "31"
+            ],
+            "MMER0A": [
+              "18",
+              "30"
+            ],
+            "MNAD0A": [
+              "21",
+              "33"
+            ],
+            "PLRO0R": [
+              "9",
+              "21"
+            ],
+            "PMID0A": [
+              "23",
+              "35"
+            ],
+            "PNA16A": [
+              "7",
+              "19"
+            ],
+            "PRA16A": [
+              "6",
+              "18"
+            ],
+            "PROC0A": [
+              "17",
+              "29"
+            ],
+            "RAG22R": [
+              "4",
+              "16"
+            ],
+            "RPO16A": [
+              "8",
+              "20"
+            ],
+            "RSE0AA": [
+              "26",
+              "38"
+            ],
+            "THEC0A": [
+              "1",
+              "13"
+            ],
+            "THEG0A": [
+              "3",
+              "15"
+            ],
+            "VERR0A": [
+              "16",
+              "28"
+            ]
+          },
+          "text": "the stop list offers a stop twice: THEC0A Théoule Plages at 1 and 13, ISL22R Le Princes des Iles at 2 and 14, THEG0A Théoule Gare at 3 and 15, and 24 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -5824,7 +6877,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6075,15 +7129,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6091,7 +7148,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6282,15 +7340,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6442,15 +7503,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6722,15 +7786,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6738,7 +7805,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -6746,7 +7814,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -7168,15 +8237,141 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "BLAN0C": [
+              "1",
+              "7",
+              "11"
+            ],
+            "CABR0A": [
+              "6",
+              "10"
+            ],
+            "CJA01A": [
+              "3",
+              "9",
+              "13"
+            ],
+            "CMOU0A": [
+              "2",
+              "6"
+            ],
+            "GSNF0R": [
+              "13",
+              "17",
+              "23",
+              "27"
+            ],
+            "JUYE0A": [
+              "3",
+              "7"
+            ],
+            "LCA0AA": [
+              "9",
+              "13",
+              "19",
+              "23"
+            ],
+            "LIC01A": [
+              "2",
+              "6",
+              "12",
+              "16"
+            ],
+            "LRO01A": [
+              "4",
+              "10",
+              "14"
+            ],
+            "MADR6A": [
+              "6",
+              "10",
+              "16",
+              "20"
+            ],
+            "MEU0AA": [
+              "11",
+              "15",
+              "21",
+              "25"
+            ],
+            "MIL0AA": [
+              "10",
+              "14",
+              "20",
+              "24"
+            ],
+            "MRO35A": [
+              "4",
+              "8",
+              "14",
+              "18"
+            ],
+            "NDAN6A": [
+              "5",
+              "9",
+              "15",
+              "19"
+            ],
+            "OLI01A": [
+              "1",
+              "5",
+              "11",
+              "15"
+            ],
+            "PDO0AA": [
+              "8",
+              "12",
+              "18",
+              "22"
+            ],
+            "PRO11R": [
+              "3",
+              "7",
+              "13",
+              "17"
+            ],
+            "PVA0AA": [
+              "12",
+              "16",
+              "22",
+              "26"
+            ],
+            "SEV06A": [
+              "7",
+              "11",
+              "17",
+              "21"
+            ],
+            "TOUR0A": [
+              "1",
+              "5"
+            ],
+            "VALM0A": [
+              "4",
+              "8"
+            ],
+            "VAUM0A": [
+              "5",
+              "9"
+            ],
+            "VFE01A": [
+              "2",
+              "8",
+              "12"
+            ]
+          },
+          "text": "the stop list offers a stop twice: TOUR0A Tournamy at 1 and 5, BLAN0C Blanchisserie at 1 and 7 and 11, OLI01A L'Olivet at 1 and 5 and 11 and 15, and 20 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -7184,7 +8379,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -7192,7 +8388,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -7200,7 +8397,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -10335,15 +11533,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -10489,15 +11690,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -10703,15 +11907,79 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "ORLEANS:StopArea:00001220": [
+              "11",
+              "21"
+            ],
+            "ORLEANS:StopArea:00004730": [
+              "3",
+              "13"
+            ],
+            "ORLEANS:StopArea:00005402": [
+              "12",
+              "22"
+            ],
+            "ORLEANS:StopArea:00005500": [
+              "7",
+              "17"
+            ],
+            "ORLEANS:StopArea:00007923": [
+              "0",
+              "10"
+            ],
+            "ORLEANS:StopArea:00019301": [
+              "13",
+              "23"
+            ],
+            "ORLEANS:StopArea:00026500": [
+              "8",
+              "18"
+            ],
+            "ORLEANS:StopArea:00034303": [
+              "1",
+              "11"
+            ],
+            "ORLEANS:StopArea:00038310": [
+              "9",
+              "19"
+            ],
+            "ORLEANS:StopArea:00039751": [
+              "4",
+              "14"
+            ],
+            "ORLEANS:StopArea:00045620": [
+              "10",
+              "20"
+            ],
+            "ORLEANS:StopArea:00047321": [
+              "5",
+              "15"
+            ],
+            "ORLEANS:StopArea:00047361": [
+              "6",
+              "16"
+            ],
+            "ORLEANS:StopArea:01001712": [
+              "14",
+              "24"
+            ],
+            "ORLEANS:StopArea:01036003": [
+              "2",
+              "12"
+            ]
+          },
+          "text": "the stop list offers a stop twice: ORLEANS:StopArea:00007923 Chèques Postaux - M. Ricoud - Quai C at 0 and 10, ORLEANS:StopArea:00034303 Montesquieu at 1 and 11, ORLEANS:StopArea:01036003 Théâtre Philipe at 2 and 12, and 12 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -10719,7 +11987,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11156,15 +12425,123 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "ORLEANS:StopArea:00001223": [
+              "3",
+              "4"
+            ],
+            "ORLEANS:StopArea:00001600": [
+              "22",
+              "23"
+            ],
+            "ORLEANS:StopArea:00003726": [
+              "15",
+              "16"
+            ],
+            "ORLEANS:StopArea:00004732": [
+              "11",
+              "12"
+            ],
+            "ORLEANS:StopArea:00005401": [
+              "2",
+              "3"
+            ],
+            "ORLEANS:StopArea:00005501": [
+              "7",
+              "8"
+            ],
+            "ORLEANS:StopArea:00007601": [
+              "19",
+              "20"
+            ],
+            "ORLEANS:StopArea:00007923": [
+              "15",
+              "16"
+            ],
+            "ORLEANS:StopArea:00007924": [
+              "14",
+              "15"
+            ],
+            "ORLEANS:StopArea:00010100": [
+              "17",
+              "18"
+            ],
+            "ORLEANS:StopArea:00016101": [
+              "21",
+              "22"
+            ],
+            "ORLEANS:StopArea:00019303": [
+              "1",
+              "2"
+            ],
+            "ORLEANS:StopArea:00026501": [
+              "6",
+              "7"
+            ],
+            "ORLEANS:StopArea:00034302": [
+              "13",
+              "14"
+            ],
+            "ORLEANS:StopArea:00035910": [
+              "24",
+              "25"
+            ],
+            "ORLEANS:StopArea:00038311": [
+              "5",
+              "6"
+            ],
+            "ORLEANS:StopArea:00039750": [
+              "10",
+              "11"
+            ],
+            "ORLEANS:StopArea:00043320": [
+              "20",
+              "21"
+            ],
+            "ORLEANS:StopArea:00045621": [
+              "4",
+              "5"
+            ],
+            "ORLEANS:StopArea:00047320": [
+              "9",
+              "10"
+            ],
+            "ORLEANS:StopArea:00047360": [
+              "8",
+              "9"
+            ],
+            "ORLEANS:StopArea:00049101": [
+              "16",
+              "17"
+            ],
+            "ORLEANS:StopArea:01017071": [
+              "0",
+              "1"
+            ],
+            "ORLEANS:StopArea:01036004": [
+              "12",
+              "13"
+            ],
+            "ORLEANS:StopArea:01077502": [
+              "18",
+              "19"
+            ],
+            "ORLEANS:StopArea:01088001": [
+              "23",
+              "24"
+            ]
+          },
+          "text": "the stop list offers a stop twice: ORLEANS:StopArea:01017071 Gare d'Orléans - Quai M bis at 0 and 1, ORLEANS:StopArea:00019303 Halmagrand at 1 and 2, ORLEANS:StopArea:00005401 Carré St-Vincent at 2 and 3, and 23 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11172,7 +12549,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11180,7 +12558,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11188,7 +12567,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11196,7 +12576,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11528,15 +12909,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -11682,15 +13066,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12136,15 +13523,148 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "ORLEANS:StopArea:TAUBRA1": [
+              "22",
+              "23"
+            ],
+            "ORLEANS:StopArea:TAULNA1": [
+              "7",
+              "8"
+            ],
+            "ORLEANS:StopArea:TBOLIE1": [
+              "1",
+              "2"
+            ],
+            "ORLEANS:StopArea:TBUSTI1": [
+              "23",
+              "24"
+            ],
+            "ORLEANS:StopArea:TCAMPU1": [
+              "5",
+              "6"
+            ],
+            "ORLEANS:StopArea:TCOLIG1": [
+              "20",
+              "21"
+            ],
+            "ORLEANS:StopArea:TCOMET1": [
+              "11",
+              "12"
+            ],
+            "ORLEANS:StopArea:TCSMAR1": [
+              "13",
+              "14"
+            ],
+            "ORLEANS:StopArea:TFLORA1": [
+              "4",
+              "5"
+            ],
+            "ORLEANS:StopArea:TGARDO1": [
+              "18",
+              "19"
+            ],
+            "ORLEANS:StopArea:TGAULA1": [
+              "16",
+              "17"
+            ],
+            "ORLEANS:StopArea:THOPAC1": [
+              "0",
+              "1"
+            ],
+            "ORLEANS:StopArea:TINDIE1": [
+              "3",
+              "4"
+            ],
+            "ORLEANS:StopArea:TLAMBA1": [
+              "24",
+              "25"
+            ],
+            "ORLEANS:StopArea:TLARRY1": [
+              "8",
+              "9"
+            ],
+            "ORLEANS:StopArea:TLBRAL1": [
+              "19",
+              "20"
+            ],
+            "ORLEANS:StopArea:TLIBER1": [
+              "21",
+              "22"
+            ],
+            "ORLEANS:StopArea:TLORET1": [
+              "6",
+              "7"
+            ],
+            "ORLEANS:StopArea:TMOUIL1": [
+              "12",
+              "13"
+            ],
+            "ORLEANS:StopArea:TPOSTA1": [
+              "2",
+              "3"
+            ],
+            "ORLEANS:StopArea:TREPUB1": [
+              "17",
+              "18"
+            ],
+            "ORLEANS:StopArea:TROYAL1": [
+              "15",
+              "16"
+            ],
+            "ORLEANS:StopArea:TTOURE1": [
+              "14",
+              "15"
+            ],
+            "ORLEANS:StopArea:TVERNE1": [
+              "25",
+              "26"
+            ],
+            "ORLEANS:StopArea:TVERNE2": [
+              "25",
+              "26"
+            ],
+            "ORLEANS:StopArea:TVHUGO1": [
+              "9",
+              "10"
+            ],
+            "ORLEANS:StopArea:TZENIT1": [
+              "10",
+              "11"
+            ]
+          },
+          "text": "the stop list offers a stop twice: ORLEANS:StopArea:THOPAC1 Hôpital-Accueil at 0 and 1, ORLEANS:StopArea:TBOLIE1 Bolière at 1 and 2, ORLEANS:StopArea:TPOSTA1 Chèques Postaux - Michel Ricoud at 2 and 3, and 24 more"
         },
         {
+          "folded": [
+            [
+              "ORLEANS:StopArea:THOPIT2",
+              "ORLEANS:StopArea:THOPIT1"
+            ],
+            [
+              "ORLEANS:StopArea:TZENIT1",
+              "ORLEANS:StopArea:TZENIT1"
+            ],
+            [
+              "ORLEANS:StopArea:TVERNE2",
+              "ORLEANS:StopArea:TVERNE1"
+            ],
+            [
+              "ORLEANS:StopArea:TVERNE1",
+              "ORLEANS:StopArea:TVERNE2"
+            ],
+            [
+              "ORLEANS:StopArea:TVERNE2",
+              "ORLEANS:StopArea:TVERNE1"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('ORLEANS:StopArea:THOPIT2', 'ORLEANS:StopArea:THOPIT1')]"
+          "text": "the list offers one station twice in a row: ORLEANS:StopArea:THOPIT2 Hôpital de La Source then ORLEANS:StopArea:THOPIT1 Hôpital de La Source, ORLEANS:StopArea:TZENIT1 Zénith then ORLEANS:StopArea:TZENIT1 Zénith, ORLEANS:StopArea:TVERNE2 Jules Verne then ORLEANS:StopArea:TVERNE1 Jules Verne, and 2 more"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12152,7 +13672,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12160,7 +13681,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12168,7 +13690,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12176,7 +13699,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12184,7 +13708,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12759,15 +14284,27 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
         },
         {
+          "folded": [
+            [
+              "ORLEANS:StopArea:TVERNE2",
+              "ORLEANS:StopArea:TVERNE1"
+            ],
+            [
+              "ORLEANS:StopArea:THOPIT2",
+              "ORLEANS:StopArea:THOPIT1"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('ORLEANS:StopArea:TVERNE2', 'ORLEANS:StopArea:TVERNE1')]"
+          "text": "the list offers one station twice in a row: ORLEANS:StopArea:TVERNE2 Jules Verne then ORLEANS:StopArea:TVERNE1 Jules Verne, ORLEANS:StopArea:THOPIT2 Hôpital de La Source then ORLEANS:StopArea:THOPIT1 Hôpital de La Source"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12775,7 +14312,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12783,7 +14321,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -12791,7 +14330,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13276,15 +14816,48 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "ORLEANS:StopArea:TCLARC2": [
+              "3",
+              "22"
+            ],
+            "ORLEANS:StopArea:TGAUBR2": [
+              "0",
+              "19"
+            ],
+            "ORLEANS:StopArea:THAMEA1": [
+              "5",
+              "24"
+            ],
+            "ORLEANS:StopArea:TLBLUM2": [
+              "4",
+              "23"
+            ],
+            "ORLEANS:StopArea:TPTBOR2": [
+              "1",
+              "20"
+            ],
+            "ORLEANS:StopArea:TVERVI2": [
+              "2",
+              "21"
+            ]
+          },
+          "text": "the stop list offers a stop twice: ORLEANS:StopArea:TGAUBR2 Gaudier-Brzeska at 0 and 19, ORLEANS:StopArea:TPTBOR2 Pont Bordeau at 1 and 20, ORLEANS:StopArea:TVERVI2 Verville at 2 and 21, and 3 more"
         },
         {
+          "folded": [
+            [
+              "ORLEANS:StopArea:THAMEA1",
+              "ORLEANS:StopArea:THAMEA2"
+            ]
+          ],
           "ok": false,
-          "text": "the list offers one station twice in a row [('ORLEANS:StopArea:THAMEA1', 'ORLEANS:StopArea:THAMEA2')]"
+          "text": "the list offers one station twice in a row: ORLEANS:StopArea:THAMEA1 Clos du Hameau then ORLEANS:StopArea:THAMEA2 Clos du Hameau"
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13292,7 +14865,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13300,7 +14874,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13308,7 +14883,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13721,15 +15297,95 @@
       "checks": [
         {
           "ok": false,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {
+            "ORLEANS:StopArea:TAMBER1": [
+              "0",
+              "6"
+            ],
+            "ORLEANS:StopArea:TBEAUM1": [
+              "12",
+              "18"
+            ],
+            "ORLEANS:StopArea:TCAHDV1": [
+              "7",
+              "13"
+            ],
+            "ORLEANS:StopArea:TCXMOR1": [
+              "10",
+              "16"
+            ],
+            "ORLEANS:StopArea:TDRHOM1": [
+              "3",
+              "9"
+            ],
+            "ORLEANS:StopArea:TGAULB1": [
+              "9",
+              "15"
+            ],
+            "ORLEANS:StopArea:TGVILL1": [
+              "1",
+              "7"
+            ],
+            "ORLEANS:StopArea:THALMA1": [
+              "6",
+              "12"
+            ],
+            "ORLEANS:StopArea:TJDARC1": [
+              "8",
+              "14"
+            ],
+            "ORLEANS:StopArea:TMADEL1": [
+              "11",
+              "17"
+            ],
+            "ORLEANS:StopArea:TMLKIN1": [
+              "16",
+              "22"
+            ],
+            "ORLEANS:StopArea:TMOZAR1": [
+              "2",
+              "8"
+            ],
+            "ORLEANS:StopArea:TPEURO1": [
+              "14",
+              "20"
+            ],
+            "ORLEANS:StopArea:TPOMPI2": [
+              "18",
+              "24"
+            ],
+            "ORLEANS:StopArea:TPTDUN1": [
+              "13",
+              "19"
+            ],
+            "ORLEANS:StopArea:TRIOBE1": [
+              "4",
+              "10"
+            ],
+            "ORLEANS:StopArea:TTANGU1": [
+              "15",
+              "21"
+            ],
+            "ORLEANS:StopArea:TTFONT1": [
+              "17",
+              "23"
+            ],
+            "ORLEANS:StopArea:TVIGNA1": [
+              "5",
+              "11"
+            ]
+          },
+          "text": "the stop list offers a stop twice: ORLEANS:StopArea:TAMBER1 Ambert at 0 and 6, ORLEANS:StopArea:TGVILL1 Grand Villiers at 1 and 7, ORLEANS:StopArea:TMOZAR1 Mozart at 2 and 8, and 16 more"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13737,7 +15393,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13745,7 +15402,8 @@
         },
         {
           "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -13993,15 +15651,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,
@@ -14153,15 +15814,18 @@
       "checks": [
         {
           "ok": true,
-          "text": "the stop list repeats a stop_id"
+          "repeated": {},
+          "text": "the stop list offers a stop twice"
+        },
+        {
+          "folded": [],
+          "ok": true,
+          "text": "the list offers one station twice in a row"
         },
         {
           "ok": true,
-          "text": "the list offers one station twice in a row []"
-        },
-        {
-          "ok": true,
-          "text": "a trip serves a stop the list does not offer"
+          "text": "a trip serves a stop the list does not offer",
+          "unoffered": []
         },
         {
           "ok": true,

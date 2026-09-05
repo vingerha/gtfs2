@@ -41,6 +41,11 @@ Reading a failure:
   asked (origin -> destination, line, direction, where the two stops sit in
   the ride) and what get_next_departure gave back (stops, line, direction and
   trip it took them from), so the trip can be looked up in the fixture zip
+- a stop list failure names the stops it judged: a stop the selector
+  offers twice comes with the two sequence numbers it was offered at
+  (THEC0A Théoule Plages at 1 and 13), two records of one station offered
+  one after the other come as the pair, and a stop a trip serves but the
+  list leaves out comes with the ride it was found on
 - a plain full run also writes tests_provider/results.json: the same records,
   every check of every case whether it passed or not, as fields, keys sorted.
   A run with -k, -m or --runxfail leaves the file alone
