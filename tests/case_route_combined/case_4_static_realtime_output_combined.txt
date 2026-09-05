@@ -8,7 +8,7 @@
   'name': 'route_name',
   'file': 'zou_proximite',
   'route_type': '3',
-  'route': 'route_idxxxxxxxxxxxxxxxxxxx',
+  'route': 'route_id',
   'extracting': False,
   'next_departure': {
     'trip_id': 'trip_id_1',
