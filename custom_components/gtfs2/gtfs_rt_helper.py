@@ -510,7 +510,7 @@ def get_gtfs_rt(hass, path, data):
             return "no_rt_data_file" 
         return "ok"                                
     try:
-        r = requests.get(url, headers = _headers , allow_redirects=True)
+        r = requests.get(url, headers=_headers, allow_redirects=True, timeout=20)
         open(os.path.join(gtfs_dir, file), "wb").write(r.content)
         if r.status_code != 200:
             _LOGGER.error("Ìssues with downloading GTFS RT data, error: %s, content: %s", r.status_code, r.content)
