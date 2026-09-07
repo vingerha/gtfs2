@@ -1986,9 +1986,9 @@ async def get_route_departures(hass, data):
     cutoff_tomorrow = datetime.datetime.strptime(tomorrow_date + ' ' + data.get('from_time','00:00:00'), "%Y-%m-%d %H:%M:%S")
     _LOGGER.debug("Cutoff today: %s, cutoff tomorrow: %s", cutoff_today, cutoff_tomorrow)
 
-    _pygtfs = get_gtfs(
-            hass, DEFAULT_PATH, cf_data, False
-        ) 
+    _pygtfs = await hass.async_add_executor_job(
+        get_gtfs, hass, DEFAULT_PATH, cf_data, False
+    )
     
     _data = {
             "schedule": _pygtfs,
@@ -2055,9 +2055,9 @@ async def get_trip_stops(hass, data):
     
     trip_list = str(trips).replace("[","(").replace("]",")")
 
-    schedule = get_gtfs(
-            hass, DEFAULT_PATH, cf_data, False
-        ) 
+    schedule = await hass.async_add_executor_job(
+        get_gtfs, hass, DEFAULT_PATH, cf_data, False
+    )
        
     sql_stops = f"""
     SELECT st.trip_id, s.stop_name, time(st.departure_time), s.stop_id
