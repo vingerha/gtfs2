@@ -9,37 +9,31 @@ Context:
 1a. Route based:
 
 case_1_static_route: real life case static only for french 'zou' route 653, not further maintained if crashing
->> IMPLEMENTATION STATUS: done 
+>> IMPLEMENTATION STATUS: removed
 
 case_2_static: synthetic test, 
 - today trips only
 > verify it filters out properly old and non-applicable trips
 Data:
-- 1st before 'now'
-- 3 after 'now' of which one has today/tomorrow 0
-> expected output: 3 next trips, 2nd trip shows as first trip
+- 2 after 'now' only today
+> expected output: 2 next trips, 1st trip shows as first trip
 >> IMPLEMENTATION STATUS: done 
 
 case_3_static_route: synthetic test, 
 - today and tomorrow trips
 > verify if it puts trips for today, today&tomorrow and tomorrow-only in proper order
 Data:
-- 1 before 'now', running today and tomorrow, should show only tomorrow
 - 1 after 'now' for today only
-- 1 after now but for  today/tomorrow 0
-- 1 after 'now' for today&tomorrow
 - 1 after 'now' for tomorrow only
-> expected output: 5 next trips, 2nd trip shows as first trip, 2 trips for today, 2 for tomorrow
+> expected output: 2 next trips, 1st trip shows as first trip, 1 trips for today, 1 for tomorrow
 >> IMPLEMENTATION STATUS: done 
 
 case_4_static_route: synthetic test, 
 - only tomorrow trips
 > verify if it puts trips for tomorrow
 Data:
-- 1 before 'now', running today, should show only tomorrow
-- 1 after 'now' for tomorrow only
-- 1 after now but for  today/tomorrow 0
-> expected output: 2 next trips, 1st trip shows as first trip with tomorrow date
+- 2 after 'now' for tomorrow only
+> expected output: 2 next trips with tomorrow date
 >> IMPLEMENTATION STATUS: done 
 
 

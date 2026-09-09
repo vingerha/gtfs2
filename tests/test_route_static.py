@@ -207,17 +207,10 @@ def test_route_static(case_id: str, case_dir: Path):
         now_local_tz = dt_util.now()
         now_date_local_tz = now_local_tz.strftime(dt_util.DATE_STR_FORMAT)
         now_time = now.strftime(TIME_STR_FORMAT)
-        yesterday_date = (now - datetime.timedelta(days=1)).strftime(dt_util.DATE_STR_FORMAT)
-        tomorrow = now + datetime.timedelta(days=1)
-        tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
-        tomorrow_date_local_tz = (dt_util.now() + datetime.timedelta(days=1)).strftime(
-            dt_util.DATE_STR_FORMAT
-        )
 
         result = _interpret_departure_rows(
             hass, rows, start_station_id, now, now_local_tz,
-            now_date_local_tz, now_time, yesterday_date,
-            tomorrow, tomorrow_date, tomorrow_date_local_tz,
+            now_date_local_tz, now_time
         )
 
     # 1. The real function, given this case's real inputs, must

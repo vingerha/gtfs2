@@ -1,19 +1,31 @@
 test_route_combined.py case results -- 6 case(s)
 
 case: case_1
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given
 
 case: case_2
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given
 
 case: case_4
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given
 
 case: case_5
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given
 
 case: case_6
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given
 
 case: case_7
-  result: PASSED
+  result: FAILED
+  detail:
+    TypeError: _interpret_departure_rows() takes 7 positional arguments but 11 were given

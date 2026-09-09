@@ -42,14 +42,8 @@ from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_p
 _LOGGER = logging.getLogger(__name__)
 
 
-def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
-                           now, now_date, yesterday, tomorrow, tomorrow_date, schedule):
+def _fetch_departure_rows(route_type, origin, destination, schedule):
     """Run the static-GTFS SQL query and return matching rows as plain dicts.
-                                                                                                            
-                 
-
-                                        
-
     This is the only part of get_next_departure that touches the database.
     Split out so its output (`rows`) can be handed in directly by a test,
     without a real schedule/database, instead of always coming from here.
@@ -70,19 +64,8 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
         _LOGGER.debug("Setting up Route for start/end : %s / %s ", start_station_id, end_station_id)
 
     limit = 24 * 60 * 60 * 2
-    tomorrow_select = tomorrow_select2 = tomorrow_where = tomorrow_order = ""
-    tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}'))"
-    if include_tomorrow:
-        _LOGGER.debug("Includes Tomorrow")
-        limit = int(limit / 2 * 3)
-        tomorrow_name = tomorrow.strftime("%A").lower()
-        tomorrow_select = f"( select calendar.{tomorrow_name} - ( select case when (select 1 from calendar_dates where service_id=trip.service_id and date = '{tomorrow_date}' and exception_type = 2 ) == 1 then 1 else 0 end) ) as tomorrow,"
-        tomorrow_where = f"OR calendar.{tomorrow_name} = 1"
-        tomorrow_order = f"calendar.{tomorrow_name} DESC,"
-        tomorrow_calendar_date_where = f"AND (calendar_date_today.date = date('{now_date}') or calendar_date_today.date = date('{now_date}','+1 day') )"
-        tomorrow_select2 = f"CASE WHEN date('{now_date}') < calendar_date_today.date or date(origin_stop_time.departure_time) = '1970-01-02' THEN 1 else 0 END as tomorrow,"
     sql_query = f"""
-        SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
+        SELECT distinct trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
                route.route_long_name,route.route_short_name,
         	   start_station.stop_id as origin_stop_id,
                start_station.stop_name as origin_stop_name,
@@ -90,7 +73,7 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
                agency.agency_timezone as agency_timezone,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
                time(origin_stop_time.departure_time) AS origin_depart_time,
-               date(origin_stop_time.departure_time) AS origin_depart_date,
+               sd.date AS origin_depart_date,
                origin_stop_time.drop_off_type AS origin_drop_off_type,
                origin_stop_time.pickup_type AS origin_pickup_type,
                origin_stop_time.shape_dist_traveled AS origin_dist_traveled,
@@ -107,17 +90,8 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
                destination_stop_time.shape_dist_traveled AS dest_dist_traveled,
                destination_stop_time.stop_headsign AS dest_stop_headsign,
                destination_stop_time.stop_sequence AS dest_stop_sequence,
-               destination_stop_time.timepoint AS dest_stop_timepoint,
-               calendar.{yesterday.strftime("%A").lower()} AS yesterday,
-               ( select calendar.{now.strftime("%A").lower()} - (  select case when (select 1 from calendar_dates where service_id=trip.service_id and date = date('{now_date}') and exception_type = 2 ) == 1 then 1 else 0 end  ) ) as today,
-               {tomorrow_select}
-               calendar.start_date AS start_date,
-               calendar.end_date AS end_date,
-               "" as calendar_date,
-               0 as today_cd
+               destination_stop_time.timepoint AS dest_stop_timepoint
         FROM trips trip
-        INNER JOIN calendar calendar
-                   ON trip.service_id = calendar.service_id
         INNER JOIN stop_times origin_stop_time
                    ON trip.trip_id = origin_stop_time.trip_id
         INNER JOIN stops start_station
@@ -129,93 +103,38 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
         INNER JOIN routes route
                    ON route.route_id = trip.route_id 
         INNER JOIN agency agency
-                   ON route.agency_id = agency.agency_id                 
+                   ON route.agency_id = agency.agency_id 
+        INNER JOIN service_dates sd 
+                    ON sd.feed_id = trip.feed_id AND sd.service_id = trip.service_id                   
 		WHERE {route_type_where}
         {start_station_where}
         {end_station_where}
         AND origin_stop_sequence < dest_stop_sequence
-        AND calendar.start_date <= date('{now_date}')
-        AND calendar.end_date >= date('{now_date}')
-		UNION ALL
-	    SELECT trip.trip_id, trip.route_id,trip.trip_headsign, trip.direction_id,trip.trip_short_name,
-               route.route_long_name,route.route_short_name,
-               start_station.stop_id as origin_stop_id,
-               start_station.stop_name as origin_stop_name,
-               start_station.stop_timezone as origin_stop_timezone,
-               agency.agency_timezone as agency_timezone,
-               time(origin_stop_time.arrival_time) AS origin_arrival_time,
-               time(origin_stop_time.departure_time) AS origin_depart_time,
-               date(origin_stop_time.departure_time) AS origin_depart_date,
-               origin_stop_time.drop_off_type AS origin_drop_off_type,
-               origin_stop_time.pickup_type AS origin_pickup_type,
-               origin_stop_time.shape_dist_traveled AS origin_dist_traveled,
-               origin_stop_time.stop_headsign AS origin_stop_headsign,
-               origin_stop_time.stop_sequence AS origin_stop_sequence,
-               origin_stop_time.timepoint AS origin_stop_timepoint,
-               end_station.stop_id as dest_stop_id,
-               end_station.stop_name as dest_stop_name,
-               end_station.stop_timezone as dest_stop_timezone,
-               time(destination_stop_time.arrival_time) AS dest_arrival_time,
-               time(destination_stop_time.departure_time) AS dest_depart_time,
-               destination_stop_time.drop_off_type AS dest_drop_off_type,
-               destination_stop_time.pickup_type AS dest_pickup_type,
-               destination_stop_time.shape_dist_traveled AS dest_dist_traveled,
-               destination_stop_time.stop_headsign AS dest_stop_headsign,
-               destination_stop_time.stop_sequence AS dest_stop_sequence,
-               destination_stop_time.timepoint AS dest_stop_timepoint,
-               0 AS yesterday,
-               0 AS today,
-               {tomorrow_select2}
-               date('{now_date}') AS start_date,
-               date('{now_date}') AS end_date,
-               calendar_date_today.date as calendar_date,
-               calendar_date_today.exception_type as today_cd
-        FROM trips trip
-        INNER JOIN stop_times origin_stop_time
-                   ON trip.trip_id = origin_stop_time.trip_id
-        INNER JOIN stops start_station
-                   ON origin_stop_time.stop_id = start_station.stop_id
-        INNER JOIN stop_times destination_stop_time
-                   ON trip.trip_id = destination_stop_time.trip_id
-        INNER JOIN stops end_station
-                   ON destination_stop_time.stop_id = end_station.stop_id
-        INNER JOIN routes route
-                   ON route.route_id = trip.route_id 
-        INNER JOIN calendar_dates calendar_date_today
-				   ON trip.service_id = calendar_date_today.service_id
-        INNER JOIN agency agency
-                   ON route.agency_id = agency.agency_id                    
-		WHERE {route_type_where}
-        {start_station_where}
-        {end_station_where}
-		AND origin_stop_sequence < dest_stop_sequence
-        AND today_cd = 1
-		{tomorrow_calendar_date_where}
-        ORDER BY calendar_date,origin_depart_date, today_cd, origin_depart_time
+        AND datetime(
+            sd.date || ' ' || time(origin_stop_time.departure_time),
+            CASE WHEN date(origin_stop_time.departure_time) = '1970-01-02'
+            THEN '+1 day' ELSE '+0 day' END
+            ) >= datetime('now', 'localtime')
+        ORDER BY sd.date, origin_stop_time.departure_time
+        limit 30
         """  # noqa: S608
-    # Create lookup timetable for today and possibly tomorrow, taking into
+    # Create lookup timetable taking into
     # account any departures from yesterday scheduled after midnight,
     # as long as all departures are within the calendar date range.
     query_params = {
-        "tomorrow_select": tomorrow_select,
         "route_type_where": route_type_where,
         "start_station_where": start_station_where,
         "end_station_where": end_station_where,
-        "tomorrow_select2": tomorrow_select2,
-        "tomorrow_calendar_date_where": tomorrow_calendar_date_where,
         "origin_station_id": start_station_id,
-        "end_station_id": end_station_id,
-        "limit": limit,
-        "route_type": route_type,
-        "now_date": now_date,
+        "end_station_id": end_station_id
     }
 
     log_params = {
         **query_params,
     }
 
-    #_LOGGER.debug("SQL statement:\n%s", sql_query)
-    #_LOGGER.debug("SQL parameters:\n%s", log_params)      
+    _LOGGER.debug("SQL statement:\n%s", sql_query)
+    _LOGGER.debug("SQL parameters:\n%s", log_params)      
                         
     with schedule.engine.connect() as conn:
         result = conn.execute(
@@ -233,104 +152,50 @@ def _fetch_departure_rows(route_type, origin, destination, include_tomorrow,
 
 
 def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
-                               now_date_local_tz, now_time, yesterday_date,
-                               tomorrow, tomorrow_date, tomorrow_date_local_tz):
+                               now_date_local_tz, now_time):
     """Turn raw SQL-shaped rows into the `next_departure` dict.
-
     No database, no schedule object: `rows` only needs to be a list of
     plain dicts shaped like `_fetch_departure_rows`' output. This is what
     a test builds by hand to simulate a specific condition (a midnight
     crossing, a yesterday-late departure, ...) without a real GTFS feed.
     """
+    _LOGGER.debug("Interpret rows: %s", rows)
     timetable = {}
-    yesterday_start = today_start = tomorrow_start = None
-    yesterday_last = today_last = ""        
     for row in rows:
-        #_LOGGER.debug("Row in cursor: %s", row)
-        if row["yesterday"] == 1 and yesterday_date >= row["start_date"]:
-            _LOGGER.debug("Row in cursor added to yesterday")
-            extras = {"day": "yesterday", "first": None, "last": False}
-            if yesterday_start is None:
-                yesterday_start = row["origin_depart_date"]
-            if yesterday_start != row["origin_depart_date"]:
-                idx = (
-                    f"{now_date_local_tz} {row['origin_depart_time']}",
-                    str(row["trip_id"]),
-                )
-                if idx in timetable:
-                    _LOGGER.warning("Duplicate timetable key for yesterday: %s, and trip_id: %s", idx, row['trip_id'])
-                else:
-                    timetable[idx] = {**row, **extras}
-                    yesterday_last = idx
-        if (
-            (
-                (row["today"] == 1 or row["today_cd"] == 1)
-                and ("tomorrow" not in row or row["tomorrow"] == 0)
-            )
-            or (
-                row["today"] == 1
-                and row["calendar_date"] == ""
-            )
-            ):
-            _LOGGER.debug("Row in cursor added to today")
-            extras = {"day": "today", "first": False, "last": False}
-            if today_start is None:
-                today_start = row["origin_depart_date"]
-                extras["first"] = True
-            if today_start == row["origin_depart_date"]:
-                idx_prefix = now_date_local_tz
-            else:
-                idx_prefix = tomorrow_date_local_tz
-            idx = (
-                f"{idx_prefix} {row['origin_depart_time']}",
-                str(row["trip_id"]),
-            )
-            if idx in timetable:
-                _LOGGER.warning(
-                    "Duplicate timetable key for today: %s, and trip_id: %s",
-                    idx,
-                    row["trip_id"],
-                )
-            else:
-                timetable[idx] = {**row, **extras}
-                today_last = idx      
-        if (
-            "tomorrow" in row
-            and row["tomorrow"] == 1
-            and ( tomorrow_date <= row["end_date"] or tomorrow_date == row["calendar_date"] or row["origin_depart_date"]=="1970-01-02")
-        ):
-            _LOGGER.debug("Row in cursor added to tomorrow")
-            extras = {"day": "tomorrow", "first": False, "last": None}
-            if tomorrow_start is None:
-                tomorrow_start = row["origin_depart_date"]
-                extras["first"] = True
-            if tomorrow_start == row["origin_depart_date"]:
-                idx_prefix = tomorrow_date_local_tz
-            idx = (
-                f"{idx_prefix} {row['origin_depart_time']}",
-                str(row["trip_id"]),
-            )
-            if idx in timetable:
-                _LOGGER.warning(
-                    "Duplicate timetable key for tomorrow: %s, and trip_id: %s",
-                    idx,
-                    row["trip_id"],
-                )
-            else:
-                timetable[idx] = {**row, **extras}
-    # Flag last departures.
-    for idx in filter(None, [yesterday_last, today_last]):
-        timetable[idx]["last"] = True
+        service_date = row["origin_depart_date"]
+        depart_dt_str = f"{service_date} {row['origin_depart_time']}"
+        try:
+            depart_dt = datetime.datetime.strptime(depart_dt_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            _LOGGER.warning("Could not parse departure datetime: %s", depart_dt_str)
+            continue
+
+        if depart_dt <= now:
+            continue  # already departed; SQL only filters by date, not time-of-day
+
+        day_label = service_date  # real ISO date beyond tomorrow
+
+        idx = (depart_dt_str, str(row["trip_id"]))
+        if idx in timetable:
+            _LOGGER.warning("Duplicate timetable key: %s, trip_id: %s", idx, row["trip_id"])
+            continue
+        timetable[idx] = {**row, "day": day_label, "first": False, "last": False}
+
+    dates_seen = {}
+    for idx in sorted(timetable.keys()):
+        d = timetable[idx]["origin_depart_date"]
+        dates_seen.setdefault(d, []).append(idx)
+    for date_key, idxs in dates_seen.items():
+        timetable[idxs[0]]["first"] = True
+        timetable[idxs[-1]]["last"] = True
+
     item = {}
     for key in sorted(timetable.keys()):
-        if datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S") > now:
-            item = timetable[key]
-            _LOGGER.info(
-                "Departure(s) found for station %s @ %s -> %s", start_station_id, key, item
-            )
-            break
+        item = timetable[key]
+        _LOGGER.info("Departure(s) found for station %s @ %s -> %s", start_station_id, key, item)
+        break
     _LOGGER.debug("Item(s) from SQL: %s", item)
-    
+        
     if item == {}:
         data_returned = {        
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
@@ -356,7 +221,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     elif item["origin_stop_timezone"] is not None:    
         _LOGGER.debug("Setting Orig & Dest TZ based on origin stop: %s",item["origin_stop_timezone"])
         timezone = dt_util.get_time_zone(item["origin_stop_timezone"])
-        timezone_dest = dt_util.get_time_zone(item["orig_stop_timezone"]) 
+        timezone_dest = dt_util.get_time_zone(item["origin_stop_timezone"]) 
     if item["dest_stop_timezone"] is not None and item["agency_timezone"] is None:
         _LOGGER.debug("Setting Dest TZ based on dest stop: %s",item["dest_stop_timezone"])
         timezone_dest = dt_util.get_time_zone(item["dest_stop_timezone"])  
@@ -368,7 +233,8 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     # create upcoming timetable, use timezone before resetting to UTC and reset 'item' to match with timezone
     timetable_remaining = []
     ix = 0
-    item={}
+    item = {}
+    max_remaining = 10
     for key in sorted(timetable.keys()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
         #_LOGGER.debug ("Upcoming_departure_in_defined_timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
@@ -378,7 +244,9 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
                 item = timetable[key]
                 ix = ix + 1
             _LOGGER.debug("Adding departure in defined timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
-            timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())   
+            timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())
+            if len(timetable_remaining) >= max_remaining:
+                break
     _LOGGER.debug("Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining)
     if item == {}:
         data_returned = {        
@@ -392,6 +260,8 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     timetable_remaining_headsign = []
     timetable_upcoming_trips = []
     timetable_upcoming_arrivals = []
+    max_remaining = 10
+    count = 0
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
         upcoming_arrival = datetime.datetime.combine(
@@ -415,6 +285,9 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
             timetable_upcoming_arrivals.append(
                 dt_util.as_utc(upcoming_arrival).isoformat()
             )
+            count += 1
+            if count >= max_remaining:
+                break
             
     #_LOGGER.debug(
     #    "Timetable Remaining Departures on this Start/Stop, per line: %s",
@@ -436,18 +309,11 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
-    _tomorrow = False
-    if item.get("tomorrow") == 1 or item.get("calendar_date") > now_date_local_tz or item.get("origin_depart_date") != '1970-01-01' :
-        _tomorrow = True
-    _LOGGER.debug("Time is 'tomorrow': %s ,based on -> tomorrow_val: %s, calendar_date val: %s, now_date_local_tz val: %s", _tomorrow, item.get("tomorrow"),item.get("calendar_date"), now_date_local_tz)        
-    origin_arrival = now
-    dest_arrival = now
-    origin_depart_time = f"{now_date_local_tz} {item['origin_depart_time']}"
-    if _tomorrow and now_time > item['origin_depart_time']:
-        origin_arrival = tomorrow
-        dest_arrival = tomorrow
-        origin_depart_time = f"{tomorrow_date} {item['origin_depart_time']}"
-    
+    origin_date = datetime.datetime.strptime(item["origin_depart_date"], "%Y-%m-%d")
+    origin_arrival = origin_date
+    dest_arrival = origin_date
+    origin_depart_time = f"{item['origin_depart_date']} {item['origin_depart_time']}"
+
     if item["origin_arrival_time"] > item["origin_depart_time"]:
         origin_arrival -= datetime.timedelta(days=1)
     origin_arrival_time = (
@@ -542,33 +408,23 @@ def get_next_departure(hass, _data):
     route_type = _data["route_type"]
 
     offset = _data["offset"]
-    include_tomorrow = _data["include_tomorrow"]
     now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
     now_local_tz = dt_util.now() + datetime.timedelta(minutes=offset)
     now_date = now.strftime(dt_util.DATE_STR_FORMAT)
     now_date_local_tz = now_local_tz.strftime(dt_util.DATE_STR_FORMAT)
     now_time = now.strftime(TIME_STR_FORMAT)
-    yesterday = now - datetime.timedelta(days=1)
-    yesterday_date = yesterday.strftime(dt_util.DATE_STR_FORMAT)
-    tomorrow = now + datetime.timedelta(days=1)
-    tomorrow_local_tz = dt_util.now() + datetime.timedelta(minutes=offset) + datetime.timedelta(days=1) 
-    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
-    tomorrow_date_local_tz = tomorrow_local_tz.strftime(dt_util.DATE_STR_FORMAT)
 
     # Fetch all departures for yesterday, today and optionally tomorrow,
     # up to an overkill maximum in case of a departure every minute for those
     # days.
     rows, start_station_id = _fetch_departure_rows(
-        route_type, _data["origin"], _data["destination"], include_tomorrow,
-        now, now_date, yesterday, tomorrow, tomorrow_date, schedule,
+        route_type, _data["origin"], _data["destination"], schedule,
     )
 
     return _interpret_departure_rows(
         hass, rows, start_station_id, now, now_local_tz,
-        now_date_local_tz, now_time, yesterday_date,
-        tomorrow, tomorrow_date, tomorrow_date_local_tz,
+        now_date_local_tz, now_time
     )
-
 
 def get_gtfs(hass, path, data, update=False):
     _LOGGER.debug("Getting gtfs with data: %s", data)
@@ -645,6 +501,7 @@ def extract_from_zip(hass, gtfs, gtfs_dir, file, remove_file):
         return
     pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     check_datasource_index(hass, gtfs, gtfs_dir, file[:-4])
+    check_service_dates_table(hass, gtfs, gtfs_dir, file[:-4])
     
 def check_calendar_dates_from_zip(gtfs_dir,file):
     _LOGGER.debug("Checking if file contains only future data: %s ", file)
@@ -962,6 +819,79 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
 
     
             
+def check_service_dates_table(hass, schedule, gtfs_dir, file):
+    """Ensure a materialized service_dates table exists (feed_id, service_id,
+    date) — one row per date a service actually runs, expanding calendar's
+    weekly pattern and applying calendar_dates exceptions. Built once; does
+    not rebuild if the table already exists."""
+    _LOGGER.debug("Check service_dates table for file: %s", file)
+    if check_extracting(hass, gtfs_dir, file):
+        _LOGGER.warning("Cannot check service_dates table as still unpacking: %s", file)
+        return
+
+    sql_check_table = """
+    SELECT count(*) as checktbl
+    FROM sqlite_master
+    WHERE type = 'table' and name = 'service_dates';
+    """
+
+    sql_create_table = """
+    CREATE TABLE service_dates (
+        feed_id INTEGER NOT NULL,
+        service_id VARCHAR NOT NULL,
+        date DATE NOT NULL
+    )
+    """
+
+    sql_populate_table = """
+    INSERT INTO service_dates (feed_id, service_id, date)
+    WITH RECURSIVE
+      cal_expand(feed_id, service_id, d, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday) AS (
+        SELECT feed_id, service_id, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
+        FROM calendar
+        UNION ALL
+        SELECT feed_id, service_id, date(d, '+1 day'), end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
+        FROM cal_expand
+        WHERE d < end_date
+      ),
+      weekly_dates AS (
+        SELECT feed_id, service_id, d AS date
+        FROM cal_expand
+        WHERE (
+            (CAST(strftime('%w', d) AS INTEGER) = 0 AND sunday    = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 1 AND monday    = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 2 AND tuesday   = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 3 AND wednesday = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 4 AND thursday  = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 5 AND friday    = 1) OR
+            (CAST(strftime('%w', d) AS INTEGER) = 6 AND saturday  = 1)
+        )
+      )
+    SELECT feed_id, service_id, date FROM weekly_dates
+    EXCEPT
+    SELECT feed_id, service_id, date FROM calendar_dates WHERE exception_type = 2
+    UNION
+    SELECT feed_id, service_id, date FROM calendar_dates WHERE exception_type IS NOT 2
+    """
+
+    sql_create_index = """
+    CREATE INDEX gtfs2_service_dates_feed_service_date
+    ON service_dates(feed_id, service_id, date)
+    """
+
+    with schedule.engine.connect() as conn:
+        rows = conn.execute(text(sql_check_table), {"q": "q"}).fetchall()
+    for row_cursor in rows:
+        _LOGGER.debug("service_dates table check: %s", row_cursor._asdict())
+        if row_cursor._asdict()['checktbl'] == 0:
+            _LOGGER.warning("service_dates table missing, creating and populating it")
+            with schedule.engine.connect() as conn:
+                conn.execute(text(sql_create_table), {"q": "q"})
+                conn.execute(text(sql_populate_table), {"q": "q"})
+                conn.commit()
+                conn.execute(text(sql_create_index), {"q": "q"})
+
+
 def create_trip_geojson(self):
     # not in use, awaiting geojson in HA-core to cover this type of geometry
     _LOGGER.debug("Create geojson with data: %s", self._data)

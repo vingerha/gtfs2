@@ -60,6 +60,7 @@ from .gtfs_helper import (
     get_datasources,
     remove_datasource,
     check_datasource_index,
+    check_service_dates_table,
     get_agency_list,
     get_local_stop_list
 )
@@ -453,7 +454,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self._pygtfs
         check_index = await self.hass.async_add_executor_job(
                     check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
-                )            
+                )   
+        check_service_dates = await self.hass.async_add_executor_job(
+                    check_service_dates_table, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
+                )     
         return None
         
     async def _check_config(self, data):
@@ -484,6 +488,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         check_index = await self.hass.async_add_executor_job(
                     check_datasource_index, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
                 )
+        check_service_dates = await self.hass.async_add_executor_job(
+                    check_service_dates_table, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
+                )                    
         try:
             self._data["next_departure"] = await self.hass.async_add_executor_job(
                 get_next_departure, self.hass, self._data
