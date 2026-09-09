@@ -16,7 +16,7 @@
     'route_short_name': 'route_short_name',
     'trip_direction_id': None,
     'trip_short_name': 'trip_short_name_1',
-    'day': 'today',
+    'day': '2026-09-03',
     'first': True,
     'last': False,
     'origin_stop_id': 'origin_stop_id',

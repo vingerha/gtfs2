@@ -257,8 +257,7 @@ def test_coordinator_case(case_id: str, case_dir: Path):
         start_station_id = rows[0]["origin_stop_id"]
         precomputed_next_departure = _interpret_departure_rows(
             hass, rows, start_station_id, now, now_local_tz,
-            now_date_local_tz, now_time, yesterday_date,
-            tomorrow, tomorrow_date, tomorrow_date_local_tz,
+            now_date_local_tz, now_time
         )
 
         coord = coordinator_mod.GTFSUpdateCoordinator(hass, entry)
