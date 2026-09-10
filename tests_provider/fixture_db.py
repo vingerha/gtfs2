@@ -19,6 +19,7 @@ than answer something made up.
 from __future__ import annotations
 
 import csv
+import datetime
 import io
 import os
 import sqlite3
@@ -26,7 +27,7 @@ import tempfile
 import zipfile
 from types import SimpleNamespace
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 
 # columns that have to compare as numbers: a stop_sequence stored as text sorts
 # 10 before 2, which quietly reverses half a journey
@@ -68,7 +69,34 @@ def build(fixtures):
     _pygtfsify(connection)
     connection.commit()
     connection.close()
-    return SimpleNamespace(engine=create_engine("sqlite:///" + path.replace("\\", "/")))
+    engine = create_engine("sqlite:///" + path.replace("\\", "/"))
+    _freeze_sqlite_now(engine)
+    return SimpleNamespace(engine=engine)
+
+
+def _freeze_sqlite_now(engine):
+    """Make the literal 'now' in a query answer with freezegun's clock.
+
+    The component's SQL asks SQLite for datetime('now', 'localtime') /
+    date('now', 'localtime') directly; freezegun patches Python's clock, not
+    SQLite's, which reads the real OS clock through its own C code no matter
+    what freeze_time is doing. So a test that freezes time to a day the
+    fixture's trips run still has the query looking at today's real date,
+    which silently changes what a LIMIT-bound, now-ordered query returns as
+    real time passes -- a fixture built in 2026 fails differently in 2027.
+
+    Rather than touch the component's query, every 'now' the driver is about
+    to send to SQLite is rewritten here, just before execution, to the
+    instant datetime.datetime.utcnow() reports right then -- which is exactly
+    what freeze_time controls. Outside a freeze_time block this is still the
+    real time, so nothing changes when a test does not freeze the clock.
+    """
+    @event.listens_for(engine, "before_cursor_execute", retval=True)
+    def _substitute_now(conn, cursor, statement, parameters, context, executemany):
+        if "'now'" in statement:
+            frozen = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+            statement = statement.replace("'now'", f"'{frozen}'")
+        return statement, parameters
 
 
 def _pygtfsify(connection):
