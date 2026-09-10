@@ -49,7 +49,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
     without a real schedule/database, instead of always coming from here.
     """
     if route_type == "2":
-        route_type_where = f"route_type in (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)"
+        route_type_where = f"route.route_type in (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)"
         start_station_id = str(origin)+'%'
         end_station_id = str(destination)+'%'
         start_station_where = f"AND origin_stop_time.stop_id in (select stop_id from stops where stop_name like :origin_station_id)"
@@ -65,12 +65,13 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
 
     limit = 24 * 60 * 60 * 2
     sql_query = f"""
-        WITH RECURSIVE
+       WITH RECURSIVE
           candidate_trips AS MATERIALIZED (
-            SELECT trip.trip_id, trip.service_id, trip.feed_id,
+            SELECT trip.trip_id, trip.service_id,
                    origin_stop_time.stop_id AS origin_stop_id,
                    destination_stop_time.stop_id AS destination_stop_id
             FROM trips trip
+            INNER JOIN routes route ON route.route_id = trip.route_id
             INNER JOIN stop_times origin_stop_time ON trip.trip_id = origin_stop_time.trip_id
             INNER JOIN stop_times destination_stop_time ON trip.trip_id = destination_stop_time.trip_id
             WHERE {route_type_where}
@@ -78,18 +79,18 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
               {end_station_where}
               AND origin_stop_time.stop_sequence < destination_stop_time.stop_sequence
           ),
-          cal_expand(feed_id, service_id, d, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday) AS (
-            SELECT feed_id, service_id, MAX(start_date, date('now', 'localtime')), end_date,
+          cal_expand(service_id, d, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday) AS (
+            SELECT service_id, MAX(start_date, date('now', 'localtime')), end_date,
                    monday, tuesday, wednesday, thursday, friday, saturday, sunday
             FROM calendar
-            WHERE (feed_id, service_id) IN (SELECT feed_id, service_id FROM candidate_trips)
+            WHERE service_id IN (SELECT service_id FROM candidate_trips)
             UNION ALL
-            SELECT feed_id, service_id, date(d, '+1 day'), end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
+            SELECT service_id, date(d, '+1 day'), end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
             FROM cal_expand
             WHERE d < end_date
           ),
           valid_dates AS MATERIALIZED (
-            SELECT feed_id, service_id, d AS date
+            SELECT service_id, d AS date
             FROM cal_expand
             WHERE (
                 (CAST(strftime('%w', d) AS INTEGER) = 0 AND sunday    = 1) OR
@@ -102,10 +103,15 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
             )
             AND NOT EXISTS (
               SELECT 1 FROM calendar_dates cd
-              WHERE cd.feed_id = cal_expand.feed_id AND cd.service_id = cal_expand.service_id
+              WHERE cd.service_id = cal_expand.service_id
                 AND cd.date = cal_expand.d AND cd.exception_type = 2
             )
-          )
+            UNION
+                SELECT cd2.service_id, cd2.date
+                FROM calendar_dates cd2
+                WHERE cd2.service_id IN (SELECT service_id FROM candidate_trips)
+                  AND cd2.exception_type = 1
+            )
         SELECT distinct trip.trip_id, trip.route_id, trip.trip_headsign, trip.direction_id, trip.trip_short_name,
                route.route_long_name, route.route_short_name,
                start_station.stop_id as origin_stop_id,
@@ -140,7 +146,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
         INNER JOIN stops end_station ON destination_stop_time.stop_id = end_station.stop_id
         INNER JOIN routes route ON route.route_id = trip.route_id
         INNER JOIN agency agency ON route.agency_id = agency.agency_id
-        INNER JOIN valid_dates vd ON vd.feed_id = trip.feed_id AND vd.service_id = trip.service_id
+        INNER JOIN valid_dates vd ON vd.service_id = trip.service_id
         WHERE datetime(
                 vd.date || ' ' || time(origin_stop_time.departure_time),
                 CASE WHEN date(origin_stop_time.departure_time) = '1970-01-02'
@@ -148,7 +154,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
               ) >= datetime('now', 'localtime')
         ORDER BY vd.date, origin_stop_time.departure_time
         LIMIT 30;
-        """  # noqa: S608
+    """  # noqa: S608
 
     # Create lookup timetable taking into
     # account any departures from yesterday scheduled after midnight,
@@ -1154,7 +1160,7 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
             SELECT stop.stop_id, stop.stop_name, stop.stop_lat AS latitude, stop.stop_lon AS longitude,
                    stop.stop_timezone AS stop_timezone, agency.agency_timezone AS agency_timezone,
                    trip.trip_id, trip.trip_headsign, trip.direction_id, trip.trip_short_name,
-                   trip.service_id, trip.feed_id,
+                   trip.service_id,
                    time(st.departure_time) AS departure_time, st.stop_sequence AS stop_sequence,
                    route.route_long_name, route.route_short_name, route.route_type, route.route_id
             FROM trips trip
@@ -1170,10 +1176,10 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
             SELECT date(:now_offset, '+1 day')
           ),
           valid_dates AS MATERIALIZED (
-            SELECT cal.feed_id, cal.service_id, cd.date
+            SELECT cal.service_id, cd.date
             FROM calendar cal
             CROSS JOIN candidate_dates cd
-            WHERE (cal.feed_id, cal.service_id) IN (SELECT feed_id, service_id FROM candidate_stops)
+            WHERE cal.service_id IN (SELECT service_id FROM candidate_stops)
               AND cd.date BETWEEN cal.start_date AND cal.end_date
               AND (
                 (CAST(strftime('%w', cd.date) AS INTEGER) = 0 AND cal.sunday    = 1) OR
@@ -1186,14 +1192,13 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
               )
               AND NOT EXISTS (
                 SELECT 1 FROM calendar_dates ex
-                WHERE ex.feed_id = cal.feed_id AND ex.service_id = cal.service_id
-                  AND ex.date = cd.date AND ex.exception_type = 2
+                WHERE ex.service_id = cal.service_id AND ex.date = cd.date AND ex.exception_type = 2
               )
             UNION
-            SELECT cd2.feed_id, cd2.service_id, cd2.date
+            SELECT cd2.service_id, cd2.date
             FROM calendar_dates cd2
             INNER JOIN candidate_dates cd ON cd.date = cd2.date
-            WHERE (cd2.feed_id, cd2.service_id) IN (SELECT feed_id, service_id FROM candidate_stops)
+            WHERE cd2.service_id IN (SELECT service_id FROM candidate_stops)
               AND cd2.exception_type = 1
           )
         SELECT cs.stop_id, cs.stop_name, cs.latitude, cs.longitude, cs.stop_timezone, cs.agency_timezone,
@@ -1201,11 +1206,11 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
                cs.departure_time, cs.stop_sequence, cs.route_long_name, cs.route_short_name, cs.route_type,
                vd.date AS calendar_date, cs.route_id
         FROM candidate_stops cs
-        INNER JOIN valid_dates vd ON vd.feed_id = cs.feed_id AND vd.service_id = cs.service_id
+        INNER JOIN valid_dates vd ON vd.service_id = cs.service_id
         WHERE datetime(vd.date || ' ' || cs.departure_time) BETWEEN
                 datetime(:now_offset, :timerange_history) AND datetime(:now_offset, :timerange)
         ORDER BY cs.stop_id, vd.date, cs.departure_time;
-        """  # noqa: S608        
+    """  # noqa: S608        
     
     query_params = {
         "latitude": latitude,
