@@ -133,8 +133,8 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
         **query_params,
     }
 
-    _LOGGER.debug("SQL statement:\n%s", sql_query)
-    _LOGGER.debug("SQL parameters:\n%s", log_params)      
+    #_LOGGER.debug("SQL statement:\n%s", sql_query)
+    #_LOGGER.debug("SQL parameters:\n%s", log_params)      
                         
     with schedule.engine.connect() as conn:
         result = conn.execute(
@@ -414,7 +414,7 @@ def get_next_departure(hass, _data):
     now_date_local_tz = now_local_tz.strftime(dt_util.DATE_STR_FORMAT)
     now_time = now.strftime(TIME_STR_FORMAT)
 
-    # Fetch all departures for yesterday, today and optionally tomorrow,
+    # Fetch all departures
     # up to an overkill maximum in case of a departure every minute for those
     # days.
     rows, start_station_id = _fetch_departure_rows(
@@ -1111,30 +1111,11 @@ def _build_local_stop_element(self, row, base_date, date_label,
         "trip_id": row["trip_id"],
         "direction_id": row["direction_id"],
         "icon": self._icon,
-    }
+    }                
 
-
-def get_local_stops_next_departures(self):
-    # 20260803 Note: this procedure is not using an option to in/exclude 'tomorrow'
-    _LOGGER.debug("Get local stop departure with data: %s", self._data)
-    if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
-        _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
-        return {}
-    """Get next departures from data."""
-    schedule = self._data["schedule"]
-    offset = self._data["offset"]
-    now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
-    now_date = now.strftime(dt_util.DATE_STR_FORMAT)
-    device_tracker = self.hass.states.get(self._data['device_tracker_id'])
-    latitude = device_tracker.attributes.get("latitude", None)
-    longitude = device_tracker.attributes.get("longitude", None)
-    time_range = str('+' + str(self._data.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE)) + ' minute')
-    time_range_history = str('-' + str(self._data.get("timerange_history", DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY)) + ' minute')
-    radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 111111
-    if not latitude or not longitude:
-        _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
-        return []
-
+def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
+                            time_range, time_range_history, now):
+    """Run the local-stop SQL query and return plain dicts. """
     sql_query = f"""
         SELECT stop.stop_id, stop.stop_name, stop.stop_lat as latitude, stop.stop_lon as longitude,
                stop.stop_timezone as stop_timezone, agency.agency_timezone as agency_timezone,
@@ -1174,6 +1155,23 @@ def get_local_stops_next_departures(self):
     with schedule.engine.connect() as conn:
         rows = conn.execute(text(sql_query), {"latitude": latitude, "longitude": longitude, "timerange": time_range, "timerange_history": time_range_history, "radius": radius, "now_offset": now}).fetchall()
 
+    data_returned = [row_cursor._asdict() for row_cursor in rows]
+    _LOGGER.debug("Local stop rows returned: %s", data_returned)
+    return data_returned
+
+
+def _interpret_local_stop_rows(self, rows):
+    """Turn raw SQL-shaped rows into the local-stops departures list.
+
+    No database: `rows` only needs to be a list of plain dicts shaped
+    like `_fetch_local_stop_rows()`'s output. `self` is still required,
+    unchanged from before the split -- `_build_local_stop_element`
+    reads and mutates several `self._xxx` attributes per row, and both
+    its own realtime branch and the local-file RT fetch below are
+    gated by `self._realtime`, so a static-only caller just leaves
+    that False/unset and both no-op, same as they always have.
+    """
+    offset = self._data["offset"]
     timetable = []
     local_stops_list = []
     prev_stop_id = ""
@@ -1228,8 +1226,8 @@ def get_local_stops_next_departures(self):
             url=self._trip_update_url, headers=self._headers, label="trip_data"
         ) or []
 
-    for row_cursor in rows:
-        row = row_cursor._asdict()
+    for row in rows:
+                                  
         #_LOGGER.debug("Row from query: %s", row)
 
         #defining TZ for row
@@ -1277,9 +1275,38 @@ def get_local_stops_next_departures(self):
         stop["departure"].sort(key=lambda d: d["departure_datetime"])
 
     data_returned = local_stops_list
-    _LOGGER.debug("Stop data returned: %s", data_returned)
+    _LOGGER.debug("Interpreted local stop rows returned: %s", data_returned)
     return data_returned
 	   
+
+
+def get_local_stops_next_departures(self):
+    # 20260803 Note: this procedure is not using an option to in/exclude 'tomorrow'
+    _LOGGER.debug("Get local stop departure with data: %s", self._data)
+    if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
+        _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
+        return {}
+    """Get next departures from data."""
+    schedule = self._data["schedule"]
+    offset = self._data["offset"]
+    now = dt_util.now().replace(tzinfo=None) + datetime.timedelta(minutes=offset)
+    now_date = now.strftime(dt_util.DATE_STR_FORMAT)
+    device_tracker = self.hass.states.get(self._data['device_tracker_id'])
+    latitude = device_tracker.attributes.get("latitude", None)
+    longitude = device_tracker.attributes.get("longitude", None)
+    time_range = str('+' + str(self._data.get("timerange", DEFAULT_LOCAL_STOP_TIMERANGE)) + ' minute')
+    time_range_history = str('-' + str(self._data.get("timerange_history", DEFAULT_LOCAL_STOP_TIMERANGE_HISTORY)) + ' minute')
+    radius = self._data.get("radius", DEFAULT_LOCAL_STOP_RADIUS) / 111111
+    if not latitude or not longitude:
+        _LOGGER.error("No latitude and/or longitude for : %s", self._data['device_tracker_id'])
+        return []
+
+    rows = _fetch_local_stop_rows(
+        schedule, latitude, longitude, radius, time_range, time_range_history, now
+    )
+    return _interpret_local_stop_rows(self, rows)
+
+
 async def update_gtfs_local_stops(hass, data): 
     _LOGGER.debug("Update service for local stops with data: %s", data)
     entries = []
