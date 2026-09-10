@@ -43,11 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _fetch_departure_rows(route_type, origin, destination, schedule):
-    """Run the static-GTFS SQL query and return matching rows as plain dicts.
-    This is the only part of get_next_departure that touches the database.
-    Split out so its output (`rows`) can be handed in directly by a test,
-    without a real schedule/database, instead of always coming from here.
-    """
+    """Run the static-GTFS SQL query and return matching rows as plain dicts."""
     if route_type == "2":
         route_type_where = f"route.route_type in (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)"
         start_station_id = str(origin)+'%'
@@ -193,12 +189,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
 
 def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
                                now_date_local_tz, now_time):
-    """Turn raw SQL-shaped rows into the `next_departure` dict.
-    No database, no schedule object: `rows` only needs to be a list of
-    plain dicts shaped like `_fetch_departure_rows`' output. This is what
-    a test builds by hand to simulate a specific condition (a midnight
-    crossing, a yesterday-late departure, ...) without a real GTFS feed.
-    """
+    """Turn raw SQL-shaped rows into the `next_departure` dict."""
     _LOGGER.debug("Interpret rows: %s", rows)
     timetable = {}
     for row in rows:
@@ -434,15 +425,12 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     
     return data_returned
 
-
-
 def get_next_departure(hass, _data):
+    """Get next departures from data."""
     _LOGGER.debug("Get next departure with data: %s", _data)
     if check_extracting(hass, _data['gtfs_dir'],_data['file']):
         _LOGGER.debug("Cannot get next departures on this datasource as still unpacking: %s", _data["file"])
         return {}
-
-    """Get next departures from data."""
 
     schedule = _data["schedule"]
     route_type = _data["route_type"]
@@ -455,8 +443,7 @@ def get_next_departure(hass, _data):
     now_time = now.strftime(TIME_STR_FORMAT)
 
     # Fetch all departures
-    # up to an overkill maximum in case of a departure every minute for those
-    # days.
+
     rows, start_station_id = _fetch_departure_rows(
         route_type, _data["origin"], _data["destination"], schedule,
     )
@@ -1150,8 +1137,8 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
         "now_offset": now,
     }
 
-    _LOGGER.debug("SQL statement:\n%s", sql_query)
-    _LOGGER.debug("SQL parameters:\n%s", query_params)        
+    #_LOGGER.debug("SQL statement:\n%s", sql_query)
+    #_LOGGER.debug("SQL parameters:\n%s", query_params)        
 
     with schedule.engine.connect() as conn:
         rows = conn.execute(text(sql_query), {"latitude": latitude, "longitude": longitude, "timerange": time_range, "timerange_history": time_range_history, "radius": radius, "now_offset": now}).fetchall()
@@ -1164,13 +1151,7 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
 def _interpret_local_stop_rows(self, rows):
     """Turn raw SQL-shaped rows into the local-stops departures list.
 
-    No database: `rows` only needs to be a list of plain dicts shaped
-    like `_fetch_local_stop_rows()`'s output. `self` is still required,
-    unchanged from before the split -- `_build_local_stop_element`
-    reads and mutates several `self._xxx` attributes per row, and both
-    its own realtime branch and the local-file RT fetch below are
-    gated by `self._realtime`, so a static-only caller just leaves
-    that False/unset and both no-op, same as they always have.
+    No database: `rows` only needs to be a list of plain dicts
     """
     offset = self._data["offset"]
     timetable = []
@@ -1213,13 +1194,7 @@ def _interpret_local_stop_rows(self, rows):
             # use local file created as new url
             self._trip_update_url = "file://" + DEFAULT_PATH_RT + "/" + self._data["name"] + "_localstop.rt"
 
-    # Fetch + parse the RT feed once for this refresh cycle. Previously this
-    # happened inside get_rt_route_trip_statuses on every row/stop match,
-    # which re-fetched and re-parsed the same feed once per trip - expensive
-    # when a stop has many routes/trips. The feed itself doesn't change
-    # between rows within a single refresh, only which row is being matched
-    # against it, so fetching it once and passing it into each match call is
-    # equivalent and avoids the redundant work.
+    # Fetch + parse the RT feed once for this refresh cycle.
     feed_entities = None
     if self._realtime:
 
@@ -1227,10 +1202,8 @@ def _interpret_local_stop_rows(self, rows):
             url=self._trip_update_url, headers=self._headers, label="trip_data"
         ) or []
 
-    for row in rows:
-                                  
+    for row in rows:  
         #_LOGGER.debug("Row from query: %s", row)
-
         #defining TZ for row
         #_LOGGER.debug("Configured Agency timezone: %s", row['agency_timezone'])
         #_LOGGER.debug("Configured Stop timezone: %s", row['stop_timezone'])
@@ -1278,8 +1251,6 @@ def _interpret_local_stop_rows(self, rows):
     data_returned = local_stops_list
     _LOGGER.debug("Interpreted local stop rows returned: %s", data_returned)
     return data_returned
-	   
-
 
 def get_local_stops_next_departures(self):
     # 20260803 Note: this procedure is not using an option to in/exclude 'tomorrow'
