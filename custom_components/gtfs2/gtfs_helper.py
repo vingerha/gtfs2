@@ -64,6 +64,8 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
         _LOGGER.debug("Setting up Route for start/end : %s / %s ", start_station_id, end_station_id)
 
     limit = 24 * 60 * 60 * 2
+    ## QUERY candidate_trips and cal_expand are used to construct a list of valida_dates, i.e a list where services run
+    ## valid_dates is then used in the main query
     sql_query = f"""
        WITH RECURSIVE
           candidate_trips AS MATERIALIZED (
@@ -539,7 +541,7 @@ def extract_from_zip(hass, gtfs, gtfs_dir, file, remove_file):
         return
     pygtfs.append_feed(gtfs, os.path.join(gtfs_dir, file))
     check_datasource_index(hass, gtfs, gtfs_dir, file[:-4])
-    check_service_dates_table(hass, gtfs, gtfs_dir, file[:-4])
+
     
 def check_calendar_dates_from_zip(gtfs_dir,file):
     _LOGGER.debug("Checking if file contains only future data: %s ", file)
@@ -855,81 +857,6 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
                 conn.execute(text(sql_fix_route_agency), {"q": "q"})
                 conn.commit()
 
-    
-            
-def check_service_dates_table(hass, schedule, gtfs_dir, file):
-    """Ensure a materialized service_dates table exists (feed_id, service_id,
-    date) — one row per date a service actually runs, expanding calendar's
-    weekly pattern and applying calendar_dates exceptions. Built once; does
-    not rebuild if the table already exists."""
-    _LOGGER.debug("Check service_dates table for file: %s", file)
-    if check_extracting(hass, gtfs_dir, file):
-        _LOGGER.warning("Cannot check service_dates table as still unpacking: %s", file)
-        return
-
-    sql_check_table = """
-    SELECT count(*) as checktbl
-    FROM sqlite_master
-    WHERE type = 'table' and name = 'service_dates';
-    """
-
-    sql_create_table = """
-    CREATE TABLE service_dates (
-        feed_id INTEGER NOT NULL,
-        service_id VARCHAR NOT NULL,
-        date DATE NOT NULL
-    )
-    """
-
-    sql_populate_table = """
-    INSERT INTO service_dates (feed_id, service_id, date)
-    WITH RECURSIVE
-      cal_expand(feed_id, service_id, d, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday) AS (
-        SELECT feed_id, service_id, start_date, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
-        FROM calendar
-        UNION ALL
-        SELECT feed_id, service_id, date(d, '+1 day'), end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday
-        FROM cal_expand
-        WHERE d < end_date
-      ),
-      weekly_dates AS (
-        SELECT feed_id, service_id, d AS date
-        FROM cal_expand
-        WHERE (
-            (CAST(strftime('%w', d) AS INTEGER) = 0 AND sunday    = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 1 AND monday    = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 2 AND tuesday   = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 3 AND wednesday = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 4 AND thursday  = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 5 AND friday    = 1) OR
-            (CAST(strftime('%w', d) AS INTEGER) = 6 AND saturday  = 1)
-        )
-      )
-    SELECT feed_id, service_id, date FROM weekly_dates
-    EXCEPT
-    SELECT feed_id, service_id, date FROM calendar_dates WHERE exception_type = 2
-    UNION
-    SELECT feed_id, service_id, date FROM calendar_dates WHERE exception_type IS NOT 2
-    """
-
-    sql_create_index = """
-    CREATE INDEX gtfs2_service_dates_feed_service_date
-    ON service_dates(feed_id, service_id, date)
-    """
-
-    with schedule.engine.connect() as conn:
-        rows = conn.execute(text(sql_check_table), {"q": "q"}).fetchall()
-    for row_cursor in rows:
-        _LOGGER.debug("service_dates table check: %s", row_cursor._asdict())
-        if row_cursor._asdict()['checktbl'] == 0:
-            _LOGGER.warning("service_dates table missing, creating and populating it")
-            with schedule.engine.connect() as conn:
-                conn.execute(text(sql_create_table), {"q": "q"})
-                conn.execute(text(sql_populate_table), {"q": "q"})
-                conn.commit()
-                conn.execute(text(sql_create_index), {"q": "q"})
-
-
 def create_trip_geojson(self):
     # not in use, awaiting geojson in HA-core to cover this type of geometry
     _LOGGER.debug("Create geojson with data: %s", self._data)
@@ -1154,6 +1081,8 @@ def _build_local_stop_element(self, row, base_date, date_label,
 def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
                             time_range, time_range_history, now):
     """Run the local-stop SQL query and return plain dicts. """
+    ## QUERY candidate_stops and candidate_dates are used to construct a list of valid_dates, i.e a list where services run
+    ## valid_dates is then used in the main query
     sql_query = f"""    
         WITH
           candidate_stops AS MATERIALIZED (

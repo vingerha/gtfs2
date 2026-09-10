@@ -27,7 +27,7 @@ from .const import (
     ICON,
     ICONS
 )    
-from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, check_service_dates_table, create_trip_geojson, check_extracting, get_local_stops_next_departures, update_route_geojson
+from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures, update_route_geojson
 from .gtfs_rt_helper import get_next_services, get_rt_alerts
 
 _LOGGER = logging.getLogger(__name__)
@@ -254,9 +254,6 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
         check_index = await self.hass.async_add_executor_job(
                 check_datasource_index, self.hass, self._pygtfs, self.hass.config.path(DEFAULT_PATH), data["file"]
             )
-        check_service_dates = await self.hass.async_add_executor_job(
-                    check_service_dates_table, self.hass, self._pygtfs, DEFAULT_PATH, data["file"]
-                )     
             
         self._realtime = False
         if "real_time" in options: 
