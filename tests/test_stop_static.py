@@ -10,7 +10,6 @@ Only the true database boundaries are replaced:
 
     get_gtfs                          -- opens a real GTFS sqlite file
     check_datasource_index            -- runs SQL against the database
-    check_service_dates_table         -- runs SQL against the database
     get_local_stops_next_departures   -- queries the database (via
                                           `_fetch_local_stop_rows`);
                                           replaced with the real,
@@ -242,7 +241,6 @@ def test_stop_static(case_id: str, case_dir: Path):
 
         with patch.object(coordinator_mod, "get_gtfs", return_value="FAKE_SCHEDULE"), \
              patch.object(coordinator_mod, "check_datasource_index", return_value=None), \
-             patch.object(coordinator_mod, "check_service_dates_table", return_value=None), \
              patch.object(coordinator_mod, "get_local_stops_next_departures", return_value=precomputed_local_stops):
             result = asyncio.run(coord._async_update_data())
 

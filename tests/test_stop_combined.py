@@ -10,7 +10,6 @@ Only the true I/O boundaries are replaced:
 
     get_gtfs                          -- opens a real GTFS sqlite file
     check_datasource_index            -- runs SQL against the database
-    check_service_dates_table         -- runs SQL against the database
     get_local_stops_next_departures   -- queries the database; replaced
                                           with the real, unmodified
                                           `_interpret_local_stop_rows()`'s
@@ -264,7 +263,6 @@ def test_stop_combined(case_id: str, case_dir: Path):
 
         with patch.object(coordinator_mod, "get_gtfs", return_value="FAKE_SCHEDULE"), \
              patch.object(coordinator_mod, "check_datasource_index", return_value=None), \
-             patch.object(coordinator_mod, "check_service_dates_table", return_value=None), \
              patch.object(coordinator_mod, "get_local_stops_next_departures", return_value=precomputed_local_stops):
             result = asyncio.run(coord._async_update_data())
 
