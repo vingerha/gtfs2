@@ -7,6 +7,9 @@ fixture zip, with the clock pinned to a day the trips actually run:
     stop_list   each stop_id once, in an order every trip agrees with, and
                 one entry for two platforms of a place called one after the
                 other
+    destinations  from an origin, get_destination_stop_list offers every
+                stop a trip rides to after it, once, in riding order, and
+                nothing no trip through that origin reaches
     pairs       origin before destination on some trip: get_next_departure
                 answers it, on the right stops, in riding order, arriving no
                 earlier than it departs
@@ -16,7 +19,7 @@ fixture zip, with the clock pinned to a day the trips actually run:
 Trains (route_type 2) ride their own path in get_next_departure, matched by
 stop name with no direction: for them the pairs are checked by name, the
 answer must stay on the asked line, and a swapped pair is legitimate, it is
-the return journey, so only `pairs` is checked.
+the return journey, so only `pairs` is checked, by name.
 
 One test per fixture, route, direction and promise; its message lists every
 pair that broke the promise. The promises are about what the sensors say,
@@ -56,9 +59,11 @@ import fixture_db  # noqa: E402
 gtfs_helper = ha_stub.load("gtfs_helper")
 get_next_departure = gtfs_helper.get_next_departure
 get_stop_list = gtfs_helper.get_stop_list
+get_destination_stop_list = gtfs_helper.get_destination_stop_list
 
 FIXTURES = Path(__file__).parent / "fixtures"
-KINDS = ("stop_list", "pairs", "swapped")
+KINDS = ("stop_list", "destinations", "pairs", "swapped")
+TRAIN_KINDS = ("pairs",)
 
 
 class Fixture:
@@ -219,6 +224,12 @@ def served_between(patterns, origins, destinations):
     return False
 
 
+def sample_origins(pattern):
+    """The first stop, one in the middle, and the one before last."""
+    picks = sorted({0, len(pattern) // 2, max(0, len(pattern) - 2)})
+    return [i for i in picks if i < len(pattern) - 1]
+
+
 def sample_pairs(pattern):
     """First to last, first to middle, middle to last: the ends and a leg."""
     seen = []
@@ -250,20 +261,19 @@ class Check:
 # Cases known to fail on main today, each with what breaks the promise.
 # The marks are strict: the day a fix lands, its marks have to go with it,
 # which is how a fix PR and the test that turns green arrive together.
-SELECTOR = ("the stop selector offers a stop twice or out of riding order "
-            "(discussion #198)")
-SELECTOR_GVB = SELECTOR + "; trams 1, 7 and 17 also carry wrong direction_ids"
+PLATFORMS = ("two platforms of one place, called one after the other, are "
+             "offered as two entries (fix/stop-platform-groups)")
+PLATFORMS_GVB = PLATFORMS + "; trams 1, 7 and 17 also carry wrong direction_ids"
 SWAPPED = ("the swapped pair is answered although the asked direction does "
            "not ride it: the query filters neither route nor direction")
 TRAIN = ("a train journey is matched by stop name prefix on any line, not "
          "the asked one")
 KNOWN = {
-    **{f"gvb-{r}-d{d}-stop_list": SELECTOR_GVB
-       for r in ("1", "7", "13", "14", "17") for d in (0, 1)},
-    "palmbus-22-d0-stop_list": SELECTOR,
-    "palmbus-B-d1-stop_list": SELECTOR,
-    **{f"tao-journeys-{r}-d{d}-stop_list": SELECTOR
-       for r in ("40", "A", "B") for d in (0, 1)},
+    "gvb-1-d1-stop_list": PLATFORMS_GVB,
+    "gvb-14-d0-stop_list": PLATFORMS_GVB,
+    "gvb-14-d1-stop_list": PLATFORMS_GVB,
+    **{f"tao-journeys-{r}-d{d}-stop_list": PLATFORMS
+       for r in ("A", "B") for d in (0, 1)},
     **{f"{line}-d{d}-swapped": SWAPPED
        for line in ("gvb-7", "palmbus-A", "palmbus-B", "tao-journeys-40",
                     "tao-journeys-A", "tao-journeys-B", "tao-journeys-N")
@@ -291,7 +301,7 @@ def _cases():
             ids = [ids] if isinstance(ids, str) else ids
             for route_id in ids:
                 train = fx.route_types.get(route_id) == 2
-                kinds = ("pairs",) if train else KINDS
+                kinds = TRAIN_KINDS if train else KINDS
                 shown = label if len(ids) == 1 else f"{label}({route_id[-8:]})"
                 for direction in directions_of(fx.schedule, route_id):
                     for kind in kinds:
@@ -317,7 +327,7 @@ def test_journeys(record_property, fixture, route_id, direction, kind):
     dt_util.set_default_time_zone(dt_util.get_time_zone(fx.agency_tz))
     check = Check()
     if fx.route_types.get(route_id) == 2:
-        check_train_route(check, fx, route_id, direction)
+        check_train_route(check, fx, route_id, direction, kind)
     else:
         check_route(check, fx, route_id, direction, kind)
     record_property("case", {"fixture": fixture, "route": route_id,
@@ -408,8 +418,53 @@ def check_route(check, fx, route_id, direction, kind):
                                 f"{pattern[0]} .. {pattern[-1]}")
         return
 
-    hass = fx.hass()
     route_type = str(fx.route_types.get(route_id))
+    if kind == "destinations":
+        # From an origin, the trips that call at it and the rest of their
+        # ride: the list must hold every such stop, once, in the order the
+        # ride makes, and no stop no trip through that origin reaches. The
+        # origin is matched on its own record, so the pattern's stops are
+        # expected under their own records too.
+        for pattern in grouped:
+            for o in sample_origins(pattern):
+                origin = pattern[o]
+                offered = [entry.split(": ", 1)[0] for entry in
+                           get_destination_stop_list(schedule, route_id,
+                                                     query_direction, origin)]
+                who = f"from {named(fx, origin)}"
+                twice = sorted({s for s in offered if offered.count(s) > 1})
+                text = f"a destination is offered twice {who}"
+                if twice:
+                    text += ": " + listed([named(fx, s) for s in twice])
+                check.note(not twice, text, origin=origin, twice=twice)
+                after = []
+                for stop in pattern[o + 1:]:
+                    if stop not in after:
+                        after.append(stop)
+                missing = [s for s in after if s not in offered]
+                text = f"a stop this ride reaches {who} is not offered"
+                if missing:
+                    text += (": " + listed([named(fx, s) for s in missing])
+                             + f" (on the ride {pattern[0]} .. {pattern[-1]})")
+                check.note(not missing, text, origin=origin, missing=missing)
+                reachable = set()
+                for other in grouped:
+                    if origin in other:
+                        reachable.update(other[other.index(origin) + 1:])
+                stray = [s for s in offered if s not in reachable]
+                text = f"a destination no trip reaches {who} is offered"
+                if stray:
+                    text += ": " + listed([named(fx, s) for s in stray])
+                check.note(not stray, text, origin=origin, stray=stray)
+                pos = {s: n for n, s in enumerate(offered)}
+                known = [pos[s] for s in after if s in pos]
+                descents = sum(1 for a, b in zip(known, known[1:]) if a >= b)
+                check.note(descents == 0, f"the destinations {who} contradict "
+                           f"the riding order {pattern[0]} .. {pattern[-1]}",
+                           origin=origin)
+        return
+
+    hass = fx.hass()
     with freeze_time(fx.instant_on("1970-01-01")) as clock:
         for pattern, trip_ids in sorted(grouped.items()):
             # the same stand-in reading as above, so a pair asks for the
@@ -546,7 +601,7 @@ def _data_for(schedule, route_id, route_type, entries, position,
     }
 
 
-def check_train_route(check, fx, route_id, direction):
+def check_train_route(check, fx, route_id, direction, kind):
     schedule = fx.schedule
     short_name = fx.route_short_names[route_id]
     hass = fx.hass()
