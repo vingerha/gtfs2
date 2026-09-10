@@ -141,4 +141,31 @@ Data:
 >> IMPLEMENTATION STATUS: done 
 
 2b. local-stop based
-...
+case_1_static_realtime: synthetic test
+- today and tomorrow trips 
+- realtime for all
+> verify it properly represents trips with rt
+Data:
+- 3 different trips for 1 stop, 1 after 'now' only today, 2 tomorrow but with a time earlier than todays time
+- rt has entries for all three trips
+> expected output: 1 stop with 3 next trips, each with a matching RT entry
+>> IMPLEMENTATION STATUS: done 
+
+case_2_static_realtime: synthetic test
+- today and tomorrow trips 
+- realtime for all but direction id is empty string ""
+> verify it properly represents trips with rt
+Data:
+- 3 different trips for 1 stop, 1 after 'now' only today, 2 tomorrow but with a time earlier than todays time
+- rt has entries for all three trips
+> expected output: 1 stop with 3 next trips, each with a matching RT entry
+>> IMPLEMENTATION STATUS: done 
+
+case_3_static_realtime: synthetic test
+- today and tomorrow trips 
+- realtime for all but direction id attribute is missing completely
+> verify it properly represents trips with rt
+Data:
+- 3 different trips for 1 stop, 1 after 'now' only today, 2 tomorrow but with a time earlier than todays time
+- rt has entries for all three trips
+> expected output: 1 stop with 3 next trips, each with a matching RT entry

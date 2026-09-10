@@ -30,6 +30,7 @@ _TEST_FILE_TO_CASE_FOLDER = {
     "test_route_static.py": "case_route",
     "test_route_combined.py": "case_route_combined",
     "test_stop_static.py": "case_stop",
+    "test_stop_combined.py": "case_stop_combined",
 }
 
 _CASE_NODEID_RE = re.compile(r"^(?P<file>[^:]+)::test_\w+\[")
