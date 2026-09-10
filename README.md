@@ -2,7 +2,7 @@
 
 
 # GTFS2 for Static and RealTime Public transport status collecting in Home Assistant
-- configuration via the GUI
+- configuration via the GUI 
 - Static schedule on a **route** between start/end stops
 - Shows next 10 departures on the same **route-start and route-end**, including alternative transport lines if applicable for the same start/end
 - Option to add gtfs **realtime trip updates** source/url
