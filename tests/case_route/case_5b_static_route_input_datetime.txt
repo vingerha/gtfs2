@@ -1,0 +1,2 @@
+label: route_N1 origin_stop_name, a service day that runs past midnight
+2026-09-26 23:58:00+02:00

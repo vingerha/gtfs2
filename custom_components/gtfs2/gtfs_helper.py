@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import re
 import os
 import glob
 import json
@@ -40,6 +41,57 @@ from .const import (
 from .gtfs_rt_helper import get_rt_route_trip_statuses, get_gtfs_rt, safe_file_part, get_gtfs_feed_entities
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _gtfs_seconds(value):
+    """Seconds since the service day's midnight of a stored stop time, or None.
+
+    pygtfs stores stop_times through SQLAlchemy's Interval, which SQLite keeps
+    as a datetime counted from 1970-01-01: a 00:15 departure written 24:15:00
+    in the feed reads back '1970-01-02 00:15:00'. The feed's own clock past
+    24:00, plain clocks, seconds and timedeltas all pass through here, so a
+    row handed in by a test reads the same as a row read from the db.
+    """
+    if value is None:
+        return None
+    if isinstance(value, datetime.timedelta):
+        return int(value.total_seconds())
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        pass
+    text_value = str(value)
+    stored = re.match(r"^1970-01-(\d{2}) (\d{2}):(\d{2}):(\d{2})", text_value)
+    if stored:
+        day, hours, minutes, secs = (int(g) for g in stored.groups())
+        return ((day - 1) * 24 + hours) * 3600 + minutes * 60 + secs
+    clock = re.match(r"^(\d{1,3}):(\d{2}):(\d{2})$", text_value)
+    if clock:
+        hours, minutes, secs = (int(g) for g in clock.groups())
+        return hours * 3600 + minutes * 60 + secs
+    return None
+
+
+def _lay_on_service_day(date_value, stored):
+    """The instant a stop time really happens: the service day's midnight plus
+    the seconds the feed counted from it.
+
+    A GTFS clock is not a time of day. It counts from the midnight the service
+    day started at, and rides that leave after it are written 24:15, 25:40, so
+    that they stay on the day their calendar row runs. Adding the seconds says
+    which calendar day and which clock that is, with nothing to guess: no
+    comparing an arrival against a departure to decide whether the day rolled
+    over, which reads a 24:15 departure as 00:15 of the day before.
+    """
+    seconds = _gtfs_seconds(stored)
+    if date_value is None or seconds is None:
+        return None
+    date_text = str(date_value)[:10]
+    try:
+        midnight = datetime.datetime.strptime(date_text, "%Y-%m-%d")
+    except ValueError:
+        return None
+    return midnight + datetime.timedelta(seconds=seconds)
 
 
 def _fetch_departure_rows(route_type, origin, destination, schedule):
@@ -116,8 +168,8 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
                start_station.stop_name as origin_stop_name,
                start_station.stop_timezone as origin_stop_timezone,
                agency.agency_timezone as agency_timezone,
-               time(origin_stop_time.arrival_time) AS origin_arrival_time,
-               time(origin_stop_time.departure_time) AS origin_depart_time,
+               origin_stop_time.arrival_time AS origin_arrival_time,
+               origin_stop_time.departure_time AS origin_depart_time,
                vd.date AS origin_depart_date,
                origin_stop_time.drop_off_type AS origin_drop_off_type,
                origin_stop_time.pickup_type AS origin_pickup_type,
@@ -128,8 +180,8 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
                end_station.stop_id as dest_stop_id,
                end_station.stop_name as dest_stop_name,
                end_station.stop_timezone as dest_stop_timezone,
-               time(destination_stop_time.arrival_time) AS dest_arrival_time,
-               time(destination_stop_time.departure_time) AS dest_depart_time,
+               destination_stop_time.arrival_time AS dest_arrival_time,
+               destination_stop_time.departure_time AS dest_depart_time,
                destination_stop_time.drop_off_type AS dest_drop_off_type,
                destination_stop_time.pickup_type AS dest_pickup_type,
                destination_stop_time.shape_dist_traveled AS dest_dist_traveled,
@@ -194,12 +246,12 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     timetable = {}
     for row in rows:
         service_date = row["origin_depart_date"]
-        depart_dt_str = f"{service_date} {row['origin_depart_time']}"
-        try:
-            depart_dt = datetime.datetime.strptime(depart_dt_str, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            _LOGGER.warning("Could not parse departure datetime: %s", depart_dt_str)
+        depart_dt = _lay_on_service_day(service_date, row["origin_depart_time"])
+        if depart_dt is None:
+            _LOGGER.warning("Could not parse departure datetime: %s %s",
+                            service_date, row["origin_depart_time"])
             continue
+        depart_dt_str = depart_dt.strftime("%Y-%m-%d %H:%M:%S")
 
         if depart_dt <= now:
             continue  # already departed; SQL only filters by date, not time-of-day
@@ -295,12 +347,9 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     count = 0
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        upcoming_arrival = datetime.datetime.combine(
-            upcoming.date(),
-            datetime.datetime.strptime(value["dest_arrival_time"],"%H:%M:%S").time()).replace(tzinfo=timezone_dest)
-        # Arrival after midnight -> next calendar day
-        if upcoming_arrival.time() < upcoming.time():
-            upcoming_arrival += datetime.timedelta(days=1)
+        upcoming_arrival = _lay_on_service_day(
+            value["origin_depart_date"], value["dest_arrival_time"]).replace(
+            tzinfo=timezone_dest)
         #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
         if upcoming > now_local_tz:
             _LOGGER.debug("Adding list item for departure/key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
@@ -340,39 +389,20 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
 
     # Format arrival and departure dates and times, accounting for the
     # possibility of times crossing over midnight.
-    origin_date = datetime.datetime.strptime(item["origin_depart_date"], "%Y-%m-%d")
-    origin_arrival = origin_date
-    dest_arrival = origin_date
-    origin_depart_time = f"{item['origin_depart_date']} {item['origin_depart_time']}"
+    service_day = item["origin_depart_date"]
+    origin_depart = _lay_on_service_day(service_day, item["origin_depart_time"])
+    origin_arrival = _lay_on_service_day(service_day, item["origin_arrival_time"])
+    dest_arrival = _lay_on_service_day(service_day, item["dest_arrival_time"])
+    dest_depart = _lay_on_service_day(service_day, item["dest_depart_time"])
 
-    if item["origin_arrival_time"] > item["origin_depart_time"]:
-        origin_arrival -= datetime.timedelta(days=1)
-    origin_arrival_time = (
-        f"{origin_arrival.strftime(dt_util.DATE_STR_FORMAT)} "
-        f"{item['origin_arrival_time']}"
-    )
+    _LOGGER.debug("Orig depart time: %s", origin_depart)
 
-    if item["dest_arrival_time"] < item["origin_depart_time"]:
-        dest_arrival += datetime.timedelta(days=1)   
-    dest_arrival_time = (
-        f"{dest_arrival.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_arrival_time']}"
-    )
-
-    dest_depart = dest_arrival
-    if item["dest_depart_time"] < item["dest_arrival_time"]:
-        dest_depart += datetime.timedelta(days=1)
-    dest_depart_time = (
-        f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
-    )
- 
-    _LOGGER.debug("Orig depart time: %s", origin_depart_time)
-    
-    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)
-    arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone_dest)
-    origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
+    depart_time = origin_depart.replace(tzinfo=timezone)
+    arrival_time = dest_arrival.replace(tzinfo=timezone_dest)
+    origin_arrival_time = dt_util.as_utc(origin_arrival.replace(tzinfo=timezone)).isoformat()
+    origin_depart_time = dt_util.as_utc(origin_depart.replace(tzinfo=timezone)).isoformat()
+    dest_arrival_time = dt_util.as_utc(dest_arrival.replace(tzinfo=timezone_dest)).isoformat()
+    dest_depart_time = dt_util.as_utc(dest_depart.replace(tzinfo=timezone_dest)).isoformat()
     
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
