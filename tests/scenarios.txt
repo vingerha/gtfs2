@@ -13,7 +13,7 @@ case_1_static_route: real life case static only for french 'zou' route 653, not 
 
 case_2_static: synthetic test, 
 - today trips only
-> verify it filters out properly old and non-applicable trips
+> verify it properly represents today trips
 Data:
 - 2 after 'now' only today
 > expected output: 2 next trips, 1st trip shows as first trip
@@ -38,7 +38,25 @@ Data:
 
 
 1b. Local-stop based:
-case_1_static_localstop
+
+case_1_static_stop: synthetic test, 
+- today trips only
+> verify it properly represents today trips
+Data:
+- 3 different trips for 1 stop, after 'now' only today
+> expected output: 1 stop with 3 next trips
+>> IMPLEMENTATION STATUS: done 
+
+case_1_static_stop: synthetic test, 
+- today and tomorrow trips 
+> verify it properly represents trips
+Data:
+- 3 different trips for 1 stop, 1 after 'now' only today, 2 tomorrow but with a time earlier than todays time
+> expected output: 1 stop with 3 next trips
+>> IMPLEMENTATION STATUS: done 
+
+
+
 
 
 2. Static&Realtime tests
