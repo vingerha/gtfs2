@@ -4,9 +4,11 @@ from __future__ import annotations
 import datetime
 from datetime import timedelta
 import logging
+import re
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import homeassistant.util.dt as dt_util
 
@@ -48,12 +50,13 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
         )
         self.config_entry = entry
         self.hass = hass
-        
+
         self._pygtfs = ""
         self._data: dict[str, str] = {}
         # the trip whose stops are already exported, so the geojson is
         # rewritten when the journey changes and not on every refresh
         self._route_export_trip = None
+        self._stale_markers_cleaned = False
 
     async def _async_update_data(self) -> dict[str, str]:
         """Get the latest data from GTFS and GTFS relatime, depending refresh interval"""
@@ -187,12 +190,41 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 except Exception as ex:  # pylint: disable=broad-except
                   _LOGGER.error("Error getting gtfs realtime data, for origin: %s with error: %s", data["origin"], ex)
                   return self._data
+                if self._vehicle_position_url and not self._stale_markers_cleaned:
+                    self._cleanup_stale_vehicle_markers()
+                    self._stale_markers_cleaned = True
             else:
-                _LOGGER.debug("GTFS RT: RealTime = false, selected in entity options")            
+                _LOGGER.debug("GTFS RT: RealTime = false, selected in entity options")
         else:
             _LOGGER.debug("GTFS RT: RealTime not selected in entity options")
-        
+
         return self._data
+
+    def _cleanup_stale_vehicle_markers(self) -> None:
+        """One-shot removal of the stale vehicle markers of this route.
+
+        geo_json_events registers every marker of the positions file as a
+        geo_location entity and drops its state when the vehicle leaves the
+        feed, but the registry entry stays behind. As the marker id embeds the
+        trip, every run leaves a new entry and the registry grows without
+        bound. Drop the entries of this route that no longer have a state; a
+        trip that runs again is simply registered afresh.
+        """
+        registry = er.async_get(self.hass)
+        pattern = re.compile(re.escape(str(self._route_id)) + r"\(\d+\)\d{1,3}$")
+        for entry in list(registry.entities.values()):
+            if (
+                entry.domain == "geo_location"
+                and entry.platform == "geo_json_events"
+                and pattern.search(entry.unique_id)
+                and self.hass.states.get(entry.entity_id) is None
+            ):
+                _LOGGER.info(
+                    "Removing stale vehicle marker %s (unique_id: %s)",
+                    entry.entity_id,
+                    entry.unique_id,
+                )
+                registry.async_remove(entry.entity_id)
 
 class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
     """Data update coordinator for getting local stops."""
