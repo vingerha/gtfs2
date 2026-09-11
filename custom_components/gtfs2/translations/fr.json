@@ -56,20 +56,17 @@
       },
       "stops": {
         "data": {
-          "origin": "Arrêt d'origine",
-          "destination": "Arrêt de destination",
-          "name": "Nom de la ligne"
+          "origin": "Arrêt d'origine"
         },
-		"description": "Sélectionnez parmi les options [(docu)]({docu_new_route})"
+        "description": "Sélectionnez l'arrêt d'origine, dans l'ordre de passage [(docu)]({docu_new_route})"
       },
-      "stops_retry": {
+      "destination": {
         "data": {
-          "origin": "Arrêt d'origine",
           "destination": "Arrêt de destination",
           "name": "Nom de la ligne"
         },
-		"description": "Échoué, svp re-essayer avec d'autre arrêt(s) [(docu)]({docu_new_route})"
-      },	  
+        "description": "Sélectionnez la destination parmi les arrêts qu'un trajet dessert réellement depuis l'origine choisie [(docu)]({docu_new_route})"
+      },
 	  "stops_train": {
         "data": {
           "origin": "Ville de départ",
@@ -101,6 +98,8 @@
       "stop_incorrect": "Arrêt de départ et/ou de fin incorrecte, éventuellement pas de transport « aujourd'hui » ou pas dans la même direction, vérifiez logs d'érreur",
 	  "no_data_file": "Problème de collecte de données : URL incorrecte ou nom de fichier ne se trouve pas dans le bon dossier",
 	  "no_stops": "Problème de collecte de données : probablement pas des stops pour la route sélectionné",
+	  "no_destination": "Aucun arrêt n'est atteignable depuis l'origine choisie dans cette direction",
+	  "generic_failure": "Échec global, vérifiez les logs d'erreur",
 	  "no_zip_file": "Problème de collecte de données : fichier ZIP ne se trouve pas dans le bon dossier, note: sensible à la casse",
 	  "stop_limit_reached": "Un nombre élevé d'arrêts a été détecté pour ce rayon, \nrisque d'impact sur les performances du système. \n Vous pouvez modifier la limite à votre propre risque avant de modifier le rayon",
 	  "extracting": "Extraction des données en cours, cela prend du temps [(docu)]({docu_extracting})"

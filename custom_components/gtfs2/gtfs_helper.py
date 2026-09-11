@@ -589,30 +589,140 @@ def get_route_list(schedule, data):
     _LOGGER.debug(f"routes: {routes}")
     return routes
 
-def get_stop_list(schedule, route_id, direction):
-    _LOGGER.debug("Getting stops list for route: %s", route_id)
-    sql_stops = f"""
-    SELECT distinct(s.stop_id), s.stop_name, st.stop_sequence
+def _walk_stops(rows):
+    """Order (trip_id, stop_id, stop_name, stop_sequence) rows, given by trip
+    and sequence, into one stop each, in riding order.
+
+    Trips of one direction do not all run the full length, and a partial
+    trip renumbers stop_sequence from 0, so sorting the union of all trips
+    by stop_sequence interleaves the start of the route with its middle
+    (TAO tram B: 110 short runs from mid-route) and offers a stop once per
+    number it was seen under (Palm Bus 22: 52 entries for 26 stops). Walk
+    the fullest trip first instead, it is the route as the rider rides it,
+    then slot each stop it skips right after the stop preceding it on a
+    trip that does serve it.
+
+    Returns the ordered stop_ids, their names, and the sequence each was
+    first seen under.
+    """
+    trips = {}
+    names = {}
+    for trip_id, stop_id, stop_name, stop_sequence in rows:
+        trips.setdefault(trip_id, []).append((stop_id, stop_sequence))
+        names[stop_id] = stop_name
+    order = []
+    kept_seq = {}
+    for _trip_id, trip_stops in sorted(
+        trips.items(), key=lambda kv: (-len(kv[1]), kv[0])
+    ):
+        prev = -1
+        for stop_id, stop_sequence in trip_stops:
+            if stop_id in kept_seq:
+                prev = order.index(stop_id)
+                continue
+            prev += 1
+            order.insert(prev, stop_id)
+            kept_seq[stop_id] = stop_sequence
+    return order, names, kept_seq
+
+
+def _homonym_ranks(order, names):
+    """{stop_id: n} for the stops whose name the line meets more than once.
+
+    A circular line calls at its terminus twice under ids of its own (TAO 22
+    runs Zenith to Zenith and offers three stops all reading "Zenith"), a
+    square carries four stops of one name (GVB's Surinameplein). Two entries
+    reading the same thing leave the choice to chance, so the repeats are
+    numbered in the order the line calls at them. Same-name stops stay
+    distinct entries: the two sides of a street are two stops, and folding
+    them by name would show a rider departures they cannot take.
+    """
+    by_name = {}
+    for stop_id in order:
+        by_name.setdefault(names[stop_id], []).append(stop_id)
+    rank = {}
+    for group in by_name.values():
+        if len(group) > 1:
+            for n, stop_id in enumerate(group, 1):
+                rank[stop_id] = n
+    return rank
+
+
+def _stop_entries(order, names, kept_seq, rank):
+    """The picker's entries, "stop_id: Name (sequence)". The value keeps the
+    id untouched, the sensor queries on it; only the readable part changes."""
+    stops = []
+    for stop_id in order:
+        shown = names[stop_id]
+        if stop_id in rank:
+            shown = f"{shown} #{rank[stop_id]}"
+        stops.append(f"{stop_id}: {shown} ({kept_seq[stop_id]})")
+    return stops
+
+
+def _route_stop_rows(schedule, route_id, direction):
+    sql_stops = """
+    SELECT st.trip_id, s.stop_id, s.stop_name, st.stop_sequence
     from trips t
     inner join stop_times st on st.trip_id = t.trip_id
     inner join stops s on s.stop_id = st.stop_id
-    where  t.route_id = '{route_id}'
-    and (t.direction_id = {direction} or t.direction_id is null)
-    order by st.stop_sequence
-    """  # noqa: S608
-    stops_list = []
-    stops = []
+    where t.route_id = :route_id
+    and (t.direction_id = :direction or t.direction_id is null)
+    order by st.trip_id, st.stop_sequence
+    """
     with schedule.engine.connect() as conn:
-        rows = conn.execute(text(sql_stops), {"q": "q"}).fetchall()
-    for row_cursor in rows:
-        row = row_cursor._asdict()
-        stops_list.append(list(row_cursor))
-    for x in stops_list:
-        val = x[0] + ": " + x[1] + ' (' + str(x[2]) + ')'
-        stops.append(val)
+        return conn.execute(text(sql_stops), {
+            "route_id": route_id, "direction": int(direction)}).fetchall()
+
+
+def get_stop_list(schedule, route_id, direction):
+    """Every stop a route rides in one direction, once each, in riding order."""
+    _LOGGER.debug("Getting stops list for route: %s", route_id)
+    order, names, kept_seq = _walk_stops(_route_stop_rows(schedule, route_id, direction))
+    stops = _stop_entries(order, names, kept_seq, _homonym_ranks(order, names))
     _LOGGER.debug(f"Route stops: {stops}")
-    return stops 
-    
+    return stops
+
+
+def get_destination_stop_list(schedule, route_id, direction, origin_stop_id):
+    """The stops reachable from origin_stop_id on this route and direction.
+
+    Only the trips that call at the origin are read, and of each only the
+    part after it, so every entry offered can be paired with the origin on
+    at least one trip: a pair that no trip rides never reaches the sensor.
+    Whether that trip runs today is another question, answered by
+    get_next_service_date. Same walk as get_stop_list, so the list reads as
+    the rest of the ride, and the same numbering of repeated names, so a
+    stop reads the same on both screens. A loop that calls at the origin
+    twice is read from its first call, which keeps the way back on offer.
+    """
+    _LOGGER.debug("Getting destinations for route: %s direction: %s from: %s",
+                  route_id, direction, origin_stop_id)
+    sql_stops = """
+    SELECT st.trip_id, s.stop_id, s.stop_name, st.stop_sequence
+    from trips t
+    inner join (
+        select trip_id, min(stop_sequence) as origin_sequence
+        from stop_times where stop_id = :origin group by trip_id
+    ) o on o.trip_id = t.trip_id
+    inner join stop_times st on st.trip_id = t.trip_id
+        and st.stop_sequence > o.origin_sequence
+    inner join stops s on s.stop_id = st.stop_id
+    where t.route_id = :route_id
+    and (t.direction_id = :direction or t.direction_id is null)
+    order by st.trip_id, st.stop_sequence
+    """
+    with schedule.engine.connect() as conn:
+        rows = conn.execute(text(sql_stops), {
+            "route_id": route_id, "direction": int(direction),
+            "origin": origin_stop_id}).fetchall()
+    whole, whole_names, _ = _walk_stops(_route_stop_rows(schedule, route_id, direction))
+    order, names, kept_seq = _walk_stops(rows)
+    stops = _stop_entries(order, names, kept_seq, _homonym_ranks(whole, whole_names))
+    _LOGGER.debug(f"Destinations from {origin_stop_id}: {stops}")
+    return stops
+
+
 def get_agency_list(schedule, data):
     _LOGGER.debug("Getting agencies with data: %s", data)
     sql_agencies = f"""

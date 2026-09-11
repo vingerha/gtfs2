@@ -56,20 +56,17 @@
       },
       "stops": {
         "data": {
-          "origin": "Origin Stop",
-          "destination": "Zielhaltestelle",
-          "name": "Name der Route"
+          "origin": "Starthaltestelle"
         },
-        "description": "Wählen Sie aus den Optionen unten [(docu)]({docu_new_route})"
+        "description": "Wählen Sie die Starthaltestelle, in Fahrtreihenfolge [(docu)]({docu_new_route})"
       },
-      "stops_retry": {
+      "destination": {
         "data": {
-          "origin": "Origin Stop",
           "destination": "Zielhaltestelle",
           "name": "Name der Route"
         },
-        "description": "Kein Trip gefunden, bitte Haltestelle(n) ändern [(docu)]({docu_new_route})"
-      },	  
+        "description": "Wählen Sie das Ziel unter den Haltestellen, die eine Fahrt ab der gewählten Starthaltestelle tatsächlich anfährt [(docu)]({docu_new_route})"
+      },
       "stops_train": {
         "data": {
           "origin": "Wählen sie die Stadt ihrer Abfahrt",
@@ -100,6 +97,8 @@
       "files_deleted": "Datenquelle gelöscht, dies kann sich auf bestehende Routen auswirken",
       "stop_incorrect": "Start- und/oder Endziel falsch, möglicherweise kein Transport ‚heute‘ oder nicht in die gleiche Richtung, Protokolle prüfen",
 	  "no_stops": "Problem bei der Datenerfassung: wahrscheinlich keine Stops für die gewählte Route",
+	  "no_destination": "Von der gewählten Starthaltestelle ist in dieser Richtung keine Haltestelle erreichbar",
+	  "generic_failure": "Gesamtfehler, Protokolle prüfen",
       "no_data_file": "Problem bei der Datenerfassung: URL falsch oder Dateiname nicht im richtigen Ordner",
       "no_zip_file": "Problem bei der Datenerfassung: ZIP-Datei ist nicht im richtigen Ordner vorhanden. Beachten Sie, dass Groß- und Kleinschreibung berücksichtigt werden muss",
 	  "stop_limit_reached": "Es wurde eine hohe Anzahl von Stopps für diesen Umkreis festgestellt. \n Es besteht die Gefahr einer Beeinträchtigung der Systemleistung. \n Sie können die Limite auf eigenes Risiko ändern, bevor Sie den Umkreis ändern",
