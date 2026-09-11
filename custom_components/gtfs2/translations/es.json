@@ -56,20 +56,17 @@
       },
       "stops": {
         "data": {
-          "origin": "Parada de origen",
-          "destination": "Parada de destino",
-          "name": "Nombre de la ruta"
+          "origin": "Parada de origen"
         },
-		"description": "Seleccione una de las siguientes opciones [(docu)]({docu_new_route})"
+        "description": "Seleccione la parada de origen, en orden de recorrido [(docu)]({docu_new_route})"
       },
-      "stops_retry": {
+      "destination": {
         "data": {
-          "origin": "Parada de origen",
           "destination": "Parada de destino",
           "name": "Nombre de la ruta"
         },
-		"description": "Viaje no encontrado, Inténtalo de nuevo con otra parada(s). [(docu)]({docu_new_route})"
-      },	  
+        "description": "Seleccione el destino entre las paradas a las que un viaje llega realmente desde el origen elegido [(docu)]({docu_new_route})"
+      },
 	  "stops_train": {
         "data": {
           "origin": "Introduzca la ciudad de salida",
@@ -101,6 +98,8 @@
       "stop_incorrect": "Destino inicial y/o final incorrecto, posiblemente no hay transporte 'hoy' o no en la misma dirección, compruebe los registros",
 	  "no_data_file": "Problema de recopilación de datos: URL incorrecta o nombre de archivo que no está en la carpeta correcta",
 	  "no_stops": "Problema de recogida de datos: probablemente no hay paradas en la ruta seleccionada",
+	  "no_destination": "Ninguna parada es alcanzable desde el origen seleccionado en esta dirección",
+	  "generic_failure": "Fallo general, compruebe los registros",
 	  "no_zip_file": "Problema con la recogida de datos: El archivo ZIP no existe en la carpeta correcta, tenga en cuenta que es sensible a las mayúsculas",
 	  "stop_limit_reached": "Se detectó una gran cantidad de paradas para este radio, \nlo que posiblemente afecte el rendimiento del sistema. \nPuedes cambiar el límite bajo tu propia responsabilidad antes de cambiar el radio",
 	  "extracting": "(Todavía) extrayendo datos, esto llevará tiempo [(docu)]({docu_extracting})"

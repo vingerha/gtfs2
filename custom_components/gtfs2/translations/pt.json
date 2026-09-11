@@ -56,20 +56,17 @@
       },
       "stops": {
         "data": {
-          "origin": "Paragem de origem",
-          "destination": "Paragem de destino",
-          "name": "Nome da rota"
+          "origin": "Paragem de origem"
         },
-		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
+        "description": "Selecione a paragem de origem, por ordem de passagem [(docu)]({docu_new_route})"
       },
-      "stops_retry": {
+      "destination": {
         "data": {
-          "origin": "Paragem de origem",
           "destination": "Paragem de destino",
           "name": "Nome da rota"
         },
-		"description": "Viagem não encontrada, tente novamente com outra paragem(s) [(docu)]({docu_new_route})"
-      },	  
+        "description": "Selecione o destino entre as paragens que uma viagem alcança realmente a partir da origem escolhida [(docu)]({docu_new_route})"
+      },
 	  "stops_train": {
         "data": {
           "origin": "Introduza a cidade de partida",
@@ -101,6 +98,8 @@
       "stop_incorrect": "Paragem de início e/ou de fim incorreta, \n possivelmente sem transporte 'hoje' ou não na mesma direção, \n por favor, verifique os logs",
 	  "no_data_file": "Problema de recolha de dados: URL incorreta ou nome do ficheiro não está na pasta correta",
 	  "no_stops": "Problema de recolha de dados: provavelmente sem paragens para a rota selecionada",
+	  "no_destination": "Nenhuma paragem é alcançável a partir da origem selecionada nesta direção",
+	  "generic_failure": "Falha geral, verifique os logs",
 	  "no_zip_file": "Problema de recolha de dados: Ficheiro ZIP não existe na pasta correta, note que é sensível a maiúsculas",
 	  "stop_limit_reached": "Foi detectado um grande número de paragens neste raio, \nrisco de impacto no desempenho do sistema. \n Pode alterar o limite por sua conta e risco antes de alterar o raio",
 	  "extracting": "(Ainda) a extrair dados, isso vai demorar [(docu)]({docu_extracting})"
