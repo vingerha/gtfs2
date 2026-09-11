@@ -101,6 +101,7 @@ case_3_static_realtime: synthetic test,
 Data:
 - 3 after 'now' of which one same trip for tomorrow
 > expected output: 3 next trips, 2nd trip shows as first trip, realtime attrib populated as well as realtime next departures
+>> IMPLEMENTATION STATUS: likely not needed, need to review, NOT implemented
 
 Focus missing direction_id
 - missing in static
