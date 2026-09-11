@@ -74,7 +74,7 @@
         "data": {
           "origin": "Ville de départ",
           "destination": "Ville d'arrivée",
-          "name": "Nom de la ligne"
+          "name": "Nom de la ligne",
           "refresh_interval": "Intervalle de rafraîchissement en minutes"
         },
 		"description": "Sélectionnez parmi les options [(docu)]({docu_setup_train})"
