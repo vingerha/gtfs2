@@ -117,7 +117,9 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
                start_station.stop_timezone as origin_stop_timezone,
                agency.agency_timezone as agency_timezone,
                time(origin_stop_time.arrival_time) AS origin_arrival_time,
+               datetime(vd.date || ' ' || time(origin_stop_time.arrival_time),'+' || CAST(julianday(date(origin_stop_time.arrival_time)) - julianday('1970-01-01') AS INTEGER) || ' days') AS origin_arrival_dt,
                time(origin_stop_time.departure_time) AS origin_depart_time,
+			   datetime(vd.date || ' ' || time(origin_stop_time.departure_time),'+' || CAST(julianday(date(origin_stop_time.departure_time)) - julianday('1970-01-01') AS INTEGER) || ' days') AS origin_depart_dt,
                vd.date AS origin_depart_date,
                origin_stop_time.drop_off_type AS origin_drop_off_type,
                origin_stop_time.pickup_type AS origin_pickup_type,
@@ -129,7 +131,9 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
                end_station.stop_name as dest_stop_name,
                end_station.stop_timezone as dest_stop_timezone,
                time(destination_stop_time.arrival_time) AS dest_arrival_time,
+               datetime(vd.date || ' ' || time(destination_stop_time.arrival_time),'+' || CAST(julianday(date(destination_stop_time.arrival_time)) - julianday('1970-01-01') AS INTEGER) || ' days') AS dest_arrival_dt,
                time(destination_stop_time.departure_time) AS dest_depart_time,
+               datetime(vd.date || ' ' || time(destination_stop_time.departure_time),'+' || CAST(julianday(date(destination_stop_time.departure_time)) - julianday('1970-01-01') AS INTEGER) || ' days') AS dest_depart_dt,
                destination_stop_time.drop_off_type AS dest_drop_off_type,
                destination_stop_time.pickup_type AS dest_pickup_type,
                destination_stop_time.shape_dist_traveled AS dest_dist_traveled,
@@ -193,8 +197,8 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     _LOGGER.debug("Interpret rows: %s", rows)
     timetable = {}
     for row in rows:
-        service_date = row["origin_depart_date"]
-        depart_dt_str = f"{service_date} {row['origin_depart_time']}"
+        service_date = row["origin_depart_date"]  # service day, for grouping only
+        depart_dt_str = row["origin_depart_dt"]    # already a correct full instant
         try:
             depart_dt = datetime.datetime.strptime(depart_dt_str, "%Y-%m-%d %H:%M:%S")
         except ValueError:
@@ -202,7 +206,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
             continue
 
         if depart_dt <= now:
-            continue  # already departed; SQL only filters by date, not time-of-day
+            continue  # already departed; SQL now filters by real instant, not just date
 
         day_label = service_date  # real ISO date beyond tomorrow
 
@@ -226,9 +230,9 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
         _LOGGER.info("Departure(s) found for station %s @ %s -> %s", start_station_id, key, item)
         break
     _LOGGER.debug("Item(s) from SQL: %s", item)
-        
+
     if item == {}:
-        data_returned = {        
+        data_returned = {
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
         }
         _LOGGER.info("No items found in gtfs")
@@ -248,14 +252,14 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     if item["agency_timezone"] is not None:
         _LOGGER.debug("Setting Orig & Dest TZ based on Agency: %s",item["agency_timezone"])
         timezone = dt_util.get_time_zone(item["agency_timezone"])
-        timezone_dest = dt_util.get_time_zone(item["agency_timezone"])  
-    elif item["origin_stop_timezone"] is not None:    
+        timezone_dest = dt_util.get_time_zone(item["agency_timezone"])
+    elif item["origin_stop_timezone"] is not None:
         _LOGGER.debug("Setting Orig & Dest TZ based on origin stop: %s",item["origin_stop_timezone"])
         timezone = dt_util.get_time_zone(item["origin_stop_timezone"])
-        timezone_dest = dt_util.get_time_zone(item["origin_stop_timezone"]) 
+        timezone_dest = dt_util.get_time_zone(item["origin_stop_timezone"])
     if item["dest_stop_timezone"] is not None and item["agency_timezone"] is None:
         _LOGGER.debug("Setting Dest TZ based on dest stop: %s",item["dest_stop_timezone"])
-        timezone_dest = dt_util.get_time_zone(item["dest_stop_timezone"])  
+        timezone_dest = dt_util.get_time_zone(item["dest_stop_timezone"])
     else:
         timezone_dest = timezone
     _LOGGER.debug("Defined orig timezone: %s, dest timezone: %s",timezone,timezone_dest)
@@ -268,7 +272,6 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     max_remaining = 10
     for key in sorted(timetable.keys()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        #_LOGGER.debug ("Upcoming_departure_in_defined_timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
         if upcoming > now_local_tz:
             if ix == 0 :
                 _LOGGER.debug("Resetting item")
@@ -280,12 +283,12 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
                 break
     _LOGGER.debug("Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining)
     if item == {}:
-        data_returned = {        
+        data_returned = {
         "gtfs_updated_at": dt_util.utcnow().isoformat(),
         }
         _LOGGER.info("No items found in gtfs")
         return {}
-    
+
     # create upcoming timetable with line info, headsign and trips
     timetable_remaining_line = []
     timetable_remaining_headsign = []
@@ -295,13 +298,9 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     count = 0
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
-        upcoming_arrival = datetime.datetime.combine(
-            upcoming.date(),
-            datetime.datetime.strptime(value["dest_arrival_time"],"%H:%M:%S").time()).replace(tzinfo=timezone_dest)
-        # Arrival after midnight -> next calendar day
-        if upcoming_arrival.time() < upcoming.time():
-            upcoming_arrival += datetime.timedelta(days=1)
-        #_LOGGER.debug ("Upcoming list values for departure in defined tz: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, value %s", upcoming, now_local_tz, key, value)
+        # dest_arrival_dt is already the correct instant - no rollover guessing needed
+        upcoming_arrival = datetime.datetime.strptime(
+            value["dest_arrival_dt"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone_dest)
         if upcoming > now_local_tz:
             _LOGGER.debug("Adding list item for departure/key: %s, Upcoming: %s, Value: %s", key, upcoming, value )
             timetable_remaining_line.append(
@@ -319,61 +318,23 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
             count += 1
             if count >= max_remaining:
                 break
-            
-    #_LOGGER.debug(
-    #    "Timetable Remaining Departures on this Start/Stop, per line: %s",
-    #    timetable_remaining_line,
-    #)
-    #_LOGGER.debug(
-    #    "Timetable Remaining Departures on this Start/Stop, with headsign: %s",
-    #    timetable_remaining_headsign,
-    #)
-    #_LOGGER.debug(
-    #    "Timetable Remaining Trips on this Start/Stop: %s",
-    #    timetable_upcoming_trips,
-    #)
-    #_LOGGER.debug(
-    #    "Timetable arrival times on this Start/Stop: %s",
-    #    timetable_upcoming_arrivals,
-    #)
+
+    # origin/dest arrival & departure, make datetime and apply timezone
+    origin_depart = datetime.datetime.strptime(item["origin_depart_dt"], "%Y-%m-%d %H:%M:%S")
+    origin_arrival = datetime.datetime.strptime(item["origin_arrival_dt"], "%Y-%m-%d %H:%M:%S")
+    dest_arrival = datetime.datetime.strptime(item["dest_arrival_dt"], "%Y-%m-%d %H:%M:%S")
+    dest_depart = datetime.datetime.strptime(item["dest_depart_dt"], "%Y-%m-%d %H:%M:%S")
+
+    _LOGGER.debug("Origin depart time: %s, Dest depart time: %s", origin_depart, dest_depart)
+
+    depart_time = origin_depart.replace(tzinfo=timezone)
+    arrival_time = dest_arrival.replace(tzinfo=timezone_dest)
+    origin_arrival_time = dt_util.as_utc(origin_arrival.replace(tzinfo=timezone)).isoformat()
+    origin_depart_time = dt_util.as_utc(origin_depart.replace(tzinfo=timezone)).isoformat()
+    dest_arrival_time = dt_util.as_utc(dest_arrival.replace(tzinfo=timezone_dest)).isoformat()
+    dest_depart_time = dt_util.as_utc(dest_depart.replace(tzinfo=timezone_dest)).isoformat()
 
 
-    # Format arrival and departure dates and times, accounting for the
-    # possibility of times crossing over midnight.
-    origin_date = datetime.datetime.strptime(item["origin_depart_date"], "%Y-%m-%d")
-    origin_arrival = origin_date
-    dest_arrival = origin_date
-    origin_depart_time = f"{item['origin_depart_date']} {item['origin_depart_time']}"
-
-    if item["origin_arrival_time"] > item["origin_depart_time"]:
-        origin_arrival -= datetime.timedelta(days=1)
-    origin_arrival_time = (
-        f"{origin_arrival.strftime(dt_util.DATE_STR_FORMAT)} "
-        f"{item['origin_arrival_time']}"
-    )
-
-    if item["dest_arrival_time"] < item["origin_depart_time"]:
-        dest_arrival += datetime.timedelta(days=1)   
-    dest_arrival_time = (
-        f"{dest_arrival.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_arrival_time']}"
-    )
-
-    dest_depart = dest_arrival
-    if item["dest_depart_time"] < item["dest_arrival_time"]:
-        dest_depart += datetime.timedelta(days=1)
-    dest_depart_time = (
-        f"{dest_depart.strftime(dt_util.DATE_STR_FORMAT)} {item['dest_depart_time']}"
-    )
- 
-    _LOGGER.debug("Orig depart time: %s", origin_depart_time)
-    
-    depart_time = dt_util.parse_datetime(origin_depart_time).replace(tzinfo=timezone)
-    arrival_time = dt_util.parse_datetime(dest_arrival_time).replace(tzinfo=timezone_dest)
-    origin_arrival_time = dt_util.as_utc(datetime.datetime.strptime(origin_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    origin_depart_time = dt_util.as_utc(datetime.datetime.strptime(origin_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    dest_arrival_time = dt_util.as_utc(datetime.datetime.strptime(dest_arrival_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    dest_depart_time = dt_util.as_utc(datetime.datetime.strptime(dest_depart_time, "%Y-%m-%d %H:%M:%S")).isoformat()
-    
     origin_stop_time = {
         "Arrival Time": origin_arrival_time,
         "Departure Time": origin_depart_time,
@@ -395,7 +356,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
         "Sequence": item["dest_stop_sequence"],
         "Timepoint": item["dest_stop_timepoint"],
     }
-    
+
     data_returned = {
         "trip_id": item["trip_id"],
         "route_id": item["route_id"],
@@ -422,7 +383,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
         "next_departures_trip_id": timetable_upcoming_trips,
         "next_departures_destination_arrival_times": timetable_upcoming_arrivals,
     }
-    
+
     return data_returned
 
 def get_next_departure(hass, _data):
