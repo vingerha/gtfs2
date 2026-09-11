@@ -78,7 +78,6 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "origin": data["origin"],
             "destination": data["destination"],
             "offset": options["offset"] if "offset" in options else 0,
-            "include_tomorrow": data["include_tomorrow"],
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],
@@ -233,7 +232,6 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
 
         self._data = {
             "schedule": self._pygtfs,
-            "include_tomorrow": True,
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],

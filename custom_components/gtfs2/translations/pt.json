@@ -58,8 +58,7 @@
         "data": {
           "origin": "Paragem de origem",
           "destination": "Paragem de destino",
-          "name": "Nome da rota",
-          "include_tomorrow": "Incluir amanhã"
+          "name": "Nome da rota"
         },
 		"description": "Selecione uma das opções abaixo [(docu)]({docu_new_route})"
       },
@@ -67,8 +66,7 @@
         "data": {
           "origin": "Paragem de origem",
           "destination": "Paragem de destino",
-          "name": "Nome da rota",
-          "include_tomorrow": "Incluir amanhã"
+          "name": "Nome da rota"
         },
 		"description": "Viagem não encontrada, tente novamente com outra paragem(s) [(docu)]({docu_new_route})"
       },	  
@@ -77,8 +75,7 @@
           "origin": "Introduza a cidade de partida",
           "destination": "Introduza a cidade de chegada",
           "name": "Nome da rota",
-          "refresh_interval": "Intervalo de atualização em minutos",
-          "include_tomorrow": "Incluir amanhã"
+          "refresh_interval": "Intervalo de atualização em minutos"
         },
 		"description": "Selecione uma das opções abaixo [(docu)]({docu_setup_train})"
       },

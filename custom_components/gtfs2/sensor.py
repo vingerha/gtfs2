@@ -147,7 +147,6 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self.extracting = self.coordinator.data.get("extracting", False)
         self.origin = self.coordinator.data["origin"].split(": ")[0]
         self.destination = self.coordinator.data["destination"].split(": ")[0]
-        self._include_tomorrow = self.coordinator.data["include_tomorrow"]
         self._offset = self.coordinator.data["offset"]
         self._departure = self.coordinator.data.get("next_departure",None)
         self._departure_rt = self.coordinator.data.get("next_departure_realtime_attr",None)
@@ -293,8 +292,6 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         if self._state is None:
             self._attributes[ATTR_INFO] = (
                 "No more departures or extracting new data"
-                if self._include_tomorrow
-                else "No more departures today or extracting new data"
             )
         elif ATTR_INFO in self._attributes:
             del self._attributes[ATTR_INFO]

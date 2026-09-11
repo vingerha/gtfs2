@@ -58,8 +58,7 @@
         "data": {
           "origin": "Origin Stop",
           "destination": "Destination Stop",
-          "name": "Name of the route",
-          "include_tomorrow": "Include tomorrow"
+          "name": "Name of the route"
         },
 		"description": "Select from the options below [(docu)]({docu_new_route})"
       },
@@ -67,8 +66,7 @@
         "data": {
           "origin": "Origin Stop",
           "destination": "Destination Stop",
-          "name": "Name of the route",
-          "include_tomorrow": "Include tomorrow"
+          "name": "Name of the route"
         },
 		"description": "No trip found between selected stops, try again [(docu)]({docu_new_route})"
       },	  
@@ -77,8 +75,7 @@
           "origin": "Enter the city of departure",
           "destination": "Enter the city of arrival",
           "name": "Name of the route",
-          "refresh_interval": "Refresh interval in minutes",
-          "include_tomorrow": "Include tomorrow"
+          "refresh_interval": "Refresh interval in minutes"
         },
 		"description": "Select from the options below [(docu)]({docu_setup_train})"
       },

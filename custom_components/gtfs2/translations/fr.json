@@ -58,8 +58,7 @@
         "data": {
           "origin": "Arrêt d'origine",
           "destination": "Arrêt de destination",
-          "name": "Nom de la ligne",
-          "include_tomorrow": "Inclure le lendemain?"
+          "name": "Nom de la ligne"
         },
 		"description": "Sélectionnez parmi les options [(docu)]({docu_new_route})"
       },
@@ -67,8 +66,7 @@
         "data": {
           "origin": "Arrêt d'origine",
           "destination": "Arrêt de destination",
-          "name": "Nom de la ligne",
-          "include_tomorrow": "Inclure le lendemain?"
+          "name": "Nom de la ligne"
         },
 		"description": "Échoué, svp re-essayer avec d'autre arrêt(s) [(docu)]({docu_new_route})"
       },	  
@@ -76,8 +74,7 @@
         "data": {
           "origin": "Ville de départ",
           "destination": "Ville d'arrivée",
-          "name": "Nom de la ligne",
-          "include_tomorrow": "Inclure le lendemain?",
+          "name": "Nom de la ligne"
           "refresh_interval": "Intervalle de rafraîchissement en minutes"
         },
 		"description": "Sélectionnez parmi les options [(docu)]({docu_setup_train})"

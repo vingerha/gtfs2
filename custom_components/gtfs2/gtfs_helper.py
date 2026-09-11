@@ -1219,7 +1219,6 @@ def _interpret_local_stop_rows(self, rows):
     return data_returned
 
 def get_local_stops_next_departures(self):
-    # 20260803 Note: this procedure is not using an option to in/exclude 'tomorrow'
     _LOGGER.debug("Get local stop departure with data: %s", self._data)
     if check_extracting(self.hass, self._data['gtfs_dir'],self._data['file']):
         _LOGGER.warning("Cannot get next depurtures on this datasource as still unpacking: %s", self._data["file"])
@@ -1280,7 +1279,6 @@ async def get_route_departures(hass, data):
             "origin": cf_data["origin"],
             "destination": cf_data["destination"],
             "offset": cf_options["offset"] if "offset" in cf_options else 0,
-            "include_tomorrow": True,
             "gtfs_dir": DEFAULT_PATH,
             "name": cf_data["name"],
             "file": cf_data["file"],

@@ -21,7 +21,6 @@ DEFAULT_API_KEY_LOCATION = "not_applicable"
 CONF_DATA = "data"
 CONF_DESTINATION = "destination"
 CONF_ORIGIN = "origin"
-CONF_TOMORROW = "include_tomorrow"
 
 PLATFORMS = [Platform.SENSOR]
 
@@ -281,7 +280,6 @@ CONF_DIRECTION = "direction"
 CONF_ORIGIN = "origin"
 CONF_DESTINATION = "destination"
 CONF_NAME = "name"
-CONF_INCLUDE_TOMORROW = "include_tomorrow"
 CONF_LOCAL_STOP_REFRESH_INTERVAL = "local_stop_refresh_interval"
 CONF_RADIUS = "radius"
 CONF_TIMERANGE = "timerange"
