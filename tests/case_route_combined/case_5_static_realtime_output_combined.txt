@@ -3,7 +3,6 @@
   'origin': 'origin_stop_id: origin_stop_name (20)',
   'destination': 'dest_stop_id: dest_stop_name (37)',
   'offset': 0,
-  'include_tomorrow': True,
   'gtfs_dir': 'gtfs2',
   'name': 'route_name',
   'file': 'zou_proximite',
