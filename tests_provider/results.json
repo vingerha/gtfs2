@@ -14,13 +14,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979810 on 152323 d0 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3979966 -> 3979810 on 152323 d0 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -34,13 +34,13 @@
           },
           "got": {
             "destination": "3979766",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979766 on 152323 d0 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d0, trip 380877660"
+          "text": "asked 3979966 -> 3979766 on 152323 d0 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -54,13 +54,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979766",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979766 -> 3979810 on 152323 d0 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3979766 -> 3979810 on 152323 d0 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -174,13 +174,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3980938",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3980938 -> 3979810 on 152323 d0 (stop 14 to stop 27 of a 27-stop ride): got 3980938 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3980938 -> 3979810 on 152323 d0 (stop 14 to stop 27 of a 27-stop ride): got 3980938 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -715,10 +715,10 @@
             "direction": 1,
             "origin": "3979725",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832451"
           },
           "ok": true,
-          "text": "asked 3979725 -> 3980743 on 152323 d1 (stop 1 to stop 12 of a 12-stop ride): got 3979725 -> 3980743 on 152323 d1, trip 380832272"
+          "text": "asked 3979725 -> 3980743 on 152323 d1 (stop 1 to stop 12 of a 12-stop ride): got 3979725 -> 3980743 on 152323 d1, trip 380832451"
         },
         {
           "asked": {
@@ -735,10 +735,10 @@
             "direction": 1,
             "origin": "3979725",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832451"
           },
           "ok": true,
-          "text": "asked 3979725 -> 3980204 on 152323 d1 (stop 1 to stop 7 of a 12-stop ride): got 3979725 -> 3980204 on 152323 d1, trip 380832272"
+          "text": "asked 3979725 -> 3980204 on 152323 d1 (stop 1 to stop 7 of a 12-stop ride): got 3979725 -> 3980204 on 152323 d1, trip 380832451"
         },
         {
           "asked": {
@@ -755,10 +755,10 @@
             "direction": 1,
             "origin": "3980204",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832451"
           },
           "ok": true,
-          "text": "asked 3980204 -> 3980743 on 152323 d1 (stop 7 to stop 12 of a 12-stop ride): got 3980204 -> 3980743 on 152323 d1, trip 380832272"
+          "text": "asked 3980204 -> 3980743 on 152323 d1 (stop 7 to stop 12 of a 12-stop ride): got 3980204 -> 3980743 on 152323 d1, trip 380832451"
         },
         {
           "asked": {
@@ -775,10 +775,10 @@
             "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816281"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979810 on 152323 d1 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d1, trip 380816082"
+          "text": "asked 3979966 -> 3979810 on 152323 d1 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d1, trip 380816281"
         },
         {
           "asked": {
@@ -795,10 +795,10 @@
             "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816281"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979766 on 152323 d1 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d1, trip 380816082"
+          "text": "asked 3979966 -> 3979766 on 152323 d1 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d1, trip 380816281"
         },
         {
           "asked": {
@@ -815,10 +815,10 @@
             "direction": 1,
             "origin": "3979766",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816281"
           },
           "ok": true,
-          "text": "asked 3979766 -> 3979810 on 152323 d1 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816082"
+          "text": "asked 3979766 -> 3979810 on 152323 d1 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816281"
         },
         {
           "asked": {
@@ -835,10 +835,10 @@
             "direction": 1,
             "origin": "3980295",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832271"
           },
           "ok": true,
-          "text": "asked 3980295 -> 3980743 on 152323 d1 (stop 1 to stop 30 of a 30-stop ride): got 3980295 -> 3980743 on 152323 d1, trip 380832272"
+          "text": "asked 3980295 -> 3980743 on 152323 d1 (stop 1 to stop 30 of a 30-stop ride): got 3980295 -> 3980743 on 152323 d1, trip 380832271"
         },
         {
           "asked": {
@@ -855,10 +855,10 @@
             "direction": 1,
             "origin": "3980295",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832271"
           },
           "ok": true,
-          "text": "asked 3980295 -> 3981140 on 152323 d1 (stop 1 to stop 16 of a 30-stop ride): got 3980295 -> 3981140 on 152323 d1, trip 380832272"
+          "text": "asked 3980295 -> 3981140 on 152323 d1 (stop 1 to stop 16 of a 30-stop ride): got 3980295 -> 3981140 on 152323 d1, trip 380832271"
         },
         {
           "asked": {
@@ -875,10 +875,10 @@
             "direction": 1,
             "origin": "3981140",
             "route": "152323",
-            "trip": "380832272"
+            "trip": "380832271"
           },
           "ok": true,
-          "text": "asked 3981140 -> 3980743 on 152323 d1 (stop 16 to stop 30 of a 30-stop ride): got 3981140 -> 3980743 on 152323 d1, trip 380832272"
+          "text": "asked 3981140 -> 3980743 on 152323 d1 (stop 16 to stop 30 of a 30-stop ride): got 3981140 -> 3980743 on 152323 d1, trip 380832271"
         },
         {
           "asked": {
@@ -895,10 +895,10 @@
             "direction": 1,
             "origin": "3980295",
             "route": "152323",
-            "trip": "380877388"
+            "trip": "380877387"
           },
           "ok": true,
-          "text": "asked 3980295 -> 3980743 on 152323 d1 (stop 1 to stop 27 of a 27-stop ride): got 3980295 -> 3980743 on 152323 d1, trip 380877388"
+          "text": "asked 3980295 -> 3980743 on 152323 d1 (stop 1 to stop 27 of a 27-stop ride): got 3980295 -> 3980743 on 152323 d1, trip 380877387"
         },
         {
           "asked": {
@@ -915,10 +915,10 @@
             "direction": 1,
             "origin": "3980295",
             "route": "152323",
-            "trip": "380877388"
+            "trip": "380877387"
           },
           "ok": true,
-          "text": "asked 3980295 -> 3981186 on 152323 d1 (stop 1 to stop 14 of a 27-stop ride): got 3980295 -> 3981186 on 152323 d1, trip 380877388"
+          "text": "asked 3980295 -> 3981186 on 152323 d1 (stop 1 to stop 14 of a 27-stop ride): got 3980295 -> 3981186 on 152323 d1, trip 380877387"
         },
         {
           "asked": {
@@ -935,10 +935,10 @@
             "direction": 1,
             "origin": "3981186",
             "route": "152323",
-            "trip": "380877388"
+            "trip": "380877387"
           },
           "ok": true,
-          "text": "asked 3981186 -> 3980743 on 152323 d1 (stop 14 to stop 27 of a 27-stop ride): got 3981186 -> 3980743 on 152323 d1, trip 380877388"
+          "text": "asked 3981186 -> 3980743 on 152323 d1 (stop 14 to stop 27 of a 27-stop ride): got 3981186 -> 3980743 on 152323 d1, trip 380877387"
         },
         {
           "asked": {
@@ -955,10 +955,10 @@
             "direction": 1,
             "origin": "4132580",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816081"
           },
           "ok": true,
-          "text": "asked 4132580 -> 3979810 on 152323 d1 (stop 1 to stop 16 of a 16-stop ride): got 4132580 -> 3979810 on 152323 d1, trip 380816082"
+          "text": "asked 4132580 -> 3979810 on 152323 d1 (stop 1 to stop 16 of a 16-stop ride): got 4132580 -> 3979810 on 152323 d1, trip 380816081"
         },
         {
           "asked": {
@@ -975,10 +975,10 @@
             "direction": 1,
             "origin": "4132580",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816081"
           },
           "ok": true,
-          "text": "asked 4132580 -> 3979766 on 152323 d1 (stop 1 to stop 9 of a 16-stop ride): got 4132580 -> 3979766 on 152323 d1, trip 380816082"
+          "text": "asked 4132580 -> 3979766 on 152323 d1 (stop 1 to stop 9 of a 16-stop ride): got 4132580 -> 3979766 on 152323 d1, trip 380816081"
         },
         {
           "asked": {
@@ -995,10 +995,10 @@
             "direction": 1,
             "origin": "3979766",
             "route": "152323",
-            "trip": "380816082"
+            "trip": "380816281"
           },
           "ok": true,
-          "text": "asked 3979766 -> 3979810 on 152323 d1 (stop 9 to stop 16 of a 16-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816082"
+          "text": "asked 3979766 -> 3979810 on 152323 d1 (stop 9 to stop 16 of a 16-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816281"
         }
       ],
       "direction": 1,
@@ -1454,10 +1454,10 @@
             "direction": 0,
             "origin": "3979794",
             "route": "152330",
-            "trip": "380806755"
+            "trip": "380806958"
           },
           "ok": true,
-          "text": "asked 3979794 -> 3981133 on 152330 d0 (stop 1 to stop 13 of a 13-stop ride): got 3979794 -> 3981133 on 152330 d0, trip 380806755"
+          "text": "asked 3979794 -> 3981133 on 152330 d0 (stop 1 to stop 13 of a 13-stop ride): got 3979794 -> 3981133 on 152330 d0, trip 380806958"
         },
         {
           "asked": {
@@ -1474,10 +1474,10 @@
             "direction": 0,
             "origin": "3979794",
             "route": "152330",
-            "trip": "380806755"
+            "trip": "380806958"
           },
           "ok": true,
-          "text": "asked 3979794 -> 3980268 on 152330 d0 (stop 1 to stop 7 of a 13-stop ride): got 3979794 -> 3980268 on 152330 d0, trip 380806755"
+          "text": "asked 3979794 -> 3980268 on 152330 d0 (stop 1 to stop 7 of a 13-stop ride): got 3979794 -> 3980268 on 152330 d0, trip 380806958"
         },
         {
           "asked": {
@@ -1494,10 +1494,10 @@
             "direction": 0,
             "origin": "3980268",
             "route": "152330",
-            "trip": "380806754"
+            "trip": "380806958"
           },
           "ok": true,
-          "text": "asked 3980268 -> 3981133 on 152330 d0 (stop 7 to stop 13 of a 13-stop ride): got 3980268 -> 3981133 on 152330 d0, trip 380806754"
+          "text": "asked 3980268 -> 3981133 on 152330 d0 (stop 7 to stop 13 of a 13-stop ride): got 3980268 -> 3981133 on 152330 d0, trip 380806958"
         },
         {
           "asked": {
@@ -1514,10 +1514,10 @@
             "direction": 0,
             "origin": "3981287",
             "route": "152330",
-            "trip": "380856955"
+            "trip": "380856956"
           },
           "ok": true,
-          "text": "asked 3981287 -> 4149790 on 152330 d0 (stop 1 to stop 22 of a 22-stop ride): got 3981287 -> 4149790 on 152330 d0, trip 380856955"
+          "text": "asked 3981287 -> 4149790 on 152330 d0 (stop 1 to stop 22 of a 22-stop ride): got 3981287 -> 4149790 on 152330 d0, trip 380856956"
         },
         {
           "asked": {
@@ -1534,10 +1534,10 @@
             "direction": 0,
             "origin": "3981287",
             "route": "152330",
-            "trip": "380856955"
+            "trip": "380856956"
           },
           "ok": true,
-          "text": "asked 3981287 -> 3980544 on 152330 d0 (stop 1 to stop 12 of a 22-stop ride): got 3981287 -> 3980544 on 152330 d0, trip 380856955"
+          "text": "asked 3981287 -> 3980544 on 152330 d0 (stop 1 to stop 12 of a 22-stop ride): got 3981287 -> 3980544 on 152330 d0, trip 380856956"
         },
         {
           "asked": {
@@ -1554,10 +1554,10 @@
             "direction": 0,
             "origin": "3980544",
             "route": "152330",
-            "trip": "380856955"
+            "trip": "380856956"
           },
           "ok": true,
-          "text": "asked 3980544 -> 4149790 on 152330 d0 (stop 12 to stop 22 of a 22-stop ride): got 3980544 -> 4149790 on 152330 d0, trip 380856955"
+          "text": "asked 3980544 -> 4149790 on 152330 d0 (stop 12 to stop 22 of a 22-stop ride): got 3980544 -> 4149790 on 152330 d0, trip 380856956"
         },
         {
           "asked": {
@@ -1574,10 +1574,10 @@
             "direction": 0,
             "origin": "3981287",
             "route": "152330",
-            "trip": "380806755"
+            "trip": "380806756"
           },
           "ok": true,
-          "text": "asked 3981287 -> 3981133 on 152330 d0 (stop 1 to stop 22 of a 22-stop ride): got 3981287 -> 3981133 on 152330 d0, trip 380806755"
+          "text": "asked 3981287 -> 3981133 on 152330 d0 (stop 1 to stop 22 of a 22-stop ride): got 3981287 -> 3981133 on 152330 d0, trip 380806756"
         },
         {
           "asked": {
@@ -1594,10 +1594,10 @@
             "direction": 0,
             "origin": "3981287",
             "route": "152330",
-            "trip": "380806755"
+            "trip": "380806756"
           },
           "ok": true,
-          "text": "asked 3981287 -> 3980544 on 152330 d0 (stop 1 to stop 12 of a 22-stop ride): got 3981287 -> 3980544 on 152330 d0, trip 380806755"
+          "text": "asked 3981287 -> 3980544 on 152330 d0 (stop 1 to stop 12 of a 22-stop ride): got 3981287 -> 3980544 on 152330 d0, trip 380806756"
         },
         {
           "asked": {
@@ -1614,10 +1614,10 @@
             "direction": 0,
             "origin": "3980544",
             "route": "152330",
-            "trip": "380806754"
+            "trip": "380806958"
           },
           "ok": true,
-          "text": "asked 3980544 -> 3981133 on 152330 d0 (stop 12 to stop 22 of a 22-stop ride): got 3980544 -> 3981133 on 152330 d0, trip 380806754"
+          "text": "asked 3980544 -> 3981133 on 152330 d0 (stop 12 to stop 22 of a 22-stop ride): got 3980544 -> 3981133 on 152330 d0, trip 380806958"
         }
       ],
       "direction": 0,
@@ -1897,10 +1897,10 @@
             "direction": 1,
             "origin": "3979948",
             "route": "152330",
-            "trip": "380856953"
+            "trip": "380856952"
           },
           "ok": true,
-          "text": "asked 3979948 -> 3980106 on 152330 d1 (stop 1 to stop 22 of a 22-stop ride): got 3979948 -> 3980106 on 152330 d1, trip 380856953"
+          "text": "asked 3979948 -> 3980106 on 152330 d1 (stop 1 to stop 22 of a 22-stop ride): got 3979948 -> 3980106 on 152330 d1, trip 380856952"
         },
         {
           "asked": {
@@ -1917,10 +1917,10 @@
             "direction": 1,
             "origin": "3979948",
             "route": "152330",
-            "trip": "380856953"
+            "trip": "380856952"
           },
           "ok": true,
-          "text": "asked 3979948 -> 3979733 on 152330 d1 (stop 1 to stop 12 of a 22-stop ride): got 3979948 -> 3979733 on 152330 d1, trip 380856953"
+          "text": "asked 3979948 -> 3979733 on 152330 d1 (stop 1 to stop 12 of a 22-stop ride): got 3979948 -> 3979733 on 152330 d1, trip 380856952"
         },
         {
           "asked": {
@@ -1937,10 +1937,10 @@
             "direction": 1,
             "origin": "3979733",
             "route": "152330",
-            "trip": "380856953"
+            "trip": "380856952"
           },
           "ok": true,
-          "text": "asked 3979733 -> 3980106 on 152330 d1 (stop 12 to stop 22 of a 22-stop ride): got 3979733 -> 3980106 on 152330 d1, trip 380856953"
+          "text": "asked 3979733 -> 3980106 on 152330 d1 (stop 12 to stop 22 of a 22-stop ride): got 3979733 -> 3980106 on 152330 d1, trip 380856952"
         },
         {
           "asked": {
@@ -1957,10 +1957,10 @@
             "direction": 1,
             "origin": "3980794",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806951"
           },
           "ok": true,
-          "text": "asked 3980794 -> 3980106 on 152330 d1 (stop 1 to stop 9 of a 9-stop ride): got 3980794 -> 3980106 on 152330 d1, trip 380806753"
+          "text": "asked 3980794 -> 3980106 on 152330 d1 (stop 1 to stop 9 of a 9-stop ride): got 3980794 -> 3980106 on 152330 d1, trip 380806951"
         },
         {
           "asked": {
@@ -1977,10 +1977,10 @@
             "direction": 1,
             "origin": "3980794",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806951"
           },
           "ok": true,
-          "text": "asked 3980794 -> 3980252 on 152330 d1 (stop 1 to stop 5 of a 9-stop ride): got 3980794 -> 3980252 on 152330 d1, trip 380806753"
+          "text": "asked 3980794 -> 3980252 on 152330 d1 (stop 1 to stop 5 of a 9-stop ride): got 3980794 -> 3980252 on 152330 d1, trip 380806951"
         },
         {
           "asked": {
@@ -1997,10 +1997,10 @@
             "direction": 1,
             "origin": "3980252",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806951"
           },
           "ok": true,
-          "text": "asked 3980252 -> 3980106 on 152330 d1 (stop 5 to stop 9 of a 9-stop ride): got 3980252 -> 3980106 on 152330 d1, trip 380806753"
+          "text": "asked 3980252 -> 3980106 on 152330 d1 (stop 5 to stop 9 of a 9-stop ride): got 3980252 -> 3980106 on 152330 d1, trip 380806951"
         },
         {
           "asked": {
@@ -2017,10 +2017,10 @@
             "direction": 1,
             "origin": "3981133",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806750"
           },
           "ok": true,
-          "text": "asked 3981133 -> 3980106 on 152330 d1 (stop 1 to stop 22 of a 22-stop ride): got 3981133 -> 3980106 on 152330 d1, trip 380806753"
+          "text": "asked 3981133 -> 3980106 on 152330 d1 (stop 1 to stop 22 of a 22-stop ride): got 3981133 -> 3980106 on 152330 d1, trip 380806750"
         },
         {
           "asked": {
@@ -2037,10 +2037,10 @@
             "direction": 1,
             "origin": "3981133",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806750"
           },
           "ok": true,
-          "text": "asked 3981133 -> 3979733 on 152330 d1 (stop 1 to stop 12 of a 22-stop ride): got 3981133 -> 3979733 on 152330 d1, trip 380806753"
+          "text": "asked 3981133 -> 3979733 on 152330 d1 (stop 1 to stop 12 of a 22-stop ride): got 3981133 -> 3979733 on 152330 d1, trip 380806750"
         },
         {
           "asked": {
@@ -2057,10 +2057,10 @@
             "direction": 1,
             "origin": "3979733",
             "route": "152330",
-            "trip": "380806753"
+            "trip": "380806750"
           },
           "ok": true,
-          "text": "asked 3979733 -> 3980106 on 152330 d1 (stop 12 to stop 22 of a 22-stop ride): got 3979733 -> 3980106 on 152330 d1, trip 380806753"
+          "text": "asked 3979733 -> 3980106 on 152330 d1 (stop 12 to stop 22 of a 22-stop ride): got 3979733 -> 3980106 on 152330 d1, trip 380806750"
         }
       ],
       "direction": 1,
@@ -4258,10 +4258,10 @@
             "direction": 0,
             "origin": "3981271",
             "route": "152324",
-            "trip": "380816285"
+            "trip": "380816284"
           },
           "ok": true,
-          "text": "asked 3981271 -> 4132580 on 152324 d0 (stop 1 to stop 15 of a 15-stop ride): got 3981271 -> 4132580 on 152324 d0, trip 380816285"
+          "text": "asked 3981271 -> 4132580 on 152324 d0 (stop 1 to stop 15 of a 15-stop ride): got 3981271 -> 4132580 on 152324 d0, trip 380816284"
         },
         {
           "asked": {
@@ -4278,10 +4278,10 @@
             "direction": 0,
             "origin": "3981271",
             "route": "152324",
-            "trip": "380816285"
+            "trip": "380816284"
           },
           "ok": true,
-          "text": "asked 3981271 -> 3980180 on 152324 d0 (stop 1 to stop 8 of a 15-stop ride): got 3981271 -> 3980180 on 152324 d0, trip 380816285"
+          "text": "asked 3981271 -> 3980180 on 152324 d0 (stop 1 to stop 8 of a 15-stop ride): got 3981271 -> 3980180 on 152324 d0, trip 380816284"
         },
         {
           "asked": {
@@ -4298,10 +4298,10 @@
             "direction": 0,
             "origin": "3980180",
             "route": "152324",
-            "trip": "380816285"
+            "trip": "380816284"
           },
           "ok": true,
-          "text": "asked 3980180 -> 4132580 on 152324 d0 (stop 8 to stop 15 of a 15-stop ride): got 3980180 -> 4132580 on 152324 d0, trip 380816285"
+          "text": "asked 3980180 -> 4132580 on 152324 d0 (stop 8 to stop 15 of a 15-stop ride): got 3980180 -> 4132580 on 152324 d0, trip 380816284"
         }
       ],
       "direction": 0,
@@ -4785,13 +4785,13 @@
           },
           "got": {
             "destination": "3980714",
-            "direction": 1,
+            "direction": 0,
             "origin": "3981271",
             "route": "152324",
-            "trip": "380815266"
+            "trip": "380816285"
           },
           "ok": true,
-          "text": "asked 3981271 -> 3980714 on 152324 d1 (stop 1 to stop 13 of a 24-stop ride): got 3981271 -> 3980714 on 152324 d1, trip 380815266"
+          "text": "asked 3981271 -> 3980714 on 152324 d1 (stop 1 to stop 13 of a 24-stop ride): got 3981271 -> 3980714 on 152324 d0, trip 380816285"
         },
         {
           "asked": {
@@ -5998,10 +5998,10 @@
             "direction": 1,
             "origin": "3980182",
             "route": "152328",
-            "trip": "380786522"
+            "trip": "380786518"
           },
           "ok": true,
-          "text": "asked 3980182 -> 3980992 on 152328 d1 (stop 15 to stop 29 of a 29-stop ride): got 3980182 -> 3980992 on 152328 d1, trip 380786522"
+          "text": "asked 3980182 -> 3980992 on 152328 d1 (stop 15 to stop 29 of a 29-stop ride): got 3980182 -> 3980992 on 152328 d1, trip 380786518"
         },
         {
           "asked": {
@@ -6018,10 +6018,10 @@
             "direction": 1,
             "origin": "3981181",
             "route": "152328",
-            "trip": "380786522"
+            "trip": "380786685"
           },
           "ok": true,
-          "text": "asked 3981181 -> 3980992 on 152328 d1 (stop 1 to stop 11 of a 11-stop ride): got 3981181 -> 3980992 on 152328 d1, trip 380786522"
+          "text": "asked 3981181 -> 3980992 on 152328 d1 (stop 1 to stop 11 of a 11-stop ride): got 3981181 -> 3980992 on 152328 d1, trip 380786685"
         },
         {
           "asked": {
@@ -6038,10 +6038,10 @@
             "direction": 1,
             "origin": "3981181",
             "route": "152328",
-            "trip": "380786522"
+            "trip": "380786685"
           },
           "ok": true,
-          "text": "asked 3981181 -> 4015723 on 152328 d1 (stop 1 to stop 6 of a 11-stop ride): got 3981181 -> 4015723 on 152328 d1, trip 380786522"
+          "text": "asked 3981181 -> 4015723 on 152328 d1 (stop 1 to stop 6 of a 11-stop ride): got 3981181 -> 4015723 on 152328 d1, trip 380786685"
         },
         {
           "asked": {
@@ -6058,10 +6058,10 @@
             "direction": 1,
             "origin": "4015723",
             "route": "152328",
-            "trip": "380786522"
+            "trip": "380786685"
           },
           "ok": true,
-          "text": "asked 4015723 -> 3980992 on 152328 d1 (stop 6 to stop 11 of a 11-stop ride): got 4015723 -> 3980992 on 152328 d1, trip 380786522"
+          "text": "asked 4015723 -> 3980992 on 152328 d1 (stop 6 to stop 11 of a 11-stop ride): got 4015723 -> 3980992 on 152328 d1, trip 380786685"
         }
       ],
       "direction": 1,

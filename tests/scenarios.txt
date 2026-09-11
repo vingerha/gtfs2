@@ -8,8 +8,13 @@ Context:
 
 1a. Route based:
 
-case_1_static_route: real life case static only for french 'zou' route 653, not further maintained if crashing
->> IMPLEMENTATION STATUS: removed
+case_1_static_route: synthetic test,
+- today trips only
+> verify it properly represents today trips overnight
+Data:
+- 1 after 'now', starts today but arrives tomorrow
+> expected output: 1st trip shows as first trip with start today(3rd) and arrival tomorrow (4th)
+>> IMPLEMENTATION STATUS: done 
 
 case_2_static: synthetic test, 
 - today trips only
@@ -36,6 +41,13 @@ Data:
 > expected output: 2 next trips with tomorrow date
 >> IMPLEMENTATION STATUS: done 
 
+case_4_static_route: synthetic test, 
+- today trips only
+> verify it properly represents today trips overnight
+Data:
+- 1 after 'now', trip has a date that starts today but the departure and destination is after midnight arrives tomorrow
+> expected output: 1st trip shows as first trip with start and arrival tomorrow (4th)
+>> IMPLEMENTATION STATUS: done 
 
 1b. Local-stop based:
 
