@@ -1,0 +1,33 @@
+{
+  "captured_at": 1789153622,
+  "kept": {
+    "agency": 2,
+    "calendar": 5,
+    "calendar_dates": 17,
+    "feed_info": 1,
+    "routes": 2,
+    "stop_times": 2396,
+    "stops": 96,
+    "trips": 120
+  },
+  "kept_night_trips": true,
+  "provider": "Adelaide Metro",
+  "routes_kept": {
+    "GLNELG": [
+      "GLNELG"
+    ],
+    "N1": [
+      "N1"
+    ]
+  },
+  "source_totals": {
+    "stop_times": 824036,
+    "trips": 710
+  },
+  "sources": {
+    "static": "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
+  },
+  "static_only": true,
+  "trip_cap_per_pattern": 5,
+  "why": "calendar.txt feed: weekday, Saturday and Sunday rows with removals and additions in calendar_dates; trips past 24:00 on the Glenelg tram (weekday, Saturday and Sunday services) and on night bus N1, whose Saturday-only service runs into Sunday; Australia/Adelaide, a half-hour offset"
+}

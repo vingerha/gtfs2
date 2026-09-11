@@ -30,9 +30,13 @@ from types import SimpleNamespace
 from sqlalchemy import create_engine, event
 
 # columns that have to compare as numbers: a stop_sequence stored as text sorts
-# 10 before 2, which quietly reverses half a journey
+# 10 before 2, which quietly reverses half a journey. calendar's weekday flags
+# too, pygtfs stores them as integers: a text '0' reads as true in Python and
+# never equals 1 once it goes through a CASE
 NUMERIC = {"stop_sequence", "direction_id", "location_type", "route_type",
-           "exception_type", "pickup_type", "drop_off_type"}
+           "exception_type", "pickup_type", "drop_off_type",
+           "monday", "tuesday", "wednesday", "thursday", "friday",
+           "saturday", "sunday"}
 
 # optional GTFS columns the component's SQL reads: pygtfs always creates
 # them, a feed is free not to publish them
