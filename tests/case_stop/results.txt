@@ -1,7 +1,10 @@
-test_stop_static.py case results -- 2 case(s)
+test_stop_static.py case results -- 3 case(s)
 
 case: case_1
   result: PASSED
 
 case: case_2
+  result: PASSED
+
+case: case_3
   result: PASSED

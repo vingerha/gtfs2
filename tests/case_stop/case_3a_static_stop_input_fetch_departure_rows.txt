@@ -29,7 +29,7 @@
     'trip_headsign': 'Headsign Two',
     'direction_id': 0,
     'trip_short_name': 'T2',
-    'departure_dt': '2026-09-10 08:30:00',
+    'departure_dt': '2026-09-11 00:30:00',
     'stop_sequence': 5,
     'route_long_name': 'Route Two Long',
     'route_short_name': 'R2',
@@ -48,12 +48,12 @@
     'trip_headsign': 'Headsign Three',
     'direction_id': 1,
     'trip_short_name': 'T3',
-    'departure_dt': '2026-09-10 09:00:00',
+    'departure_dt': '2026-09-11 07:00:00',
     'stop_sequence': 5,
     'route_long_name': 'Route One Long',
     'route_short_name': 'R1',
     'route_type': 3,
-    'calendar_date': '2026-09-10',
+    'calendar_date': '2026-09-11',
     'route_id': 'ROUTE_1'
   }
 ]
