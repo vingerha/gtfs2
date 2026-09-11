@@ -926,17 +926,12 @@ def get_local_stop_list(hass, schedule, data):
     return rowcount
         
 
-def _build_local_stop_element(self, row, base_date, date_label,
+def _build_local_stop_element(self, row, base_datetime,
                               timezone_agency, timezone_stop, now_tz,
                               apply_now_filter, feed_entities=None):
     """Build one departure element incl. realtime, for a given service date.
 
-    base_date / date_label: 'now_date' for today, 'tomorrow_date' for tomorrow.
-    apply_now_filter: True for today (drop already-passed), False for tomorrow.
-    feed_entities: already-fetched/parsed RT feed for this refresh cycle, if any
-    (avoids re-fetching + re-parsing the same feed once per row/stop).
-    Relies on self._icon being set by the caller for this row.
-    Returns the element dict, or None if filtered out.
+    base_datetime / datetime_label: both are departure_dt from the query.
     """
     self._trip_id = row["trip_id"]
     self._direction = str(row["direction_id"])
@@ -946,11 +941,11 @@ def _build_local_stop_element(self, row, base_date, date_label,
     self._stop_id = row["stop_id"]
     self._stop_sequence = row["stop_sequence"]
     #_LOGGER.debug("Row departure_time: %s", row["departure_time"])
-    #_LOGGER.debug("Base_date / date_label: %s", base_date)
+    #_LOGGER.debug("base_datetime / datetime_label: %s", base_datetime)
 
     # collect departure time from row, using agency timezone as basis, then transforming it to the stop-specific timezone (based on Amtrak)
     self._departure_datetime = datetime.datetime.strptime(
-        base_date + " " + row["departure_time"], "%Y-%m-%d %H:%M:%S"
+        base_datetime, "%Y-%m-%d %H:%M:%S"
     ).replace(tzinfo=timezone_agency).astimezone(tz=timezone_stop)
     self._departure_datetime_utc = dt_util.as_utc(self._departure_datetime)
     #_LOGGER.debug("Self._departure datetime in agency_tz: %s", self._departure_datetime)
@@ -988,14 +983,17 @@ def _build_local_stop_element(self, row, base_date, date_label,
             delay_rt_derived = str(td)
         _LOGGER.debug("Delay derived: %s, departure_rt: %s", delay_rt_derived, departure_rt)
     else:
-        depart_time_corrected_time = (dt_util.parse_datetime(f"{base_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
+        #depart_time_corrected_time = (dt_util.parse_datetime(f"{base_date} {self._departure_time}")).replace(tzinfo=timezone_stop)
+        depart_time_corrected_time = dt_util.parse_datetime(base_datetime).replace(tzinfo=timezone_stop)
     #_LOGGER.debug("Departure time corrected based on realtime-time: %s", depart_time_corrected_time)
 
     if delay_rt != "-" and delay_rt != 0:
-        depart_time_corrected_delay = (dt_util.parse_datetime(f"{base_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
+        #depart_time_corrected_delay = (dt_util.parse_datetime(f"{base_date} {self._departure_time}") + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
+        depart_time_corrected_delay = (dt_util.parse_datetime(base_datetime) + datetime.timedelta(seconds=delay_rt)).replace(tzinfo=timezone_stop)
     else:
         delay_rt = "-"
-        depart_time_corrected_delay = dt_util.parse_datetime(f"{base_date} {self._departure_time}").replace(tzinfo=timezone_stop)
+        #depart_time_corrected_delay = dt_util.parse_datetime(f"{base_date} {self._departure_time}").replace(tzinfo=timezone_stop)
+        depart_time_corrected_delay = dt_util.parse_datetime(base_datetime).replace(tzinfo=timezone_stop)
     #_LOGGER.debug("Departure time corrected based on realtime-delay: %s", depart_time_corrected_delay)
 
     if depart_time_corrected_delay > depart_time_corrected_time:
@@ -1015,7 +1013,7 @@ def _build_local_stop_element(self, row, base_date, date_label,
         "departure_realtime_datetime": departure_rt_datetime,
         "delay_realtime_derived": delay_rt_derived,
         "delay_realtime": delay_rt,
-        "date": date_label,
+        "date": datetime.datetime.strptime(base_datetime, "%Y-%m-%d %H:%M:%S").date().isoformat(),
         "stop_name": row["stop_name"],
         "stop_id": row["stop_id"],
         "route": row["route_short_name"],
@@ -1038,7 +1036,8 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
                    stop.stop_timezone AS stop_timezone, agency.agency_timezone AS agency_timezone,
                    trip.trip_id, trip.trip_headsign, trip.direction_id, trip.trip_short_name,
                    trip.service_id,
-                   time(st.departure_time) AS departure_time, st.stop_sequence AS stop_sequence,
+                   st.departure_time AS departure_time_raw,
+                   st.stop_sequence AS stop_sequence,
                    route.route_long_name, route.route_short_name, route.route_type, route.route_id
             FROM trips trip
             INNER JOIN stop_times st ON trip.trip_id = st.trip_id
@@ -1080,13 +1079,19 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
           )
         SELECT cs.stop_id, cs.stop_name, cs.latitude, cs.longitude, cs.stop_timezone, cs.agency_timezone,
                cs.trip_id, cs.trip_headsign, cs.direction_id, cs.trip_short_name,
-               cs.departure_time, cs.stop_sequence, cs.route_long_name, cs.route_short_name, cs.route_type,
-               vd.date AS calendar_date, cs.route_id
+               datetime(
+                 vd.date || ' ' || time(cs.departure_time_raw),
+                 CASE WHEN date(cs.departure_time_raw) = '1970-01-02' THEN '+1 day' ELSE '+0 day' END
+               ) AS departure_dt,
+               cs.stop_sequence, cs.route_long_name, cs.route_short_name, cs.route_type,
+               cs.route_id
         FROM candidate_stops cs
         INNER JOIN valid_dates vd ON vd.service_id = cs.service_id
-        WHERE datetime(vd.date || ' ' || cs.departure_time) BETWEEN
-                datetime(:now_offset, :timerange_history) AND datetime(:now_offset, :timerange)
-        ORDER BY cs.stop_id, vd.date, cs.departure_time;
+        WHERE datetime(
+                vd.date || ' ' || time(cs.departure_time_raw),
+                CASE WHEN date(cs.departure_time_raw) = '1970-01-02' THEN '+1 day' ELSE '+0 day' END
+              ) BETWEEN datetime(:now_offset, :timerange_history) AND datetime(:now_offset, :timerange)
+        ORDER BY cs.stop_id, vd.date, cs.departure_time_raw;
     """  # noqa: S608        
     
     query_params = {
@@ -1098,8 +1103,8 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
         "now_offset": now,
     }
 
-    #_LOGGER.debug("SQL statement:\n%s", sql_query)
-    #_LOGGER.debug("SQL parameters:\n%s", query_params)        
+    _LOGGER.debug("SQL statement:\n%s", sql_query)
+    _LOGGER.debug("SQL parameters:\n%s", query_params)        
 
     with schedule.engine.connect() as conn:
         rows = conn.execute(text(sql_query), {"latitude": latitude, "longitude": longitude, "timerange": time_range, "timerange_history": time_range_history, "radius": radius, "now_offset": now}).fetchall()
@@ -1189,7 +1194,7 @@ def _interpret_local_stop_rows(self, rows):
         self._icon = ICONS.get(row['route_type'], ICON)
        
         element = _build_local_stop_element(
-            self, row, row["calendar_date"], row["calendar_date"],
+            self, row, row["departure_dt"], 
             timezone_agency, timezone_stop, now_tz,
             apply_now_filter=True, feed_entities=feed_entities)
             
