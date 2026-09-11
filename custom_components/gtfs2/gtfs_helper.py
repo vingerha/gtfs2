@@ -78,7 +78,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule):
               AND origin_stop_time.stop_sequence < destination_stop_time.stop_sequence
           ),
           cal_expand(service_id, d, end_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday) AS (
-            SELECT service_id, MAX(start_date, date('now', 'localtime')), end_date,
+            SELECT service_id, MAX(start_date, date('now', 'localtime', '-1 day')), end_date,
                    monday, tuesday, wednesday, thursday, friday, saturday, sunday
             FROM calendar
             WHERE service_id IN (SELECT service_id FROM candidate_trips)
@@ -1047,6 +1047,8 @@ def _fetch_local_stop_rows(schedule, latitude, longitude, radius,
             INNER JOIN agency agency ON route.agency_id = agency.agency_id
           ),
           candidate_dates(date) AS (
+            SELECT date(:now_offset, '-1 day')
+            UNION ALL
             SELECT date(:now_offset)
             UNION ALL
             SELECT date(:now_offset, '+1 day')
