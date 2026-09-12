@@ -173,15 +173,31 @@ def patterns_of(schedule, route_id, direction):
 
 
 def service_date(schedule, trip_ids):
-    """The first day one of these trips runs, as an ISO date, or None."""
+    """The first day one of these trips runs, as an ISO date, or None: the
+    earliest calendar_dates addition, or the first weekday of a calendar
+    window its removals leave, over the trips' services."""
     with schedule.engine.connect() as conn:
-        row = conn.execute(text(
-            "SELECT min(cd.date) FROM calendar_dates cd "
-            "INNER JOIN trips t ON t.service_id = cd.service_id "
-            "WHERE cd.exception_type = 1 AND t.trip_id IN :trips"
+        services = {row[0] for row in conn.execute(text(
+            "SELECT DISTINCT service_id FROM trips WHERE trip_id IN :trips"
         ).bindparams(bindparam("trips", expanding=True)),
-            {"trips": list(trip_ids)}).fetchone()
-    return row[0]
+            {"trips": list(trip_ids)})}
+        exceptions = conn.execute(text(
+            "SELECT service_id, date, exception_type FROM calendar_dates")).fetchall()
+        days = {str(d)[:10] for s, d, k in exceptions if k == 1 and s in services}
+        removed = {(s, str(d)[:10]) for s, d, k in exceptions if k == 2}
+        for row in conn.execute(text(
+                "SELECT service_id, monday, tuesday, wednesday, thursday, "
+                "friday, saturday, sunday, start_date, end_date FROM calendar")):
+            if row[0] not in services or not row[8] or not row[9]:
+                continue
+            day = datetime.date.fromisoformat(str(row[8])[:10])
+            end = datetime.date.fromisoformat(str(row[9])[:10])
+            while day <= end:
+                if row[1 + day.weekday()] and (row[0], day.isoformat()) not in removed:
+                    days.add(day.isoformat())
+                    break
+                day += datetime.timedelta(days=1)
+    return min(days) if days else None
 
 
 def circular_like(grouped_by_dir):
@@ -262,6 +278,9 @@ KNOWN = {
        for r in ("1", "7", "13", "14", "17") for d in (0, 1)},
     "palmbus-22-d0-stop_list": SELECTOR,
     "palmbus-B-d1-stop_list": SELECTOR,
+    "adelaide-GLNELG-d0-stop_list": SELECTOR,
+    "adelaide-GLNELG-d1-stop_list": SELECTOR,
+    "adelaide-N1-d0-stop_list": SELECTOR,
     **{f"tao-journeys-{r}-d{d}-stop_list": SELECTOR
        for r in ("40", "A", "B") for d in (0, 1)},
     **{f"{line}-d{d}-swapped": SWAPPED

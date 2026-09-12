@@ -14,7 +14,10 @@ there for.
 
 Routes are named by route_short_name (every route bearing the name is kept,
 a short name is not unique in a national feed) or by exact route_id;
---agency narrows the match to one agency_id first.
+--agency narrows the match to one agency_id first. The cap takes trips in
+trip_id order, which says nothing about the hour: --keep-night also keeps
+every trip with a call past 24:00, so a pattern run by day and at night
+keeps its night runs.
 """
 from __future__ import annotations
 
@@ -72,6 +75,8 @@ def main():
     parser.add_argument("--source", required=True,
                         help="where the zip came from, recorded in the manifest")
     parser.add_argument("--why", default="")
+    parser.add_argument("--keep-night", action="store_true",
+                        help="also keep every trip with a call past 24:00")
     args = parser.parse_args()
 
     archive = zipfile.ZipFile(args.zip)
@@ -95,7 +100,9 @@ def main():
     i_trip = header.index("trip_id")
     i_stop = header.index("stop_id")
     i_seq = header.index("stop_sequence")
+    i_dep = header.index("departure_time")
     sequences = defaultdict(list)
+    night_trips = set()
     st_total = 0
     handle = io.TextIOWrapper(
         archive.open("stop_times.txt"), encoding="utf-8-sig", newline="")
@@ -104,6 +111,8 @@ def main():
         st_total += 1
         if row[i_trip] in trip_meta:
             sequences[row[i_trip]].append((int(row[i_seq]), row[i_stop]))
+            if row[i_dep][:2].isdigit() and int(row[i_dep].split(":")[0]) >= 24:
+                night_trips.add(row[i_trip])
 
     patterns = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     for trip_id, stops in sequences.items():
@@ -118,7 +127,10 @@ def main():
         for pats in capped.values():
             for trips in pats.values():
                 kept_trips.update(trips)
-    print(f"kept trips: {len(kept_trips)} of {len(trip_meta)}")
+    if args.keep_night:
+        kept_trips |= night_trips
+    print(f"kept trips: {len(kept_trips)} of {len(trip_meta)}"
+          f" ({len(night_trips & kept_trips)} with a call past 24:00)")
 
     tables = {}
     totals = {"stop_times": st_total, "trips": len(trip_meta)}
@@ -184,6 +196,8 @@ def main():
     }
     if args.why:
         manifest["why"] = args.why
+    if args.keep_night:
+        manifest["kept_night_trips"] = True
     with open(os.path.join(args.out, "manifest.json"), "w",
               encoding="utf-8") as handle:
         json.dump(manifest, handle, indent=2, sort_keys=True)
