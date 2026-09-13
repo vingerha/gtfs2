@@ -59,6 +59,12 @@
         },
         "description": "Selecione a paragem de origem, por ordem de passagem [(docu)]({docu_new_route})"
       },
+      "towards": {
+        "data": {
+          "towards": "Sentido"
+        },
+        "description": "As viagens a partir desta paragem partem nos dois sentidos: em que sentido vai? [(docu)]({docu_new_route})"
+      },
       "destination": {
         "data": {
           "destination": "Paragem de destino",

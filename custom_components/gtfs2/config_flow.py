@@ -59,6 +59,7 @@ from .gtfs_helper import (
     get_stop_list,
     get_destination_stop_list,
     get_pair_direction,
+    get_towards,
     get_datasources,
     remove_datasource,
     check_datasource_index,
@@ -100,6 +101,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._pygtfs = ""
         self._data: dict[str, str] = {}
         self._user_inputs: dict = {}
+        # the way the rider leaves the origin, when it was asked: it narrows
+        # the destination screen and picks a loop's rotation, the entry does
+        # not keep it
+        self._towards = None
 
     async def async_step_user(self, user_input: dict | None = None) -> FlowResult:
         """Handle the source."""
@@ -370,6 +375,34 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._user_inputs.update(user_input)
         _LOGGER.debug(f"UserInputs Origin: {self._user_inputs}")
+        self._towards = None
+        return await self.async_step_towards()
+
+    async def async_step_towards(self, user_input: dict | None = None) -> FlowResult:
+        """Ask which way the rider leaves the origin, only when trips from it
+        really leave both ways: the destination screen then shows that side
+        only, nearest first, and at a loop's terminus the answer is the
+        rotation the entry keeps. At the end of a line, where every trip
+        leaves the same way, nothing is asked."""
+        ways = await self.hass.async_add_executor_job(
+            get_towards,
+            self._pygtfs,
+            self._user_inputs[CONF_ROUTE],
+            self._user_inputs[CONF_ORIGIN].split(": ")[0],
+        )
+        if not ways:
+            return await self.async_step_destination()
+        if user_input is None:
+            return self.async_show_form(
+                step_id="towards",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required("towards", default=ways[0][0]): vol.In(dict(ways)),
+                    },
+                ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
+            )
+        self._towards = user_input["towards"]
         return await self.async_step_destination()
 
     async def async_step_destination(self, user_input: dict | None = None) -> FlowResult:
@@ -393,13 +426,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data[CONF_DESTINATION] = _stop_name_of(data[CONF_DESTINATION])
             else:
                 # the pair says which way the rider goes, except with a loop's
-                # terminus at one end: then the entry keeps the shorter rotation
+                # terminus at one end: then the entry keeps the rotation the
+                # rider answered, or the shorter one
                 data[CONF_LOOP_DIRECTION] = await self.hass.async_add_executor_job(
                     get_pair_direction,
                     self._pygtfs,
                     data[CONF_ROUTE],
                     data[CONF_ORIGIN].split(": ")[0],
                     data[CONF_DESTINATION].split(": ")[0],
+                    self._towards,
                 )
             _LOGGER.debug(f"UserInputs Destination: {data}")
             check_config = await self._check_config(data)
@@ -416,6 +451,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._user_inputs[CONF_ROUTE],
             None,
             self._user_inputs[CONF_ORIGIN].split(": ")[0],
+            self._towards,
         )
         if not destinations:
             # the origin is the last stop of every trip that calls at it

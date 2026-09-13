@@ -59,6 +59,12 @@
         },
         "description": "Wählen Sie die Starthaltestelle, in Fahrtreihenfolge [(docu)]({docu_new_route})"
       },
+      "towards": {
+        "data": {
+          "towards": "Richtung"
+        },
+        "description": "Fahrten ab dieser Haltestelle fahren in beide Richtungen: in welche Richtung fahren Sie? [(docu)]({docu_new_route})"
+      },
       "destination": {
         "data": {
           "destination": "Zielhaltestelle",

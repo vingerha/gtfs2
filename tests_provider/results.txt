@@ -1,4 +1,4 @@
-provider case results -- 150 case(s)
+provider case results -- 183 case(s)
 
 case: adelaide-GLNELG-d0-destinations
   result: PASSED
@@ -10,6 +10,9 @@ case: adelaide-GLNELG-d0-stop_list
   result: PASSED
 
 case: adelaide-GLNELG-d0-swapped
+  result: PASSED
+
+case: adelaide-GLNELG-d0-towards
   result: PASSED
 
 case: adelaide-GLNELG-d1-destinations
@@ -24,6 +27,9 @@ case: adelaide-GLNELG-d1-stop_list
 case: adelaide-GLNELG-d1-swapped
   result: PASSED
 
+case: adelaide-GLNELG-d1-towards
+  result: PASSED
+
 case: adelaide-N1-d0-destinations
   result: PASSED
 
@@ -36,6 +42,9 @@ case: adelaide-N1-d0-stop_list
 case: adelaide-N1-d0-swapped
   result: PASSED
 
+case: adelaide-N1-d0-towards
+  result: PASSED
+
 case: adelaide-N1-d1-destinations
   result: PASSED
 
@@ -46,6 +55,9 @@ case: adelaide-N1-d1-stop_list
   result: PASSED
 
 case: adelaide-N1-d1-swapped
+  result: PASSED
+
+case: adelaide-N1-d1-towards
   result: PASSED
 
 case: adelaide-local_stop-calendar
@@ -72,6 +84,9 @@ case: gvb-1-d0-stop_list
 case: gvb-1-d0-swapped
   result: PASSED
 
+case: gvb-1-d0-towards
+  result: PASSED
+
 case: gvb-1-d1-destinations
   result: PASSED
 
@@ -82,6 +97,9 @@ case: gvb-1-d1-stop_list
   result: PASSED
 
 case: gvb-1-d1-swapped
+  result: PASSED
+
+case: gvb-1-d1-towards
   result: PASSED
 
 case: gvb-13-d0-destinations
@@ -96,6 +114,9 @@ case: gvb-13-d0-stop_list
 case: gvb-13-d0-swapped
   result: PASSED
 
+case: gvb-13-d0-towards
+  result: PASSED
+
 case: gvb-13-d1-destinations
   result: PASSED
 
@@ -106,6 +127,9 @@ case: gvb-13-d1-stop_list
   result: PASSED
 
 case: gvb-13-d1-swapped
+  result: PASSED
+
+case: gvb-13-d1-towards
   result: PASSED
 
 case: gvb-14-d0-destinations
@@ -120,6 +144,9 @@ case: gvb-14-d0-stop_list
 case: gvb-14-d0-swapped
   result: PASSED
 
+case: gvb-14-d0-towards
+  result: PASSED
+
 case: gvb-14-d1-destinations
   result: PASSED
 
@@ -130,6 +157,9 @@ case: gvb-14-d1-stop_list
   result: PASSED
 
 case: gvb-14-d1-swapped
+  result: PASSED
+
+case: gvb-14-d1-towards
   result: PASSED
 
 case: gvb-17-d0-destinations
@@ -144,6 +174,9 @@ case: gvb-17-d0-stop_list
 case: gvb-17-d0-swapped
   result: PASSED
 
+case: gvb-17-d0-towards
+  result: PASSED
+
 case: gvb-17-d1-destinations
   result: PASSED
 
@@ -154,6 +187,9 @@ case: gvb-17-d1-stop_list
   result: PASSED
 
 case: gvb-17-d1-swapped
+  result: PASSED
+
+case: gvb-17-d1-towards
   result: PASSED
 
 case: gvb-7-d0-destinations
@@ -168,6 +204,9 @@ case: gvb-7-d0-stop_list
 case: gvb-7-d0-swapped
   result: PASSED
 
+case: gvb-7-d0-towards
+  result: PASSED
+
 case: gvb-7-d1-destinations
   result: PASSED
 
@@ -178,6 +217,9 @@ case: gvb-7-d1-stop_list
   result: PASSED
 
 case: gvb-7-d1-swapped
+  result: PASSED
+
+case: gvb-7-d1-towards
   result: PASSED
 
 case: gvb-local_stop-calendar
@@ -204,6 +246,9 @@ case: palmbus-21-d0-stop_list
 case: palmbus-21-d0-swapped
   result: PASSED
 
+case: palmbus-21-d0-towards
+  result: PASSED
+
 case: palmbus-22-d0-destinations
   result: PASSED
 
@@ -214,6 +259,9 @@ case: palmbus-22-d0-stop_list
   result: PASSED
 
 case: palmbus-22-d0-swapped
+  result: PASSED
+
+case: palmbus-22-d0-towards
   result: PASSED
 
 case: palmbus-22-d1-destinations
@@ -228,6 +276,9 @@ case: palmbus-22-d1-stop_list
 case: palmbus-22-d1-swapped
   result: PASSED
 
+case: palmbus-22-d1-towards
+  result: PASSED
+
 case: palmbus-A-d0-destinations
   result: PASSED
 
@@ -238,6 +289,9 @@ case: palmbus-A-d0-stop_list
   result: PASSED
 
 case: palmbus-A-d0-swapped
+  result: PASSED
+
+case: palmbus-A-d0-towards
   result: PASSED
 
 case: palmbus-A-d1-destinations
@@ -252,6 +306,9 @@ case: palmbus-A-d1-stop_list
 case: palmbus-A-d1-swapped
   result: PASSED
 
+case: palmbus-A-d1-towards
+  result: PASSED
+
 case: palmbus-B-d0-destinations
   result: PASSED
 
@@ -264,6 +321,9 @@ case: palmbus-B-d0-stop_list
 case: palmbus-B-d0-swapped
   result: PASSED
 
+case: palmbus-B-d0-towards
+  result: PASSED
+
 case: palmbus-B-d1-destinations
   result: PASSED
 
@@ -274,6 +334,9 @@ case: palmbus-B-d1-stop_list
   result: PASSED
 
 case: palmbus-B-d1-swapped
+  result: PASSED
+
+case: palmbus-B-d1-towards
   result: PASSED
 
 case: sncf-journeys-K8+-d0-pairs
@@ -339,6 +402,9 @@ case: tao-journeys-22-d0-stop_list
 case: tao-journeys-22-d0-swapped
   result: PASSED
 
+case: tao-journeys-22-d0-towards
+  result: PASSED
+
 case: tao-journeys-22-d1-destinations
   result: PASSED
 
@@ -349,6 +415,9 @@ case: tao-journeys-22-d1-stop_list
   result: PASSED
 
 case: tao-journeys-22-d1-swapped
+  result: PASSED
+
+case: tao-journeys-22-d1-towards
   result: PASSED
 
 case: tao-journeys-40-d0-destinations
@@ -363,6 +432,9 @@ case: tao-journeys-40-d0-stop_list
 case: tao-journeys-40-d0-swapped
   result: PASSED
 
+case: tao-journeys-40-d0-towards
+  result: PASSED
+
 case: tao-journeys-40-d1-destinations
   result: PASSED
 
@@ -373,6 +445,9 @@ case: tao-journeys-40-d1-stop_list
   result: PASSED
 
 case: tao-journeys-40-d1-swapped
+  result: PASSED
+
+case: tao-journeys-40-d1-towards
   result: PASSED
 
 case: tao-journeys-41-d0-destinations
@@ -387,6 +462,9 @@ case: tao-journeys-41-d0-stop_list
 case: tao-journeys-41-d0-swapped
   result: PASSED
 
+case: tao-journeys-41-d0-towards
+  result: PASSED
+
 case: tao-journeys-41-d1-destinations
   result: PASSED
 
@@ -397,6 +475,9 @@ case: tao-journeys-41-d1-stop_list
   result: PASSED
 
 case: tao-journeys-41-d1-swapped
+  result: PASSED
+
+case: tao-journeys-41-d1-towards
   result: PASSED
 
 case: tao-journeys-A-d0-destinations
@@ -411,6 +492,9 @@ case: tao-journeys-A-d0-stop_list
 case: tao-journeys-A-d0-swapped
   result: PASSED
 
+case: tao-journeys-A-d0-towards
+  result: PASSED
+
 case: tao-journeys-A-d1-destinations
   result: PASSED
 
@@ -421,6 +505,9 @@ case: tao-journeys-A-d1-stop_list
   result: PASSED
 
 case: tao-journeys-A-d1-swapped
+  result: PASSED
+
+case: tao-journeys-A-d1-towards
   result: PASSED
 
 case: tao-journeys-B-d0-destinations
@@ -435,6 +522,9 @@ case: tao-journeys-B-d0-stop_list
 case: tao-journeys-B-d0-swapped
   result: PASSED
 
+case: tao-journeys-B-d0-towards
+  result: PASSED
+
 case: tao-journeys-B-d1-destinations
   result: PASSED
 
@@ -445,6 +535,9 @@ case: tao-journeys-B-d1-stop_list
   result: PASSED
 
 case: tao-journeys-B-d1-swapped
+  result: PASSED
+
+case: tao-journeys-B-d1-towards
   result: PASSED
 
 case: tao-journeys-N-d0-destinations
@@ -459,6 +552,9 @@ case: tao-journeys-N-d0-stop_list
 case: tao-journeys-N-d0-swapped
   result: PASSED
 
+case: tao-journeys-N-d0-towards
+  result: PASSED
+
 case: tao-journeys-N-d1-destinations
   result: PASSED
 
@@ -469,4 +565,7 @@ case: tao-journeys-N-d1-stop_list
   result: PASSED
 
 case: tao-journeys-N-d1-swapped
+  result: PASSED
+
+case: tao-journeys-N-d1-towards
   result: PASSED

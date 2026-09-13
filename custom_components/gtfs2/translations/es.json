@@ -59,6 +59,12 @@
         },
         "description": "Seleccione la parada de origen, en orden de recorrido [(docu)]({docu_new_route})"
       },
+      "towards": {
+        "data": {
+          "towards": "Dirección"
+        },
+        "description": "Los viajes desde esta parada salen en ambos sentidos: ¿en qué dirección va? [(docu)]({docu_new_route})"
+      },
       "destination": {
         "data": {
           "destination": "Parada de destino",

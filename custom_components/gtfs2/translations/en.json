@@ -59,6 +59,12 @@
         },
         "description": "Select the origin stop, listed in riding order [(docu)]({docu_new_route})"
       },
+      "towards": {
+        "data": {
+          "towards": "Towards"
+        },
+        "description": "Trips from this stop leave both ways: which way are you going? [(docu)]({docu_new_route})"
+      },
       "destination": {
         "data": {
           "destination": "Destination Stop",
