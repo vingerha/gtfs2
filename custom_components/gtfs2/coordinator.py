@@ -69,9 +69,11 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             except Exception:
                 pass
 
-        self._pygtfs = get_gtfs(
-            self.hass, DEFAULT_PATH, data, False
-        )        
+        # get_gtfs opens the sqlite file and, when it is missing, downloads
+        # and unpacks the feed: blocking work that has no place on the loop
+        self._pygtfs = await self.hass.async_add_executor_job(
+            get_gtfs, self.hass, DEFAULT_PATH, data, False
+        )
 
         self._data = {
             "schedule": self._pygtfs,
@@ -228,8 +230,10 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
             except Exception:
                 pass
 
-        self._pygtfs = get_gtfs(
-            self.hass, DEFAULT_PATH, data, False
+        # get_gtfs opens the sqlite file and, when it is missing, downloads
+        # and unpacks the feed: blocking work that has no place on the loop
+        self._pygtfs = await self.hass.async_add_executor_job(
+            get_gtfs, self.hass, DEFAULT_PATH, data, False
         )
 
         self._data = {
