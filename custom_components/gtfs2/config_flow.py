@@ -37,6 +37,7 @@ from .const import (
     CONF_ROUTE_TYPE,
     CONF_ROUTE,
     CONF_DIRECTION,
+    CONF_LOOP_DIRECTION,
     CONF_ORIGIN,
     CONF_DESTINATION,
     CONF_NAME,
@@ -56,6 +57,9 @@ from .gtfs_helper import (
     get_next_departure,
     get_route_list,
     get_stop_list,
+    get_destination_stop_list,
+    get_pair_direction,
+    get_towards,
     get_datasources,
     remove_datasource,
     check_datasource_index,
@@ -76,6 +80,16 @@ TRANSLATION_DESCRIPTION_PLACEHOLDERS = {
     "model": "Example model",
 }
 
+
+def _stop_name_of(entry):
+    """The stop name inside a picker entry "stop_id: Name #2 (12)": the
+    number given to a repeated name and the sequence are display only."""
+    name = entry.split(": ", 1)[1].rsplit(" (", 1)[0]
+    if " #" in name and name.rsplit(" #", 1)[1].isdigit():
+        name = name.rsplit(" #", 1)[0]
+    return name
+
+
 @config_entries.HANDLERS.register(DOMAIN)
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for GTFS."""
@@ -87,6 +101,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._pygtfs = ""
         self._data: dict[str, str] = {}
         self._user_inputs: dict = {}
+        # the way the rider leaves the origin, when it was asked: it narrows
+        # the destination screen and picks a loop's rotation, the entry does
+        # not keep it
+        self._towards = None
 
     async def async_step_user(self, user_input: dict | None = None) -> FlowResult:
         """Handle the source."""
@@ -313,7 +331,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data_schema=vol.Schema(
                     {
                         vol.Required(CONF_ROUTE, default = ""): selector.SelectSelector(selector.SelectSelectorConfig(options=route_list, translation_key="route",custom_value=True)),
-                        vol.Required(CONF_DIRECTION): selector.SelectSelector(selector.SelectSelectorConfig(options=["0", "1"], translation_key="direction")),
                     },
                 ),
                 description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
@@ -322,88 +339,136 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input[CONF_ROUTE_TYPE] = user_input.get(CONF_ROUTE).split('##')[0] 
         user_input[CONF_ROUTE] = user_input.get(CONF_ROUTE).split('##')[1].split(": (")[0]   
                
+        # no direction is asked: the rider picks where they are and where they
+        # go, and the order of the stops on a trip says which way that is
+        user_input[CONF_DIRECTION] = None
         self._user_inputs.update(user_input)
         _LOGGER.debug(f"UserInputs Route: {self._user_inputs}")
         return await self.async_step_stops()
 
     async def async_step_stops(self, user_input: dict | None = None) -> FlowResult:
-        """Handle the route step."""
+        """Pick the origin: every place the line rides, both ways round."""
         errors: dict[str, str] = {}
         if user_input is None:
             try:
-                stops = get_stop_list(
+                stops = await self.hass.async_add_executor_job(
+                    get_stop_list,
                     self._pygtfs,
                     self._user_inputs[CONF_ROUTE],
-                    self._user_inputs[CONF_DIRECTION],
+                    None,
                 )
-                last_stop = stops[-1:][0]
+                if not stops:
+                    raise ValueError("no stops")
                 return self.async_show_form(
                     step_id="stops",
                     data_schema=vol.Schema(
                         {
                             vol.Required(CONF_ORIGIN): vol.In(stops),
-                            vol.Required(CONF_DESTINATION, default=last_stop): vol.In(stops),
-                            vol.Required(CONF_NAME): str,
                         },
                     ),
                     description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
                     errors=errors,
                 )
-            except:
+            except Exception:  # pylint: disable=broad-except
                 _LOGGER.debug(f"Likely no stops for this route: {[CONF_ROUTE]}")
                 return self.async_abort(reason="no_stops")
-                
-        # when train route-type, use the names of the selected stops       
-        if self._user_inputs[CONF_ROUTE_TYPE] == '2':
-            user_input[CONF_ORIGIN] = user_input.get(CONF_ORIGIN).split(': ')[1].split(" (")[0] 
-            user_input[CONF_DESTINATION] = user_input.get(CONF_DESTINATION).split(': ')[1].split(" (")[0]  
-            
+
         self._user_inputs.update(user_input)
-        _LOGGER.debug(f"UserInputs Stops: {self._user_inputs}")
-        check_config = await self._check_config(self._user_inputs)
-        if check_config:
-            return await self.async_step_stops_retry()
-        else:
-            return self.async_create_entry(
-                title=user_input[CONF_NAME], data=self._user_inputs
-            )
-            
-    async def async_step_stops_retry(self, user_input: dict | None = None) -> FlowResult:
-        """Handle the route step."""
-        errors: dict[str, str] = {}
+        _LOGGER.debug(f"UserInputs Origin: {self._user_inputs}")
+        self._towards = None
+        return await self.async_step_towards()
+
+    async def async_step_towards(self, user_input: dict | None = None) -> FlowResult:
+        """Ask which way the rider leaves the origin, only when trips from it
+        really leave both ways: the destination screen then shows that side
+        only, nearest first, and at a loop's terminus the answer is the
+        rotation the entry keeps. At the end of a line, where every trip
+        leaves the same way, nothing is asked."""
+        ways = await self.hass.async_add_executor_job(
+            get_towards,
+            self._pygtfs,
+            self._user_inputs[CONF_ROUTE],
+            self._user_inputs[CONF_ORIGIN].split(": ")[0],
+        )
+        if not ways:
+            return await self.async_step_destination()
         if user_input is None:
-            try:
-                stops = get_stop_list(
+            return self.async_show_form(
+                step_id="towards",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required("towards", default=ways[0][0]): vol.In(dict(ways)),
+                    },
+                ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
+            )
+        self._towards = user_input["towards"]
+        return await self.async_step_destination()
+
+    async def async_step_destination(self, user_input: dict | None = None) -> FlowResult:
+        """Pick the destination among the stops a trip really rides to from
+        the chosen origin, so the pair can always be matched to a trip.
+
+        A pair no trip rides cannot be picked any more, so the only check
+        left is whether a trip is still to come. When none is, the screen
+        comes back with that said, the picks kept, and the user can choose
+        another destination.
+        """
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            data = {**self._user_inputs, **user_input}
+            # when train route-type, use the names of the selected stops: a
+            # platform id is not something the rider picks, the station is.
+            # The picker entries stay untouched in _user_inputs, the screen
+            # may have to be shown again
+            if data[CONF_ROUTE_TYPE] == '2':
+                data[CONF_ORIGIN] = _stop_name_of(data[CONF_ORIGIN])
+                data[CONF_DESTINATION] = _stop_name_of(data[CONF_DESTINATION])
+            else:
+                # the pair says which way the rider goes, except with a loop's
+                # terminus at one end: then the entry keeps the rotation the
+                # rider answered, or the shorter one
+                data[CONF_LOOP_DIRECTION] = await self.hass.async_add_executor_job(
+                    get_pair_direction,
                     self._pygtfs,
-                    self._user_inputs[CONF_ROUTE],
-                    self._user_inputs[CONF_DIRECTION],
+                    data[CONF_ROUTE],
+                    data[CONF_ORIGIN].split(": ")[0],
+                    data[CONF_DESTINATION].split(": ")[0],
+                    self._towards,
                 )
-                last_stop = stops[-1:][0]
-                return self.async_show_form(
-                    step_id="stops_retry",
-                    data_schema=vol.Schema(
-                        {
-                            vol.Required(CONF_ORIGIN, default = self._user_inputs[CONF_ORIGIN]): vol.In(stops),
-                            vol.Required(CONF_DESTINATION, default = self._user_inputs[CONF_DESTINATION]): vol.In(stops),
-                            vol.Required(CONF_NAME): str,
-                        },
-                    ),
-                    description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
-                    errors=errors,
-                )
-            except:
-                _LOGGER.debug(f"Likely no stops for this route: {[CONF_ROUTE]}")
-                return self.async_abort(reason="no_stops")
-        self._user_inputs.update(user_input)
-        _LOGGER.debug(f"UserInputs Stops: {self._user_inputs}")
-        check_config = await self._check_config(self._user_inputs)
-        if check_config:
-            return await self.async_step_stops_retry()
-        else:
-            return self.async_create_entry(
-                title=user_input[CONF_NAME], data=self._user_inputs
-            )            
-            
+            _LOGGER.debug(f"UserInputs Destination: {data}")
+            check_config = await self._check_config(data)
+            if check_config == "stop_incorrect":
+                errors["base"] = "stop_incorrect"
+            elif check_config:
+                return self.async_abort(reason=check_config)
+            else:
+                return self.async_create_entry(title=data[CONF_NAME], data=data)
+
+        destinations = await self.hass.async_add_executor_job(
+            get_destination_stop_list,
+            self._pygtfs,
+            self._user_inputs[CONF_ROUTE],
+            None,
+            self._user_inputs[CONF_ORIGIN].split(": ")[0],
+            self._towards,
+        )
+        if not destinations:
+            # the origin is the last stop of every trip that calls at it
+            return self.async_abort(reason="no_destination")
+        picked = user_input or {}
+        return self.async_show_form(
+            step_id="destination",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_DESTINATION, default=picked.get(CONF_DESTINATION, destinations[-1])): vol.In(destinations),
+                    vol.Required(CONF_NAME, default=picked.get(CONF_NAME, vol.UNDEFINED)): str,
+                },
+            ),
+            description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
+            errors=errors,
+        )
+
     async def async_step_stops_train(self, user_input: dict | None = None) -> FlowResult:
         """Handle the stops when train, as often impossible to select ID"""
         errors: dict[str, str] = {}

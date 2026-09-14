@@ -277,6 +277,9 @@ CONF_AGENCY = "agency"
 CONF_ROUTE_TYPE = "route_type"
 CONF_ROUTE = "route"
 CONF_DIRECTION = "direction"
+# the rotation an entry keeps at a loop's terminus, the only direction the
+# departure query reads: entries created before it carry none
+CONF_LOOP_DIRECTION = "loop_direction"
 CONF_ORIGIN = "origin"
 CONF_DESTINATION = "destination"
 CONF_NAME = "name"

@@ -65,5 +65,9 @@
   'next_departures_destination_arrival_times': [
     '2026-09-04T12:36:00+00:00',
     '2026-09-04T13:21:00+00:00'
+  ],
+  'next_departures_origin_stop_id': [
+    'origin_stop_id',
+    'origin_stop_id'
   ]
 }

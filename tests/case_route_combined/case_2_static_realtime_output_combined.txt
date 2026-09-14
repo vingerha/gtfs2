@@ -8,6 +8,7 @@
   'file': 'zou_proximite',
   'route_type': '3',
   'route': 'route_id',
+  'loop_direction': None,
   'extracting': False,
   'next_departure': {
     'trip_id': 'trip_id_1',
@@ -76,6 +77,10 @@
     'next_departures_destination_arrival_times': [
       '2026-09-03T12:36:00+00:00',
       '2026-09-04T13:36:00+00:00'
+    ],
+    'next_departures_origin_stop_id': [
+      'origin_stop_id',
+      'origin_stop_id'
     ]
   },
   'next_departure_realtime_attr': {

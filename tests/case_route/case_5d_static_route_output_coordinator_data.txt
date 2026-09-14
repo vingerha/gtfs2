@@ -72,6 +72,9 @@
   ],
   'next_departures_destination_arrival_times': [
     '2026-09-03T22:36:00+00:00'
+  ],
+  'next_departures_origin_stop_id': [
+    'origin_stop_id'
   ]
   },
   'next_departure_realtime_attr': {

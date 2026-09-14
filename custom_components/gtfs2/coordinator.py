@@ -83,6 +83,8 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "file": data["file"],
             "route_type": data["route_type"],
             "route": data["route"],
+            # kept only at a loop's terminus, absent everywhere else
+            "loop_direction": data.get("loop_direction"),
             "extracting": False,
             "next_departure": {},
             "next_departure_realtime_attr": {},

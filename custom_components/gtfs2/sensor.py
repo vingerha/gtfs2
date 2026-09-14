@@ -158,11 +158,18 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         self._route = None
         self._agency = None
         self._origin = None
-        self._destination = None        
+        self._destination = None
+        # The entry holds one record of each end's place; the departure says
+        # which record the vehicle really calls at, often the pole across the
+        # road from the entry's one. The station attributes, its position
+        # among them, describe where to wait, so they follow the departure.
+        departure_ends = self._departure or {}
+        origin_id = departure_ends.get("origin_stop_id") or self.origin
+        destination_id = departure_ends.get("destination_stop_id") or self.destination
         # Fetch valid stop information once
         # exclude check if route_type =2 (trains) as no ID is used
         if not self._origin and not self.extracting and self._route_type != "2":
-            stops = self._pygtfs.stops_by_id(self.origin)
+            stops = self._pygtfs.stops_by_id(origin_id) or self._pygtfs.stops_by_id(self.origin)
             if not stops:
                 self._available = False
                 _LOGGER.warning("Origin stop ID %s not found", self.origin)
@@ -172,7 +179,8 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
             self._origin = self.origin
         # exclude check if route_type =2 (trains) as no ID is used
         if not self._destination and not self.extracting and self._route_type != "2":
-            stops = self._pygtfs.stops_by_id(self.destination)
+            stops = (self._pygtfs.stops_by_id(destination_id)
+                     or self._pygtfs.stops_by_id(self.destination))
             if not stops:
                 self._available = False
                 _LOGGER.warning(
@@ -437,6 +445,13 @@ class GTFSDepartureSensor(CoordinatorEntity, SensorEntity):
         if self._next_departures:
             self._attributes["next_departures_destination_arrival_times"] = self._departure[
                 "next_departures_destination_arrival_times"][:10] 
+
+        # Add the stop each next departure leaves from: a place can be served
+        # from two of its records in turn (a terminus's quays)
+        self._attributes["next_departures_origin_stop_id"] = []
+        if self._next_departures:
+            self._attributes["next_departures_origin_stop_id"] = self._departure.get(
+                "next_departures_origin_stop_id", [])[:10]
 
       
         self._attributes["gtfs_updated_at"] = self.coordinator.data[
