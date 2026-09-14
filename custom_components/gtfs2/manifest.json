@@ -17,5 +17,5 @@
     "gtfs-realtime-bindings==1.0.0",
     "protobuf"
   ],
-  "version": "0.5.7"
+  "version": "0.5.10.2"
 }

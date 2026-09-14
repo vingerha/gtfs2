@@ -1,4 +1,4 @@
-test_route_static.py case results -- 4 case(s)
+test_route_static.py case results -- 5 case(s)
 
 case: case_1
   result: PASSED
@@ -10,4 +10,7 @@ case: case_3
   result: PASSED
 
 case: case_4
+  result: PASSED
+
+case: case_5
   result: PASSED

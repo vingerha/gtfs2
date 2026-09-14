@@ -38,7 +38,8 @@ _reports = []
 
 
 def pytest_runtest_logreport(report):
-    if "test_journeys.py::" not in report.nodeid:
+    if not any(f"{name}::" in report.nodeid
+               for name in ("test_journeys.py", "test_night.py")):
         return
     if report.when == "call" or (report.when == "setup" and report.failed):
         _reports.append(report)
@@ -71,7 +72,7 @@ def _cases():
                 "outcome": _outcome(report), "reason": _reason(report),
                 "checks": props.get("checks", [])}
         case.update(props.get("case", {}))
-        if not case["checks"] and report.longrepr is not None:
+        if not case["checks"] and report.failed:
             case["error"] = [line[2:].strip() for line in
                              str(report.longrepr).splitlines()
                              if line.startswith("E ")] or [str(report.longrepr)]
@@ -83,7 +84,7 @@ def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001
     if not _reports:
         return
     cases = _cases()
-    lines = [f"test_journeys.py case results -- {len(cases)} case(s)", ""]
+    lines = [f"provider case results -- {len(cases)} case(s)", ""]
     for case in cases:
         lines += [f"case: {case['id']}", f"  result: {case['outcome'].upper()}"]
         if case["reason"]:

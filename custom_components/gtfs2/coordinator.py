@@ -78,12 +78,13 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
             "origin": data["origin"],
             "destination": data["destination"],
             "offset": options["offset"] if "offset" in options else 0,
-            "include_tomorrow": data["include_tomorrow"],
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],
             "route_type": data["route_type"],
             "route": data["route"],
+            # kept only at a loop's terminus, absent everywhere else
+            "loop_direction": data.get("loop_direction"),
             "extracting": False,
             "next_departure": {},
             "next_departure_realtime_attr": {},
@@ -233,7 +234,6 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
 
         self._data = {
             "schedule": self._pygtfs,
-            "include_tomorrow": True,
             "gtfs_dir": DEFAULT_PATH,
             "name": data["name"],
             "file": data["file"],
@@ -250,6 +250,10 @@ class GTFSLocalStopUpdateCoordinator(DataUpdateCoordinator):
             self._data.update(previous_data)
             self._data["extracting"] = True
             return self._data
+
+        check_index = await self.hass.async_add_executor_job(
+                check_datasource_index, self.hass, self._pygtfs, self.hass.config.path(DEFAULT_PATH), data["file"]
+            )
             
         self._realtime = False
         if "real_time" in options: 

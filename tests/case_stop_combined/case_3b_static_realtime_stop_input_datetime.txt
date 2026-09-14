@@ -1,0 +1,2 @@
+label: single stop STOP_A, three trips
+2026-09-10 07:30:00+02:00

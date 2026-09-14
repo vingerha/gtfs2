@@ -1,0 +1,10 @@
+test_stop_combined.py case results -- 3 case(s)
+
+case: case_1
+  result: PASSED
+
+case: case_2
+  result: PASSED
+
+case: case_3
+  result: PASSED

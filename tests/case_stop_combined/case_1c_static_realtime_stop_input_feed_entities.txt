@@ -1,0 +1,56 @@
+[
+  {
+    "id": "rt_entity_trip_1",
+    "trip_update": {
+      "trip": {
+        "route_id": "ROUTE_1",
+        "trip_id": "TRIP_1",
+        "direction_id": "0"
+      },
+      "stop_time_update": [
+        {
+          "stop_id": "STOP_A",
+          "stop_sequence": 5,
+          "arrival": { "time": 1789020090, "delay": 90 },
+          "departure": { "time": 1789020090, "delay": 90 }
+        }
+      ]
+    }
+  },
+  {
+    "id": "rt_entity_trip_2",
+    "trip_update": {
+      "trip": {
+        "route_id": "ROUTE_2",
+        "trip_id": "TRIP_2",
+        "direction_id": "0"
+      },
+      "stop_time_update": [
+        {
+          "stop_id": "STOP_A",
+          "stop_sequence": 5,
+          "arrival": { "time": 1789101120, "delay": 120 },
+          "departure": { "time": 1789101120, "delay": 120 }
+        }
+      ]
+    }
+  },
+  {
+    "id": "rt_entity_trip_3",
+    "trip_update": {
+      "trip": {
+        "route_id": "ROUTE_1",
+        "trip_id": "TRIP_3",
+        "direction_id": "1"
+      },
+      "stop_time_update": [
+        {
+          "stop_id": "STOP_A",
+          "stop_sequence": 5,
+          "arrival": { "time": 1789102845, "delay": 45 },
+          "departure": { "time": 1789102845, "delay": 45 }
+        }
+      ]
+    }
+  }
+]

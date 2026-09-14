@@ -14,13 +14,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979810 on 152323 d0 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3979966 -> 3979810 on 152323 d0 (stop 1 to stop 15 of a 15-stop ride): got 3979966 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -34,13 +34,13 @@
           },
           "got": {
             "destination": "3979766",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979966",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979966 -> 3979766 on 152323 d0 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d0, trip 380877660"
+          "text": "asked 3979966 -> 3979766 on 152323 d0 (stop 1 to stop 8 of a 15-stop ride): got 3979966 -> 3979766 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -54,13 +54,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3979766",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3979766 -> 3979810 on 152323 d0 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3979766 -> 3979810 on 152323 d0 (stop 8 to stop 15 of a 15-stop ride): got 3979766 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -174,13 +174,13 @@
           },
           "got": {
             "destination": "3979810",
-            "direction": 0,
+            "direction": 1,
             "origin": "3980938",
             "route": "152323",
-            "trip": "380877660"
+            "trip": "380816082"
           },
           "ok": true,
-          "text": "asked 3980938 -> 3979810 on 152323 d0 (stop 14 to stop 27 of a 27-stop ride): got 3980938 -> 3979810 on 152323 d0, trip 380877660"
+          "text": "asked 3980938 -> 3979810 on 152323 d0 (stop 14 to stop 27 of a 27-stop ride): got 3980938 -> 3979810 on 152323 d1, trip 380816082"
         },
         {
           "asked": {
@@ -4785,13 +4785,13 @@
           },
           "got": {
             "destination": "3980714",
-            "direction": 1,
+            "direction": 0,
             "origin": "3981271",
             "route": "152324",
-            "trip": "380815266"
+            "trip": "380816285"
           },
           "ok": true,
-          "text": "asked 3981271 -> 3980714 on 152324 d1 (stop 1 to stop 13 of a 24-stop ride): got 3981271 -> 3980714 on 152324 d1, trip 380815266"
+          "text": "asked 3981271 -> 3980714 on 152324 d1 (stop 1 to stop 13 of a 24-stop ride): got 3981271 -> 3980714 on 152324 d0, trip 380816285"
         },
         {
           "asked": {
@@ -12016,9 +12016,15 @@
             "served": false,
             "to_stop": 1
           },
-          "got": null,
-          "ok": true,
-          "text": "asked ORLEANS:StopArea:01001712 -> ORLEANS:StopArea:00007923 on ORLEANS:Line:40 d0 (stop 15 to stop 1 of a 15-stop ride, this direction does not make it): no departure"
+          "got": {
+            "destination": "ORLEANS:StopArea:00007923",
+            "direction": 1,
+            "origin": "ORLEANS:StopArea:01001712",
+            "route": "ORLEANS:Line:40",
+            "trip": "ORLEANS:VehicleJourney:40_R_98_21_4003_1_063001"
+          },
+          "ok": false,
+          "text": "asked ORLEANS:StopArea:01001712 -> ORLEANS:StopArea:00007923 on ORLEANS:Line:40 d0 (stop 15 to stop 1 of a 15-stop ride, this direction does not make it): got ORLEANS:StopArea:01001712 -> ORLEANS:StopArea:00007923 on ORLEANS:Line:40 d1, trip ORLEANS:VehicleJourney:40_R_98_21_4003_1_063001"
         },
         {
           "asked": {

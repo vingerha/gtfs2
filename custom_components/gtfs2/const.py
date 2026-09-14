@@ -21,7 +21,6 @@ DEFAULT_API_KEY_LOCATION = "not_applicable"
 CONF_DATA = "data"
 CONF_DESTINATION = "destination"
 CONF_ORIGIN = "origin"
-CONF_TOMORROW = "include_tomorrow"
 
 PLATFORMS = [Platform.SENSOR]
 
@@ -278,10 +277,12 @@ CONF_AGENCY = "agency"
 CONF_ROUTE_TYPE = "route_type"
 CONF_ROUTE = "route"
 CONF_DIRECTION = "direction"
+# the rotation an entry keeps at a loop's terminus, the only direction the
+# departure query reads: entries created before it carry none
+CONF_LOOP_DIRECTION = "loop_direction"
 CONF_ORIGIN = "origin"
 CONF_DESTINATION = "destination"
 CONF_NAME = "name"
-CONF_INCLUDE_TOMORROW = "include_tomorrow"
 CONF_LOCAL_STOP_REFRESH_INTERVAL = "local_stop_refresh_interval"
 CONF_RADIUS = "radius"
 CONF_TIMERANGE = "timerange"
