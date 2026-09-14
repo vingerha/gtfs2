@@ -12,7 +12,8 @@ the rotation get_pair_direction keeps at a loop's terminus.
                 and every trip riding the list one way or the other
     destinations  from an origin, get_destination_stop_list offers every
                 place a trip rides to after it, once, in the order every
-                ride makes, nearest first where the rides leave it open, and
+                ride makes, one branch at a time (busiest first) where the
+                rides leave it open, and
                 nothing no trip through that origin reaches
     towards     from an origin, a way is asked exactly when its trips go
                 to different termini (the next stop telling them apart at a
@@ -553,28 +554,36 @@ def check_route(check, fx, route_id, direction, kind):
                 if stray:
                     text += ": " + listed([named(fx, s) for s in stray])
                 check.note(not stray, text, origin=origin, stray=stray)
-                # Riding order across every trip of the line, nearest first
-                # where the rides leave it open. Read from all the line's
-                # trips: a place follows the places any of them calls at just
-                # before it on its way from the origin (counted again from a
-                # later call at the origin, a place met again on a ride
-                # starting a new stretch); among the places free to come
-                # next, the nearest one by the fewest stops, the far side of
-                # the list before the near one; when none is free (a loop's
-                # terminus, reached both ways round), the nearest remaining.
-                fewest, before = {}, {}
+                # Riding order across every trip of the line, one branch at a
+                # time where the rides leave it open. Read from all the
+                # line's trips: a place follows the places any of them calls
+                # at just before it on its way from the origin (counted again
+                # from a later call at the origin, a place met again on a
+                # ride starting a new stretch). Among the places free to come
+                # next, one that follows the place just listed goes on with
+                # the branch in progress; otherwise, and between several, the
+                # busiest by the trips of the rides reaching it, then the
+                # nearest by the fewest stops, then the list's order. When
+                # none is free (a loop's terminus, reached both ways round),
+                # the same among the places left.
+                fewest, before, trips_at = {}, {}, {}
                 for other in everything:
-                    count, previous, stretch = None, None, set()
-                    for s in other:
-                        if s not in entry_of:
+                    count, previous, stretch, ride = None, None, set(), set()
+                    for s in list(other) + [None]:
+                        if s is not None and s not in entry_of:
+                            continue
+                        if s is None or entry_of[s] == entry_of[origin]:
+                            for e in ride:
+                                trips_at[e] = trips_at.get(e, 0) + len(everything[other])
+                            if s is None:
+                                break
+                            count, previous, stretch, ride = 0, None, set(), set()
                             continue
                         e = ids[entry_of[s]]
-                        if entry_of[s] == entry_of[origin]:
-                            count, previous, stretch = 0, None, set()
-                            continue
                         if count is None:
                             continue
                         count += 1
+                        ride.add(e)
                         fewest[e] = min(fewest.get(e, count), count)
                         before.setdefault(e, set())
                         if e in stretch:
@@ -585,25 +594,26 @@ def check_route(check, fx, route_id, direction, kind):
                         else:
                             stretch.add(e)
                         previous = e
-                home = entry_of[origin]
 
-                def nearest(e):
-                    return (ids.index(e) < home, fewest.get(e, 0), ids.index(e))
+                def busiest(e):
+                    return (-trips_at.get(e, 0), fewest.get(e, 0), ids.index(e))
 
-                listed_before, ordered, first_break = set(), True, None
+                listed_before, ordered, first_break, last = set(), True, None, None
                 for e in offered:
                     left = [x for x in offered if x not in listed_before]
-                    free = [x for x in left if not (before.get(x, set()) - listed_before)]
-                    expected = min(free or left, key=nearest)
+                    pool = [x for x in left if not (before.get(x, set()) - listed_before)] or left
+                    going_on = [x for x in pool if last in before.get(x, set())]
+                    expected = min(going_on or pool, key=busiest)
                     if e != expected and ordered:
                         ordered, first_break = False, [e, expected]
                     listed_before.add(e)
+                    last = e
                 check.note(ordered, f"the destinations {who} are not in riding order, "
-                           f"nearest first where the rides leave it open"
+                           f"one branch at a time where the rides leave it open"
                            + (f" ({named(fx, first_break[0])} before {named(fx, first_break[1])})"
                               if first_break else ""),
                            origin=origin,
-                           order=[[s, ids.index(s) < home, fewest.get(s, 0)] for s in offered])
+                           order=[[s, trips_at.get(s, 0), fewest.get(s, 0)] for s in offered])
                 # And along this ride, the order it makes: counted again from
                 # a later call at the origin, one reshuffle allowed where it
                 # touches the ride's own last stop (a terminus's quays). From

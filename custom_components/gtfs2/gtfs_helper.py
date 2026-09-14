@@ -1092,7 +1092,7 @@ def get_destination_stop_list(schedule, route_id, direction, origin_stop_id, tow
     """The places a trip really reaches from the departure place.
 
     towards, a way get_towards offered, keeps the rides leaving that way
-    only: the places on the rider's side, nearest first.
+    only: the places on the rider's side, in riding order.
 
     Only the trips that call at the origin are read, and of each only the
     part after it, so every entry offered can be paired with the origin on
@@ -1108,7 +1108,7 @@ def get_destination_stop_list(schedule, route_id, direction, origin_stop_id, tow
     _LOGGER.debug("Getting destinations for route: %s direction: %s from: %s",
                   route_id, direction, origin_stop_id)
     # same sampling as _STOP_ROWS, on the part of each trip after the origin
-    sql = f"""
+    rides_sql = f"""
     with through as (
         select trip_id, min(stop_sequence) as origin_sequence
         from stop_times where stop_id in {_STOP_GROUP} group by trip_id
@@ -1121,7 +1121,8 @@ def get_destination_stop_list(schedule, route_id, direction, origin_stop_id, tow
         where t.route_id = :route_id
         and (:direction is null or t.direction_id = :direction or t.direction_id is null)
         group by t.trip_id
-    ), sample as (
+    )"""  # noqa: S608
+    sql = rides_sql + """, sample as (
         select min(trip_id) as trip_id from ride group by stops
     )
     SELECT st.trip_id, s.stop_id, s.stop_name, st.stop_sequence, s.parent_station, station.stop_name,
@@ -1133,37 +1134,43 @@ def get_destination_stop_list(schedule, route_id, direction, origin_stop_id, tow
     inner join stops s on s.stop_id = st.stop_id
     left join stops station on station.stop_id = s.parent_station
     order by st.trip_id, st.stop_sequence
-    """  # noqa: S608
+    """
+    # how many trips each sampled ride stands for
+    weights_sql = rides_sql + """
+    select min(trip_id), count(*) from ride group by stops
+    """
     scope = {"route_id": route_id, "direction": _direction_param(direction)}
     with schedule.engine.connect() as conn:
         line, station_names, place, _line_trips = _line_of(conn, route_id, direction)
         rows = conn.execute(text(sql), {**scope, "origin": origin_stop_id}).fetchall()
+        trip_count = dict(conn.execute(text(weights_sql), {**scope, "origin": origin_stop_id}).fetchall())
     position = {x[0]: i for i, x in enumerate(line)}
     by_place = {x[0]: x for x in line}
     trips, _info = _trips_of(rows)
     origin_place = place.get(origin_stop_id, origin_stop_id)
-    home = position.get(origin_place, -1)
     # the rows start right after each trip's first call at the origin
-    rides = _rides_from({t: [(origin_stop_id, None)] + s for t, s in trips.items()},
-                        place, origin_place)
+    calls = _calls_out({t: [(origin_stop_id, None)] + s for t, s in trips.items()},
+                       place, origin_place)
     if towards is not None:
         # the rides of the way get_towards offered, read from the same trips
         way = _ways_of(_line_trips, place, origin_place).get(towards, [])
         chosen = {tuple(ride) for ride, _trip_id in way}
-        rides = [ride for ride in rides if tuple(ride) in chosen]
+        calls = [(ride, trip_id) for ride, trip_id in calls if tuple(ride) in chosen]
     # Riding order first: a place comes after every place some trip calls at
     # just before it on its way from the origin, so two branches that meet
     # again (GVB 1 reaches Leidseplein by Overtoom or by Jan Pieter
     # Heijestraat) keep each ride's order. A later call at the origin starts
     # the ride again (Palm Bus 21 passes Gare SNCF out and back), and a place
     # met again on the same ride starts a new stretch rather than closing a
-    # circle. Among places no ride orders, nearest first: the fewest stops
-    # any trip takes to reach them, the line's far side of the origin before
-    # its near side. From a loop's terminus every stop is reached both ways
-    # round and the rides order nothing for good; the nearest is taken
-    # there, the shorter way round.
-    reach, before = {}, {}
-    for ride in rides:
+    # circle.
+    # Where the rides leave the order open, the branch in progress is
+    # finished before another starts, so the stops of one street stay
+    # together: interleaving them by distance read as no bus runs (Zou 653
+    # put RD du 24 Août inside the Plascassier village loop, which is the
+    # other variant). The busiest branch comes first, by the trips it
+    # carries, then the nearest.
+    reach, before, weight = {}, {}, {}
+    for ride, trip_id in calls:
         count, previous, stretch = 0, None, set()
         for p in ride:
             count += 1
@@ -1177,17 +1184,19 @@ def get_destination_stop_list(schedule, route_id, direction, origin_stop_id, tow
             else:
                 stretch.add(p)
             previous = p
+        for p in set(ride):
+            weight[p] = weight.get(p, 0) + trip_count.get(trip_id, 1)
 
-    def nearest(p):
-        return (position.get(p, 0) < home, reach[p], position.get(p, 0))
-
-    order, placed = [], set()
+    order, placed, last = [], set(), None
     while len(order) < len(reach):
         ready = [p for p in reach if p not in placed and not (before[p] - placed)]
-        # nothing free: a loop's rotations order each other round, take the nearest
-        p = min(ready or [p for p in reach if p not in placed], key=nearest)
+        # nothing free: a loop's rotations order each other round
+        pool = ready or [p for p in reach if p not in placed]
+        going_on = [p for p in pool if last in before[p]]
+        p = min(going_on or pool, key=lambda q: (-weight[q], reach[q], position.get(q, 0)))
         order.append(p)
         placed.add(p)
+        last = p
     kept = [by_place[p] for p in order if p in by_place]
     stops = _entries_of(kept, _labels_of(line, station_names))
     _LOGGER.debug(f"Destinations from {origin_stop_id}: {stops}")
