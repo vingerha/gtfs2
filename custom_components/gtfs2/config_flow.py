@@ -529,6 +529,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         if self._pygtfs == "no_data_file":
             return "no_data_file"
+        if self._pygtfs == "extracting":
+                return "extracting"            
         self._data = {
             "schedule": self._pygtfs,
             "origin": data["origin"],

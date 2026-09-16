@@ -478,7 +478,9 @@ def get_gtfs(hass, path, data, update=False):
     else:
         _pending_remove = False
     if update and data["extract_from"] == "zip" and os.path.exists(os.path.join(gtfs_dir, file)) and os.path.exists(os.path.join(gtfs_dir, sqlite)):
-        os.remove(os.path.join(gtfs_dir, sqlite))      
+        os.remove(os.path.join(gtfs_dir, sqlite))  
+        if os.path.exists(journal):
+                os.remove(journal)        
     if data["extract_from"] == "zip":
         if not os.path.exists(os.path.join(gtfs_dir, file)):
             _LOGGER.error("The given GTFS zipfile was not found")
@@ -1521,6 +1523,9 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
 
 def create_trip_geojson(self):
     # not in use, awaiting geojson in HA-core to cover this type of geometry
+    if check_extracting(self.hass, self._data['gtfs_dir'], self._data['file']):
+        _LOGGER.debug("Cannot create trip geojson on this datasource as still unpacking: %s", self._data['file'])
+        return None
     _LOGGER.debug("Create geojson with data: %s", self._data)
     schedule = self._data["schedule"]
     self._trip_id = self._data["next_departure"]["trip_id"]
@@ -1569,6 +1574,9 @@ def update_route_geojson(self):
     describes the whole journey sits on the FeatureCollection.
     Rewritten only when the drawn trip changes (see coordinator).
     """
+    if check_extracting(self.hass, self._data['gtfs_dir'], self._data['file']):
+        _LOGGER.debug("Cannot update route geojson on this datasource as still unpacking: %s", self._data['file'])
+        return
     schedule = self._data["schedule"]
     departure = self._data.get("next_departure") or {}
     trip_id = departure.get("trip_id", None)
@@ -1978,6 +1986,10 @@ async def get_route_departures(hass, data):
     cf_options = config_entry.options
     _LOGGER.debug("config entry data: %s, options: %s", cf_data, cf_options)
     
+    if check_extracting(hass, DEFAULT_PATH, cf_data["file"]):
+        _LOGGER.warning("Cannot get route departures on this datasource as still unpacking: %s", cf_data["file"])
+        return {"today": [], "tomorrow": [], "extracting": True}
+    
     now = dt_util.now().replace(tzinfo=None)
     now_date = now.strftime(dt_util.DATE_STR_FORMAT)
     cutoff_today = datetime.datetime.strptime(now_date + ' ' + data.get('from_time','00:00:00'), "%Y-%m-%d %H:%M:%S")
@@ -2038,6 +2050,11 @@ async def get_trip_stops(hass, data):
     entry = entity_registry.async_get(data.get("entity_id",""))
     config_entry = hass.config_entries.async_get_entry(entry.config_entry_id)
     cf_data = config_entry.data
+    
+    if check_extracting(hass, DEFAULT_PATH, cf_data["file"]):
+        _LOGGER.warning("Cannot get trip stops on this datasource as still unpacking: %s", cf_data["file"])
+        return {"entity": data.get("entity_id","entity-not-found"), "trip_stops": {}, "extracting": True}
+    
     origin_station_ids=[]
     origin_station_names=[]
     trips=[]
