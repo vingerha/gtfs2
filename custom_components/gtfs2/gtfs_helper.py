@@ -1329,6 +1329,62 @@ def _quickest_rotations(schedule, route_id, origin_stop_id, destination_stop_id,
     return {min(medians, key=medians.get)}
 
 
+def get_train_station_list(schedule):
+    """Every train station name in the feed, alphabetically, for the
+    "city method" origin/destination picker.
+
+    Matches the route types _fetch_departure_rows treats as train (2 and
+    its 100-117 extensions), so the list mirrors what the LIKE search it
+    feeds can actually find. A name used by more than one distinct place
+    (several "Bordeaux" stops, say) is kept once: the LIKE search still
+    matches every record of that name, this list only has to offer the
+    name for the rider to pick.
+    """
+    sql = """
+        SELECT DISTINCT s.stop_name
+        FROM stops s
+        INNER JOIN stop_times st ON st.stop_id = s.stop_id
+        INNER JOIN trips t ON t.trip_id = st.trip_id
+        INNER JOIN routes r ON r.route_id = t.route_id
+        WHERE r.route_type IN (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)
+        ORDER BY s.stop_name
+    """  # noqa: S608
+    with schedule.engine.connect() as conn:
+        rows = conn.execute(text(sql)).fetchall()
+    stations = [row[0] for row in rows if row[0]]
+    _LOGGER.debug("Train stations found: %s", len(stations))
+    return stations
+
+
+def get_train_destination_list(schedule, origin):
+    """Train station names reachable from origin on some trip, in the
+    direction that trip actually rides: only names that occur later in a
+    trip's stop_sequence than a call matching origin do, the same LIKE
+    match _fetch_departure_rows makes on the stored origin. origin's own
+    name is left out, so the picker cannot offer a pair no trip serves.
+    """
+    sql = """
+        SELECT DISTINCT destination_stop.stop_name
+        FROM stop_times origin_st
+        INNER JOIN stop_times destination_st
+            ON destination_st.trip_id = origin_st.trip_id
+            AND destination_st.stop_sequence > origin_st.stop_sequence
+        INNER JOIN trips t ON t.trip_id = origin_st.trip_id
+        INNER JOIN routes r ON r.route_id = t.route_id
+        INNER JOIN stops origin_stop ON origin_stop.stop_id = origin_st.stop_id
+        INNER JOIN stops destination_stop ON destination_stop.stop_id = destination_st.stop_id
+        WHERE r.route_type IN (2,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117)
+          AND origin_stop.stop_name LIKE :origin
+          AND destination_stop.stop_name <> origin_stop.stop_name
+        ORDER BY destination_stop.stop_name
+    """  # noqa: S608
+    with schedule.engine.connect() as conn:
+        rows = conn.execute(text(sql), {"origin": str(origin) + "%"}).fetchall()
+    destinations = [row[0] for row in rows if row[0]]
+    _LOGGER.debug("Train destinations from %s: %s", origin, len(destinations))
+    return destinations
+
+
 def get_agency_list(schedule, data):
     _LOGGER.debug("Getting agencies with data: %s", data)
     sql_agencies = f"""

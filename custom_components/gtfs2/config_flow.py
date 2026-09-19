@@ -64,7 +64,9 @@ from .gtfs_helper import (
     remove_datasource,
     check_datasource_index,
     get_agency_list,
-    get_local_stop_list
+    get_local_stop_list,
+    get_train_station_list,
+    get_train_destination_list
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -470,15 +472,56 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_stops_train(self, user_input: dict | None = None) -> FlowResult:
-        """Handle the stops when train, as often impossible to select ID"""
+        """Pick the origin station, as often impossible to select ID."""
         errors: dict[str, str] = {}
         if user_input is None:
+            stations = await self.hass.async_add_executor_job(
+                get_train_station_list, self._pygtfs
+            )
             return self.async_show_form(
                 step_id="stops_train",
                 data_schema=vol.Schema(
                     {
-                        vol.Required(CONF_ORIGIN): str,
-                        vol.Required(CONF_DESTINATION): str,
+                        vol.Required(CONF_ORIGIN): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=stations,
+                                custom_value=True,
+                                mode=selector.SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
+                    },
+                ),
+                description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
+                errors=errors,
+            )
+        self._user_inputs.update(user_input)
+        _LOGGER.debug(f"UserInputs Origin Train: {self._user_inputs}")
+        return await self.async_step_destination_train()
+
+    async def async_step_destination_train(self, user_input: dict | None = None) -> FlowResult:
+        """Pick the destination among the stations a trip actually reaches
+        from the chosen origin, so the pair is always feasible as a trip."""
+        errors: dict[str, str] = {}
+        if user_input is None:
+            destinations = await self.hass.async_add_executor_job(
+                get_train_destination_list, self._pygtfs, self._user_inputs[CONF_ORIGIN]
+            )
+            if not destinations:
+                return self.async_abort(
+                    reason="no_destination",
+                    description_placeholders=TRANSLATION_DESCRIPTION_PLACEHOLDERS,
+                )
+            return self.async_show_form(
+                step_id="destination_train",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONF_DESTINATION): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=destinations,
+                                custom_value=True,
+                                mode=selector.SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
                         vol.Required(CONF_NAME): str,
                     },
                 ),
@@ -496,8 +539,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason=check_config)
         else:
             return self.async_create_entry(
-                title=user_input[CONF_NAME], data=self._user_inputs
-            )            
+                title=self._user_inputs[CONF_NAME], data=self._user_inputs
+            )
 
     async def _check_data(self, data):
         if self._pygtfs and hasattr(self._pygtfs, 'session'):
