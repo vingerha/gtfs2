@@ -247,7 +247,7 @@
     },
 	"extract_departures": {
       "name": "Abfahrten extrahieren",
-      "description": "Extrahiert alle nächsten Abfahrten von Ihrer Entität bis zum morgigen Tagesende",
+      "description": "Extrahiert (max) 100 nächsten Abfahrten von Ihrer Entität bis zum morgigen Tagesende",
       "fields": {
         "config_entry": {
           "name": "Route, von der extrahiert werden soll",
@@ -258,6 +258,20 @@
 		  "description": "Der Zeitpunkt, nach dem Sie die Slots erhalten möchten. \n Wenn leer, werden alle zukünftigen Slots für heute/morgen extrahiert. \n In Yaml muss dies das 24-Stunden-Format sein"
 		}
 	  }
-	}
+	},
+	"extract_arrivals": {
+      "name": "Ankunften extrahieren",
+      "description": "Extrahiert (max) 100 Ankunften von Ihrer Entität bis zum morgigen Tagesende",
+      "fields": {
+        "config_entry": {
+          "name": "Route, von der extrahiert werden soll",
+		  "description": "Wählen Sie Ihre Start-/Stopp-Konfiguration"
+		},
+		"from_time": {
+          "name": "Die Zeit, nach der Ankunften extrahiert werden",
+		  "description": "Der Zeitpunkt, nach dem Sie die Slots erhalten möchten. \n Wenn leer, werden alle zukünftigen Slots für heute/morgen extrahiert. \n In Yaml muss dies das 24-Stunden-Format sein"
+		}
+	  }
+	}	
   }
 }

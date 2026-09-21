@@ -186,7 +186,7 @@ def _fetch_departure_rows(route_type, origin, destination, schedule, direction=N
                 THEN '+1 day' ELSE '+0 day' END
               ) >= datetime('now', 'localtime')
         ORDER BY vd.date, origin_stop_time.departure_time
-        LIMIT 30;
+        LIMIT 100;
     """  # noqa: S608
 
     # Create lookup timetable taking into
@@ -302,7 +302,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     timetable_remaining = []
     ix = 0
     item = {}
-    max_remaining = 10
+
     for key in sorted(timetable.keys()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
         if upcoming > now_local_tz:
@@ -312,8 +312,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
                 ix = ix + 1
             _LOGGER.debug("Adding departure in defined timezone: %s, Now_in_defined_timezone_plus_offset: %s, key: %s, ix: %s", upcoming, now_local_tz, key, ix)
             timetable_remaining.append(dt_util.as_utc(upcoming).isoformat())
-            if len(timetable_remaining) >= max_remaining:
-                break
+
     _LOGGER.debug("Timetable Remaining Departures on this Start/Stop: %s", timetable_remaining)
     if item == {}:
         data_returned = {
@@ -328,8 +327,7 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
     timetable_upcoming_trips = []
     timetable_upcoming_arrivals = []
     timetable_upcoming_origin_stops = []
-    max_remaining = 10
-    count = 0
+
     for key, value in sorted(timetable.items()):
         upcoming = datetime.datetime.strptime(key[0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone)
         # dest_arrival_dt is already the correct instant - no rollover guessing needed
@@ -351,9 +349,6 @@ def _interpret_departure_rows(hass, rows, start_station_id, now, now_local_tz,
             )
             # the record it leaves from: a place may be served from either
             timetable_upcoming_origin_stops.append(str(value.get("origin_stop_id")))
-            count += 1
-            if count >= max_remaining:
-                break
 
     # origin/dest arrival & departure, make datetime and apply timezone
     origin_depart = datetime.datetime.strptime(item["origin_depart_dt"], "%Y-%m-%d %H:%M:%S")
@@ -2098,6 +2093,70 @@ async def get_route_departures(hass, data):
     _LOGGER.debug("Departures returned: %s", _departures)   
     _pygtfs.engine.dispose()
     return _departures
+    
+async def get_route_arrivals(hass, data):
+    _LOGGER.debug("Getting route arrivals with data: %s", data)
+    config_entry = hass.config_entries.async_get_entry(data.get("config_entry",""))
+    cf_data = config_entry.data
+    cf_options = config_entry.options
+    _LOGGER.debug("config entry data: %s, options: %s", cf_data, cf_options)
+    
+    if check_extracting(hass, DEFAULT_PATH, cf_data["file"]):
+        _LOGGER.warning("Cannot get route arrivals on this datasource as still unpacking: %s", cf_data["file"])
+        return {"today": [], "tomorrow": [], "extracting": True}
+    
+    now = dt_util.now().replace(tzinfo=None)
+    now_date = now.strftime(dt_util.DATE_STR_FORMAT)
+    cutoff_today = datetime.datetime.strptime(now_date + ' ' + data.get('from_time','00:00:00'), "%Y-%m-%d %H:%M:%S")
+    tomorrow = now + datetime.timedelta(days=1)
+    tomorrow_date = tomorrow.strftime(dt_util.DATE_STR_FORMAT)
+    cutoff_tomorrow = datetime.datetime.strptime(tomorrow_date + ' ' + data.get('from_time','00:00:00'), "%Y-%m-%d %H:%M:%S")
+    _LOGGER.debug("Cutoff today: %s, cutoff tomorrow: %s", cutoff_today, cutoff_tomorrow)
+
+    _pygtfs = await hass.async_add_executor_job(
+        get_gtfs, hass, DEFAULT_PATH, cf_data, False
+    )
+    
+    _data = {
+            "schedule": _pygtfs,
+            "origin": cf_data["origin"],
+            "destination": cf_data["destination"],
+            "offset": cf_options["offset"] if "offset" in cf_options else 0,
+            "gtfs_dir": DEFAULT_PATH,
+            "name": cf_data["name"],
+            "file": cf_data["file"],
+            "route_type": cf_data["route_type"],
+            "route": cf_data["route"],
+            "extracting": False,
+            "next_departure": {},
+            "next_departure_realtime_attr": {},
+            "alert": {}
+        }
+        
+    departures = await hass.async_add_executor_job(
+                    get_next_departure, hass, _data
+                ) 
+                
+    _LOGGER.debug("Arrivals received: %s", departures["next_departures_destination_arrival_times"])
+
+    today_arrivals = []
+    tomorrow_arrivals = []
+    for dt_string in departures["next_departures_destination_arrival_times"]:
+        dt = datetime.datetime.fromisoformat(dt_string).replace(tzinfo=None)
+        dt_date = dt.strftime(dt_util.DATE_STR_FORMAT)
+        if dt_date == now_date and cutoff_today < dt:
+            today_arrivals.append(dt_string)
+        if dt_date == tomorrow_date and cutoff_tomorrow < dt:
+            tomorrow_arrivals.append(dt_string)
+     
+    _arrivals = {
+        "today": today_arrivals if len(today_arrivals) > 0 else [],
+        "tomorrow": tomorrow_arrivals if len(tomorrow_arrivals) > 0 else []
+    } 
+     
+    _LOGGER.debug("Arrivals returned: %s", _arrivals)   
+    _pygtfs.engine.dispose()
+    return _arrivals    
     
 async def get_trip_stops(hass, data):
     _LOGGER.debug("Getting stoptimes for trip with: %s", data)

@@ -12,7 +12,7 @@ from .const import DOMAIN, PLATFORMS, DEFAULT_PATH, DEFAULT_PATH_RT, DEFAULT_REF
 from homeassistant.const import CONF_HOST
 from .coordinator import GTFSUpdateCoordinator, GTFSLocalStopUpdateCoordinator
 import voluptuous as vol
-from .gtfs_helper import get_gtfs, update_gtfs_local_stops, get_route_departures, get_trip_stops
+from .gtfs_helper import get_gtfs, update_gtfs_local_stops, get_route_departures, get_route_arrivals, get_trip_stops
 from .gtfs_rt_helper import get_gtfs_rt
 
 _LOGGER = logging.getLogger(__name__)
@@ -110,31 +110,37 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
      
 
 def setup(hass, config):
-    """Setup the service component."""
+    """Setup the service/action components."""
 
     def update_gtfs(call):
-        """My GTFS Update service."""
+        """My GTFS Update service/action."""
         _LOGGER.debug("Updating GTFS with: %s", call.data)
         get_gtfs(hass, DEFAULT_PATH, call.data, True)
         return True     
 
     def update_gtfs_rt_local(call):
-        """My GTFS RT service."""
+        """My GTFS RT service/action."""
         _LOGGER.debug("Updating GTFS RT with: %s", call.data)
         get_gtfs_rt(hass, DEFAULT_PATH_RT, call.data)
         return True  
 
     async def update_local_stops(call):
-        """My GTFS Update Local Stops service."""
+        """My GTFS Update Local Stops service/action."""
         _LOGGER.debug("Updating GTFS Local Stops with: %s", call.data)
         await update_gtfs_local_stops(hass, call.data)
         return True
     
     async def extract_departures(call):
-        """My GTFS Departures service."""
+        """My GTFS Departures service/action."""
         _LOGGER.debug("Retrieving next departures with: %s", call.data)
         departures = await get_route_departures(hass, call.data)
         return departures
+        
+    async def extract_arrivals(call):
+        """My GTFS Arrivals service/action."""
+        _LOGGER.debug("Retrieving arrivals with: %s", call.data)
+        arrivals = await get_route_arrivals(hass, call.data)
+        return arrivals       
         
     async def extract_trip_stops(call):
         """My GTFS Trip Stops service."""
@@ -150,6 +156,8 @@ def setup(hass, config):
         DOMAIN, "update_gtfs_local_stops", update_local_stops)
     hass.services.register(
         DOMAIN, "extract_departures", extract_departures,supports_response=SupportsResponse.OPTIONAL)
+    hass.services.register(
+        DOMAIN, "extract_arrivals", extract_arrivals,supports_response=SupportsResponse.OPTIONAL)        
     hass.services.register(
         DOMAIN, "extract_trip_stops", extract_trip_stops,supports_response=SupportsResponse.OPTIONAL)     
     return True

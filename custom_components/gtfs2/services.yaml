@@ -171,7 +171,7 @@ update_gtfs_local_stops:
           
 extract_departures: 
   name: Extract Departures
-  description: Extracts all next departures from your entity up-until tomorrow EOD
+  description: Extracts next (max) 100 departures from your entity up-until tomorrow EOD
   fields:       
     config_entry:
       name: Route
@@ -186,6 +186,24 @@ extract_departures:
       description: "The time after which you would like to receive the slots.\n If left empty then all future slots will be extracted for today/tomorrow.\n In yaml this has to be 24H format"
       selector:
         time: {}  
+        
+extract_arrivals: 
+  name: Extract Arrivals
+  description: Extracts next (max) 100 arrivals from your entity up-until tomorrow EOD
+  fields:       
+    config_entry:
+      name: Route
+      description: Select your start/stop configuration
+      required: true
+      selector:
+        config_entry:
+          integration: "gtfs2"
+    from_time:
+      name: The time after which arrivals are collected
+      required: false
+      description: "The time after which you would like to receive the slots.\n If left empty then all future slots will be extracted for today/tomorrow.\n In yaml this has to be 24H format"
+      selector:
+        time: {}          
 
 extract_trip_stops: 
   name: Extract Trip Stops
