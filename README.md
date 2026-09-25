@@ -10,7 +10,7 @@
 - Option to add realtime gtfs **realtime trip updates**, **realtime vehicle location**,  **realtime alerts**, depends on the offering from your provider
 - With realtime vehicle location, geojson files allow to visualize and track vehicles on a map card
 - Services/actions to support automated processes, e.g. update the GTFSs of static and real time data
-- Dedicated card for route-based configurations by [GTFS2 Live Card by Pulpyyyy](https://github.com/Pulpyyyy/gtfs2-live-card)
+- Dedicated card for route-based configurations [GTFS2 Live Card by Pulpyyyy](https://github.com/Pulpyyyy/gtfs2-live-card)
 - translations: English, French, German, Spanish, Portuguese
 
 **[Documentation (WIKI)](https://github.com/vingerha/gtfs2/wiki)**
