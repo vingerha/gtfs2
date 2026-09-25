@@ -2,16 +2,19 @@
 
 
 # GTFS2 for Static and RealTime Public transport status collecting in Home Assistant
-- configuration via the GUI 
-- Static schedule for a **route** between self-defined start/end stops
-- Static schedule of all (mulit-route) departures from specific stops in a self-defined zone/area or around a device
-- Shows next 10 departures on the same **route-start and route-end**, including alternative transport lines if applicable for the same start/end
+
+**Key features**
+
+- Schedule a **route** between self-defined start/end stops
+- Schedule all (multi-route) departures from stops in a self-defined zone/area or (dynamically) around a device
 - Option to add realtime gtfs **realtime trip updates**, **realtime vehicle location**,  **realtime alerts**, depends on the offering from your provider
 - With realtime vehicle location, geojson files allow to visualize and track vehicles on a map card
 - Services/actions to support automated processes, e.g. update the GTFSs of static and real time data
 - translations: English, French, German, Spanish, Portuguese
 
 **[Documentation (WIKI)](https://github.com/vingerha/gtfs2/wiki)**
+
+<img width="492" height="782" alt="image" src="https://github.com/user-attachments/assets/f1608034-3a9d-4a2f-b7c5-42ec4040a68d" />
 
 ![image](https://github.com/vingerha/gtfs2/assets/44190435/401d3f5b-c3c3-405f-ab9a-1ecf949d5428)
 
