@@ -153,6 +153,17 @@ Data:
 > #119 verify if properly adds realtime only for the first one
 >> IMPLEMENTATION STATUS: done 
 
+case_7_static_realtime: synthetic test, 
+- today trips only
+- static data 
+- realtime missing stop_id and missing 'time' (only 0)
+Data:
+- 2 trips only today bot direction 0
+- 2 rt sets, one for trip_1, direction 1 and one for trip_2 directon 0, both contain the stop sequence on the 2nd element
+> #119 verify if properly adds realtime only for the first one
+>> IMPLEMENTATION STATUS: done 
+
+
 2b. local-stop based
 case_1_static_realtime: synthetic test
 - today and tomorrow trips 
