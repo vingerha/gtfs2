@@ -1724,7 +1724,9 @@ def _build_local_stop_element(self, row, base_datetime,
     #_LOGGER.debug("Self._departure datetime in agency_tz: %s", self._departure_datetime)
     self._departure_time = self._departure_datetime.replace(tzinfo=None).strftime(TIME_STR_FORMAT)
     #_LOGGER.debug("Self._departure time in stop tz: %s", self._departure_time)
-
+    self._departure_timestamp = self._departure_datetime_utc.timestamp()
+    #_LOGGER.debug("Self._departure timestamp: %s", self._departure_timestamp)  
+    
     departure_rt = "-"
     departure_rt_datetime = "-"
     delay_rt = "-"

@@ -119,6 +119,8 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
             feed.ParseFromString(response.content)
             return feed.entity            
     
+    if isinstance(feed, list):
+        return feed
     return feed.get('entity')
 
 def get_next_services(self):
@@ -128,6 +130,8 @@ def get_next_services(self):
     self._trip = self._trip_id
     self._direction = self._direction
     self._trip_short_name = self._trip_short_name
+    self._arrival_timestamp = (self._data["next_departure"]["arrival_time"]).timestamp()
+    self._departure_timestamp = (self._data["next_departure"]["departure_time"]).timestamp()
     _LOGGER.debug("Configuration for RT route: %s, RT trip: %s, RT stop: %s, RT direction: %s, trip short name: %s", self._route, self._trip, self._stop, self._direction, self._trip_short_name)
     self._rt_group = "route"
     rt_departures = get_rt_route_trip_statuses(self)
@@ -308,13 +312,17 @@ def get_rt_route_trip_statuses(self, feed_entities=None):
                         # the later of the two 'time' attributes is the one to announce
                         # e.g. at a terminus/layover where the vehicle stands several
                         # minutes at its bay
-                        stop_time = max(stop["arrival"]["time"],
-                                        stop["departure"]["time"])
-                            
+                        stop_time = max(stop["arrival"].get("time",0),
+                                        stop["departure"].get("time",0))
+
                         if stop["departure"].get("delay",0) >= stop["arrival"].get("delay",0):
                             delay = stop["departure"].get("delay",0)
                         else: 
                             delay = stop["arrival"].get("delay",0)
+                                        
+                        if stop_time == 0 :
+                            stop_time = self._departure_timestamp + delay
+                            _LOGGER.debug("No arrival or departure time in the RT data, use delay with schedule departure timestamp: %s", stop_time)
                             
                         # Ignore arrival times in the past
                         departure_dt = dt_util.utc_from_timestamp(stop_time)  # aware UTC, epoch is always UTC                       
