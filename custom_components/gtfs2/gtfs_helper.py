@@ -1502,12 +1502,12 @@ def check_datasource_index(hass, schedule, gtfs_dir, file):
     sql_check_route_agency = f"""
     SELECT count(*) as check_agency
     FROM routes where agency_id='None'
-    """
+    and exists (select 1 from agency where agency_id <> 'None')"""
     sql_fix_route_agency = f"""
-    update routes set agency_id = (select agency_id from agency limit 1)
+    update routes set agency_id = (select agency_id from agency where agency_id <> 'None' limit 1)
         where agency_id='None'
     """
-    
+   
     with schedule.engine.connect() as conn:
         rows_1a = conn.execute(text(sql_index_1), {"q": "q"}).fetchall()
     for row_cursor in rows_1a:
