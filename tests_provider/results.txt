@@ -1,4 +1,4 @@
-provider case results -- 183 case(s)
+provider case results -- 114 case(s)
 
 case: adelaide-GLNELG-d0-destinations
   result: PASSED
@@ -58,18 +58,6 @@ case: adelaide-N1-d1-swapped
   result: PASSED
 
 case: adelaide-N1-d1-towards
-  result: PASSED
-
-case: adelaide-local_stop-calendar
-  result: PASSED
-
-case: adelaide-local_stop-calendar_dates
-  result: PASSED
-
-case: adelaide-route-calendar
-  result: PASSED
-
-case: adelaide-route-calendar_dates
   result: PASSED
 
 case: gvb-1-d0-destinations
@@ -222,18 +210,6 @@ case: gvb-7-d1-swapped
 case: gvb-7-d1-towards
   result: PASSED
 
-case: gvb-local_stop-calendar
-  result: PASSED
-
-case: gvb-local_stop-calendar_dates
-  result: PASSED
-
-case: gvb-route-calendar
-  result: PASSED
-
-case: gvb-route-calendar_dates
-  result: PASSED
-
 case: palmbus-21-d0-destinations
   result: PASSED
 
@@ -384,188 +360,5 @@ case: sncf-journeys-P8(CDD3F95:)-d1-pairs
     asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 8 of a 8-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
     asked Orléans -> Paris Austerlitz on P8 (stop 1 to stop 5 of a 5-stop ride): got Orléans -> Paris Austerlitz on K8+ d1, trip OCESN860500F1187_F:TER:FR:Line::1BF2D66F-09EF-4CB8-A003-1417C1EA6532::87543009:87547000:3:608:20261119
 
-case: sncf-local_stop-calendar
-  result: PASSED
-
-case: sncf-local_stop-calendar_dates
-  result: PASSED
-
-case: tao-journeys-22-d0-destinations
-  result: PASSED
-
-case: tao-journeys-22-d0-pairs
-  result: PASSED
-
 case: tao-journeys-22-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-22-d0-swapped
-  result: PASSED
-
-case: tao-journeys-22-d0-towards
-  result: PASSED
-
-case: tao-journeys-22-d1-destinations
-  result: PASSED
-
-case: tao-journeys-22-d1-pairs
-  result: PASSED
-
-case: tao-journeys-22-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-22-d1-swapped
-  result: PASSED
-
-case: tao-journeys-22-d1-towards
-  result: PASSED
-
-case: tao-journeys-40-d0-destinations
-  result: PASSED
-
-case: tao-journeys-40-d0-pairs
-  result: PASSED
-
-case: tao-journeys-40-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-40-d0-swapped
-  result: PASSED
-
-case: tao-journeys-40-d0-towards
-  result: PASSED
-
-case: tao-journeys-40-d1-destinations
-  result: PASSED
-
-case: tao-journeys-40-d1-pairs
-  result: PASSED
-
-case: tao-journeys-40-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-40-d1-swapped
-  result: PASSED
-
-case: tao-journeys-40-d1-towards
-  result: PASSED
-
-case: tao-journeys-41-d0-destinations
-  result: PASSED
-
-case: tao-journeys-41-d0-pairs
-  result: PASSED
-
-case: tao-journeys-41-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-41-d0-swapped
-  result: PASSED
-
-case: tao-journeys-41-d0-towards
-  result: PASSED
-
-case: tao-journeys-41-d1-destinations
-  result: PASSED
-
-case: tao-journeys-41-d1-pairs
-  result: PASSED
-
-case: tao-journeys-41-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-41-d1-swapped
-  result: PASSED
-
-case: tao-journeys-41-d1-towards
-  result: PASSED
-
-case: tao-journeys-A-d0-destinations
-  result: PASSED
-
-case: tao-journeys-A-d0-pairs
-  result: PASSED
-
-case: tao-journeys-A-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-A-d0-swapped
-  result: PASSED
-
-case: tao-journeys-A-d0-towards
-  result: PASSED
-
-case: tao-journeys-A-d1-destinations
-  result: PASSED
-
-case: tao-journeys-A-d1-pairs
-  result: PASSED
-
-case: tao-journeys-A-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-A-d1-swapped
-  result: PASSED
-
-case: tao-journeys-A-d1-towards
-  result: PASSED
-
-case: tao-journeys-B-d0-destinations
-  result: PASSED
-
-case: tao-journeys-B-d0-pairs
-  result: PASSED
-
-case: tao-journeys-B-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-B-d0-swapped
-  result: PASSED
-
-case: tao-journeys-B-d0-towards
-  result: PASSED
-
-case: tao-journeys-B-d1-destinations
-  result: PASSED
-
-case: tao-journeys-B-d1-pairs
-  result: PASSED
-
-case: tao-journeys-B-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-B-d1-swapped
-  result: PASSED
-
-case: tao-journeys-B-d1-towards
-  result: PASSED
-
-case: tao-journeys-N-d0-destinations
-  result: PASSED
-
-case: tao-journeys-N-d0-pairs
-  result: PASSED
-
-case: tao-journeys-N-d0-stop_list
-  result: PASSED
-
-case: tao-journeys-N-d0-swapped
-  result: PASSED
-
-case: tao-journeys-N-d0-towards
-  result: PASSED
-
-case: tao-journeys-N-d1-destinations
-  result: PASSED
-
-case: tao-journeys-N-d1-pairs
-  result: PASSED
-
-case: tao-journeys-N-d1-stop_list
-  result: PASSED
-
-case: tao-journeys-N-d1-swapped
-  result: PASSED
-
-case: tao-journeys-N-d1-towards
   result: PASSED

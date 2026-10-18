@@ -322,8 +322,8 @@ def create_estimated_vehicle_geojson(self) -> list[dict]:
     # an empty collection is still written, so vehicles that finished disappear
     geojson_dir = self.hass.config.path(DEFAULT_PATH_GEOJSON)
     os.makedirs(geojson_dir, exist_ok=True)
-    ## name = f"{safe_file_part(self._route_id)}_{safe_file_part(self._direction)}_estimated.json"
-    name = f"{safe_file_part(self._route_id)}_{safe_file_part(self._direction)}.json"
+    name = f"{safe_file_part(self._route_id)}_{safe_file_part(self._direction)}_estimated.json"
+    ## name = f"{safe_file_part(self._route_id)}_{safe_file_part(self._direction)}.json"
     path = os.path.join(geojson_dir, name)
     tmp = path + ".tmp"
     with open(tmp, "w") as outfile:
