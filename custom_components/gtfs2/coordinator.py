@@ -29,6 +29,7 @@ from .const import (
 )    
 from .gtfs_helper import get_gtfs, get_next_departure, check_datasource_index, create_trip_geojson, check_extracting, get_local_stops_next_departures, update_route_geojson
 from .gtfs_rt_helper import get_next_services, get_rt_alerts
+from .rt_estimated_positions import create_estimated_vehicle_geojson
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -190,6 +191,12 @@ class GTFSUpdateCoordinator(DataUpdateCoordinator):
                 except Exception as ex:  # pylint: disable=broad-except
                   _LOGGER.error("Error getting gtfs realtime data, for origin: %s with error: %s", data["origin"], ex)
                   return self._data
+                # estimated positions from TripUpdates, only when no GPS feed is configured
+                if self._trip_update_url and not self._vehicle_position_url:
+                    try:
+                        await self.hass.async_add_executor_job(create_estimated_vehicle_geojson, self)
+                    except Exception as ex:  # pylint: disable=broad-except
+                        _LOGGER.error("Error creating estimated vehicle positions for route: %s with error: %s", self._route_id, ex)
             else:
                 _LOGGER.debug("GTFS RT: RealTime = false, selected in entity options")            
         else:
