@@ -1,0 +1,31 @@
+test_night.py case results -- 10 case(s)
+
+case: adelaide-local_stop-calendar
+  result: PASSED
+
+case: adelaide-local_stop-calendar_dates
+  result: PASSED
+
+case: adelaide-route-calendar
+  result: PASSED
+
+case: adelaide-route-calendar_dates
+  result: PASSED
+
+case: gvb-local_stop-calendar
+  result: PASSED
+
+case: gvb-local_stop-calendar_dates
+  result: PASSED
+
+case: gvb-route-calendar
+  result: PASSED
+
+case: gvb-route-calendar_dates
+  result: PASSED
+
+case: sncf-local_stop-calendar
+  result: PASSED
+
+case: sncf-local_stop-calendar_dates
+  result: PASSED

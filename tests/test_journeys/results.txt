@@ -1,0 +1,70 @@
+test_journeys.py case results -- 23 case(s)
+
+case: adelaide-GLNELG-d0-destinations
+  result: PASSED
+
+case: adelaide-GLNELG-d0-pairs
+  result: PASSED
+
+case: adelaide-GLNELG-d0-stop_list
+  result: PASSED
+
+case: adelaide-GLNELG-d0-swapped
+  result: PASSED
+
+case: adelaide-GLNELG-d0-towards
+  result: PASSED
+
+case: adelaide-GLNELG-d1-destinations
+  result: PASSED
+
+case: adelaide-GLNELG-d1-pairs
+  result: PASSED
+
+case: adelaide-GLNELG-d1-stop_list
+  result: PASSED
+
+case: adelaide-GLNELG-d1-swapped
+  result: PASSED
+
+case: adelaide-GLNELG-d1-towards
+  result: PASSED
+
+case: adelaide-N1-d0-destinations
+  result: PASSED
+
+case: adelaide-N1-d0-pairs
+  result: PASSED
+
+case: adelaide-N1-d0-stop_list
+  result: PASSED
+
+case: adelaide-N1-d0-swapped
+  result: PASSED
+
+case: adelaide-N1-d0-towards
+  result: PASSED
+
+case: adelaide-N1-d1-destinations
+  result: PASSED
+
+case: adelaide-N1-d1-pairs
+  result: PASSED
+
+case: adelaide-N1-d1-stop_list
+  result: PASSED
+
+case: adelaide-N1-d1-swapped
+  result: PASSED
+
+case: adelaide-N1-d1-towards
+  result: PASSED
+
+case: gvb-1-d0-destinations
+  result: PASSED
+
+case: gvb-1-d0-stop_list
+  result: PASSED
+
+case: gvb-1-d0-towards
+  result: PASSED
