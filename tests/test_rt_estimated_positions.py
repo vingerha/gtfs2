@@ -65,6 +65,8 @@ def test_estimate_finished_and_not_started():
 
 @pytest.fixture
 def schedule(tmp_path):
+    if ha_stub.is_stub(sqlalchemy):
+        pytest.skip("real sqlalchemy not installed (ha_stub stands in for it)")
     engine = sqlalchemy.create_engine(f"sqlite:///{tmp_path / 'gtfs.sqlite'}")
     with engine.begin() as conn:
         t = sqlalchemy.text

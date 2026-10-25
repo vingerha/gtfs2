@@ -182,6 +182,7 @@ def _module(name: str, **attrs) -> types.ModuleType:
     """
     module = types.ModuleType(name)
     module.__path__ = []
+    module.__ha_stub__ = True
     for key, value in attrs.items():
         setattr(module, key, value)
 
@@ -307,6 +308,25 @@ def _pygtfs_installed() -> bool:
     return True
 
 
+def _sqlalchemy_installed() -> bool:
+    """Whether the real `sqlalchemy` can be imported. Checked on its own,
+    not through pygtfs: sqlalchemy can be installed without pygtfs, and a
+    stub registered over it would hide the real one from every test.
+    """
+    if "sqlalchemy" in sys.modules:
+        return True
+    try:
+        import sqlalchemy  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+def is_stub(module) -> bool:
+    """Whether a module object is one of this harness's stubs."""
+    return getattr(module, "__ha_stub__", False) is True
+
+
 def install() -> None:
     """Register the homeassistant modules the gtfs2 import chain touches.
 
@@ -396,6 +416,7 @@ def install() -> None:
         _module("pygtfs",
                 Schedule=_Unreached("pygtfs.Schedule"),
                 append_feed=_Unreached("pygtfs.append_feed"))
+    if not _sqlalchemy_installed():
         _module("sqlalchemy")
         _module("sqlalchemy.sql", text=_Unreached("sqlalchemy.sql.text"))
 
