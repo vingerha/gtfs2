@@ -634,6 +634,7 @@ class GTFSOptionsFlowHandler(config_entries.OptionsFlow):
                 _data["extract_from"] = self.config_entry.data["extract_from"]
                 _data["device_tracker_id"] = self.config_entry.data["device_tracker_id"]
                 _data["radius"] = user_input["radius"]
+                _data[CONF_MAX_LOCAL_STOPS] = user_input[CONF_MAX_LOCAL_STOPS]
                 stop_limit = await _check_stop_list(self, _data)
                 if stop_limit :
                     return self.async_abort(reason=stop_limit) 
@@ -731,7 +732,7 @@ async def _check_stop_list(self, data):
     count_stops = await self.hass.async_add_executor_job(
                 get_local_stop_list, self.hass, self._pygtfs, data
             )  
-    if count_stops > DEFAULT_MAX_LOCAL_STOPS:
+    if count_stops > data.get(CONF_MAX_LOCAL_STOPS,DEFAULT_MAX_LOCAL_STOPS):
         _LOGGER.debug("Checkstops limit reached with: %s", count_stops)
         return "stop_limit_reached"
     return None         
