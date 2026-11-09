@@ -356,7 +356,7 @@ def get_rt_vehicle_positions(self):
     for entity in feed_entities:
         vehicle = entity["vehicle"]
         
-        if not vehicle["trip"]["trip_id"]:
+        if not vehicle["trip"]["trip_id"] and not vehicle["trip"]["route_id"]:
             # Vehicle is not in service
             continue
         if vehicle["trip"]["trip_id"] == self._trip_id: 
@@ -364,8 +364,8 @@ def get_rt_vehicle_positions(self):
             
         # add data if trip found or if route in the selected direction
         if ( 
-            str(vehicle["trip"]["trip_id"]) == str(self._trip_id)
-            or 
+            str(vehicle["trip"]["trip_id"]) in [str(t) for t in getattr(self, "_trip_list", [])]
+            or
             ( str(self._route_id) == str(vehicle["trip"]["route_id"])  and str(self._direction) == str(vehicle["trip"]["direction_id"] ))
             ):
             _LOGGER.debug("Found vehicle on route with attributes: %s", vehicle)

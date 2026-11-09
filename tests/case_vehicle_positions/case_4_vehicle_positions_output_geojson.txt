@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.037149906158447, 43.54278564453125] },
+      "properties": {
+        "id": "route_id_1_0_vehicle_id_1",
+        "title": "route_id_1(0)0_bus",
+        "trip_id": "",
+        "route_id": "route_id_1",
+        "direction_id": 0,
+        "vehicle_id": "vehicle_id_1",
+        "vehicle_label": "vehicle_label_1",
+        "": [7.037149906158447, 43.54278564453125]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.025241851806641, 43.57041549682617] },
+      "properties": {
+        "id": "route_id_1_0_vehicle_id_2",
+        "title": "route_id_1(0)0_bus",
+        "trip_id": "",
+        "route_id": "route_id_1",
+        "direction_id": 0,
+        "vehicle_id": "vehicle_id_2",
+        "vehicle_label": "vehicle_label_2",
+        "": [7.025241851806641, 43.57041549682617]
+      }
+    }
+  ]
+}

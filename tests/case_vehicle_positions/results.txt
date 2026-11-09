@@ -1,0 +1,13 @@
+test_vehicle_positions.py case results -- 4 case(s)
+
+case: case_1
+  result: PASSED
+
+case: case_2
+  result: PASSED
+
+case: case_3
+  result: PASSED
+
+case: case_4
+  result: PASSED

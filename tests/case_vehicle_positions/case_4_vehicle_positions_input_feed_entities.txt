@@ -1,0 +1,86 @@
+[
+    {
+        "vehicle": {
+            "trip": {
+                "trip_id": "",
+                "route_id": "route_id_1",
+                "direction_id": 0
+            },
+            "vehicle": {
+                "id": "vehicle_id_1",
+                "label": "vehicle_label_1"
+            },
+            "position": {
+                "latitude": 43.54278564453125,
+                "longitude": 7.037149906158447,
+                "bearing": 258.0,
+                "speed": 1.0
+            },
+            "stop_id": "stop_id_1",
+            "timestamp": 1788079958
+        }
+    },
+    {
+        "vehicle": {
+            "trip": {
+                "trip_id": "",
+                "route_id": "route_id_1",
+                "direction_id": 0
+            },
+            "vehicle": {
+                "id": "vehicle_id_2",
+                "label": "vehicle_label_2"
+            },
+            "position": {
+                "latitude": 43.57041549682617,
+                "longitude": 7.025241851806641,
+                "bearing": 177.0,
+                "speed": 0.0
+            },
+            "stop_id": "stop_id_2",
+            "timestamp": 1788079949
+        }
+    },
+    {
+        "vehicle": {
+            "trip": {
+                "trip_id": "",
+                "route_id": "route_id_1",
+                "direction_id": 1
+            },
+            "vehicle": {
+                "id": "vehicle_id_3",
+                "label": "vehicle_label_3"
+            },
+            "position": {
+                "latitude": 43.57041549682617,
+                "longitude": 7.025241851806641,
+                "bearing": 177.0,
+                "speed": 0.0
+            },
+            "stop_id": "stop_id_2",
+            "timestamp": 1788079949
+        }
+    },	
+    {
+        "vehicle": {
+            "trip": {
+                "trip_id": "",
+                "route_id": "route_id_2",
+                "direction_id": 0
+            },
+            "vehicle": {
+                "id": "vehicle_id_4",
+                "label": "vehicle_label_4"
+            },
+            "position": {
+                "latitude": 43.58041549682617,
+                "longitude": 7.025241851806641,
+                "bearing": 177.0,
+                "speed": 0.0
+            },
+            "stop_id": "stop_id_2",
+            "timestamp": 1788079949
+        }
+    }	
+]

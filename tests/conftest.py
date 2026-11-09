@@ -31,6 +31,7 @@ _TEST_FILE_TO_CASE_FOLDER = {
     "test_route_combined.py": "case_route_combined",
     "test_stop_static.py": "case_stop",
     "test_stop_combined.py": "case_stop_combined",
+    "test_vehicle_positions.py": "case_vehicle_positions",                                                          
 }
 
 _CASE_NODEID_RE = re.compile(r"^(?P<file>[^:]+)::test_\w+\[")
@@ -78,21 +79,7 @@ def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001 - exitstatus requ
                 # the value summary, and the "Differing items:" section
                 # that actually shows which field changed and how -- not
                 # just the first line, which is only the custom message.
-                                                                          
-                                                                         
-                                                                           
-                                                                        
-                                                                           
-                                                                            
-                                                                         
-                                                                              
-                                 
                 detail_lines = [line for line in failure_lines if line.startswith("E ")]
-                                                 
-                                
-                                                        
-                             
-                                             
                 if detail_lines:
                     lines.append("  detail:")
                     for detail_line in detail_lines:

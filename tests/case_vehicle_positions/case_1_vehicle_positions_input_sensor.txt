@@ -1,0 +1,9 @@
+{
+  "label": "regular: all attributes populated",
+  "trip_id": "trip_id_1",
+  "route_id": "route_id_1",
+  "direction": "0",
+  "icon": "mdi:bus",
+  "route_short_name": "",
+  "destination": ""
+}

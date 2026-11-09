@@ -193,3 +193,50 @@ Data:
 - 3 different trips for 1 stop, 1 after 'now' only today, 2 tomorrow but with a time earlier than todays time
 - rt has entries for all three trips
 > expected output: 1 stop with 3 next trips, each with a matching RT entry
+
+
+
+3. Vehicle position test cases
+Context:
+- verify get_rt_vehicle_positions end-2-end with an assumed pre-decoded feed
+- verify that location is still created when data is missing from either sensor or rt-feed
+
+case_1_vehicle_positions: synthetic test,
+- selection rule
+> verify vehicles are kept for the sensor's own trip_id, or for the same route and direction
+Data:
+- 2 vehicles: own trip, other trip same route/direction, other direction, other route, no trip_id (not in service)
+> expected output: geojson with 2 features (own trip, same route/direction), [lon, lat], title '<line> → <destination> <vehicle_id>_<icon>'
+>> IMPLEMENTATION STATUS: done
+
+case_2_vehicle_positions: synthetic test,
+- missing BOTH trip_id and route_id in the feed
+> verify when trip_id is missing that the file is still created
+Data:
+- 2 vehicles: one with id, one without id/label, one on another route
+> expected output: (almost) empty geo_json as without trip_id no data (functional bug 20261109 as having a route and a direction in both entity and feed should also work, low prio)
+>> IMPLEMENTATION STATUS: done
+
+case_3_vehicle_positions: synthetic test,
+- missing route_id in the feed
+> verify whe route_id is missing that the file is still created with all the vehicles of current and upcoming trip_id
+Data:
+- 3 vehicles with route_id missing: two with trip_id belonging to this route and 1 not belonging to this route
+> expected output: geojson with 2 features (own trip, same route/direction), [lon, lat], title '<line> → <destination> <vehicle_id>_<icon>'
+>> IMPLEMENTATION STATUS: done
+
+case_3_vehicle_positions: synthetic test,
+- missing route_id in the feed
+> verify whe route_id is missing that the file is still created with all the vehicles of current and upcoming trip_id
+Data:
+- 3 vehicles with route_id missing: two with trip_id belonging to this route and 1 not belonging to this route
+> expected output: geojson with 2 features (own trip, same route/direction), [lon, lat], title '<line> → <destination> <vehicle_id>_<icon>'
+>> IMPLEMENTATION STATUS: OPEN
+
+case_4_vehicle_positions: synthetic test,
+- missing trip_id in the feed
+> verify whe trip_id is missing that the file is still created with all the vehicles
+Data:
+- 4 vehicles with trip_id missing in the feed: 2 with proper route in proper direction, 1 with proper route in opposite direction and 1 not belonging to this route but in the same direction
+> expected output: geojson with 2 features (own trip, same route/direction), [lon, lat], title '<line> → <destination> <vehicle_id>_<icon>'
+>> IMPLEMENTATION STATUS: OPEN
