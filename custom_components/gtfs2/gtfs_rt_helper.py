@@ -97,7 +97,9 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
     else:
         response = requests.get(url, headers=headers, timeout=20)
 
-    if response.status_code == 200 and "Bad Gateway" not in response.text and "Not Found" not in response.text :
+    # change as HA profiler detected this as possible character code reading issue, slowing things down: 
+    #if response.status_code == 200 and "Bad Gateway" not in response.text and "Not Found" not in response.text :
+    if response.status_code == 200 and b"Bad Gateway" not in response.content and b"Not Found" not in response.content:
         _LOGGER.debug("Successfully updated %s", label)
     else:
         _LOGGER.error("Trying to update %s, and got RT response(code): %s with text: %s", label, response.status_code, response.text)
