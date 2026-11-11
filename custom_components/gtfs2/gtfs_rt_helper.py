@@ -109,7 +109,7 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
         _LOGGER.debug("Feed : %s", feed)
         
     try:
-        feed = json.loads(response.text)
+        feed = json.loads(response.content)
     except ValueError as e:   
         _LOGGER.debug("GTFS RT data is not providing format json")
         if label == "vehicle_positions":
