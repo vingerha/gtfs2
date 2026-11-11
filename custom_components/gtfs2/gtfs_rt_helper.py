@@ -109,7 +109,6 @@ def get_gtfs_feed_entities(url: str, headers, label: str):
         _LOGGER.debug("Feed : %s", feed)
         
     try:
-        json_object = json.loads(response.text)    
         feed = json.loads(response.text)
     except ValueError as e:   
         _LOGGER.debug("GTFS RT data is not providing format json")
@@ -694,8 +693,7 @@ def convert_realtime_siri_trips_to_json(url,headers,stop_id):
     url = url + f"&MonitoringRef={stop_id}"
     response = requests.get(url, headers=headers, timeout=20)
 
-    json_object = json.loads(response.content)
-    feed = json_object
+    feed = json.loads(response.content)
 
     if feed.get('Siri'):
         try:
