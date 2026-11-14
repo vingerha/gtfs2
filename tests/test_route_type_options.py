@@ -22,3 +22,13 @@ def test_sensor_lookup_has_a_label_for_every_base_route_type():
             f"route_type {route_type} has no entry: the sensor's "
             "ROUTE_TYPE_OPTIONS[...] lookup raises KeyError for it"
         )
+
+
+def test_every_base_route_type_has_its_own_icon():
+    """ICONS.get() falls back to the generic train icon, so a missing entry
+    is silent: a trolleybus sensor simply shows mdi:train forever."""
+    for route_type in BASE_ROUTE_TYPES:
+        assert route_type in const.ICONS, (
+            f"route_type {route_type} has no icon: the sensor falls back to "
+            f"{const.ICON} instead of showing the right mode"
+        )

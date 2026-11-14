@@ -88,6 +88,8 @@ ICONS = {
     5: "mdi:train-variant",
     6: "mdi:gondola",
     7: "mdi:stairs",
+    11: "mdi:bus",
+    12: "mdi:subway-variant",
     100: "mdi:train",
     101: "mdi:train",
     102: "mdi:train",
