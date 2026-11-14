@@ -186,6 +186,8 @@ ROUTE_TYPE_OPTIONS = {
     5: "Cable Tram",
     6: "Aerial Lift",
     7: "Funicular",
+    11: "Trolleybus",
+    12: "Monorail",
     100: "Railway Service",
     101: "High Speed Rail Service",
     102: "Long Distance Trains",
